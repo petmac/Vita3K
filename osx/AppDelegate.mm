@@ -8,6 +8,10 @@
 
 #import "AppDelegate.h"
 
+#include <unicorn/unicorn.h>
+
+#include <vector>
+
 @interface AppDelegate ()
 
 @end
@@ -15,11 +19,24 @@
 @implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    // Insert code here to initialize your application
+	uc_engine *uc = nullptr;
+	uc_open(UC_ARCH_ARM, UC_MODE_THUMB, &uc);
+	
+	const uint64 address = 4096;
+	std::vector<uint8_t> mapped(8192);
+	uc_mem_map(uc, address, mapped.size(), UC_PROT_ALL);
+	
+	const uint8_t expected = 123;
+	uc_mem_write(uc, address, &expected, sizeof(expected));
+	
+	uint8_t actual = 231;
+	uc_mem_read(uc, address, &actual, sizeof(actual));
+	
+	assert(actual == expected);
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
-    // Insert code here to tear down your application
+	// Insert code here to tear down your application
 }
 
 @end
