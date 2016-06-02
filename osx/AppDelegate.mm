@@ -1,5 +1,5 @@
 //
-//  AppDelegate.m
+//  AppDelegate.mm
 //  VitaEmulator
 //
 //  Created by Peter Mackay on 02/06/2016.

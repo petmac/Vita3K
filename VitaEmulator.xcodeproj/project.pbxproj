@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C121437E1D000FEE00702861 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C121437D1D000FEE00702861 /* AppDelegate.m */; };
+		C121437E1D000FEE00702861 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = C121437D1D000FEE00702861 /* AppDelegate.mm */; };
 		C12143811D000FEE00702861 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C12143801D000FEE00702861 /* main.m */; };
 		C12143841D000FEE00702861 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C12143831D000FEE00702861 /* ViewController.m */; };
 		C12143861D000FEE00702861 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C12143851D000FEE00702861 /* Assets.xcassets */; };
@@ -17,7 +17,7 @@
 /* Begin PBXFileReference section */
 		C12143791D000FEE00702861 /* VitaEmulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VitaEmulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C121437C1D000FEE00702861 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		C121437D1D000FEE00702861 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		C121437D1D000FEE00702861 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
 		C12143801D000FEE00702861 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C12143821D000FEE00702861 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		C12143831D000FEE00702861 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
@@ -57,7 +57,7 @@
 			isa = PBXGroup;
 			children = (
 				C121437C1D000FEE00702861 /* AppDelegate.h */,
-				C121437D1D000FEE00702861 /* AppDelegate.m */,
+				C121437D1D000FEE00702861 /* AppDelegate.mm */,
 				C12143851D000FEE00702861 /* Assets.xcassets */,
 				C121438A1D000FEE00702861 /* Info.plist */,
 				C12143801D000FEE00702861 /* main.m */,
@@ -139,7 +139,7 @@
 			files = (
 				C12143841D000FEE00702861 /* ViewController.m in Sources */,
 				C12143811D000FEE00702861 /* main.m in Sources */,
-				C121437E1D000FEE00702861 /* AppDelegate.m in Sources */,
+				C121437E1D000FEE00702861 /* AppDelegate.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
