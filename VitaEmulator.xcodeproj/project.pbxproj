@@ -12,7 +12,32 @@
 		C12143841D000FEE00702861 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C12143831D000FEE00702861 /* ViewController.m */; };
 		C12143861D000FEE00702861 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C12143851D000FEE00702861 /* Assets.xcassets */; };
 		C12143891D000FEE00702861 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C12143871D000FEE00702861 /* Main.storyboard */; };
+		C1855A921D015F05004539B7 /* libunicorn.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1855A911D015F05004539B7 /* libunicorn.a */; };
+		C1855A991D016320004539B7 /* libunicorn.1.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = C1855A971D016245004539B7 /* libunicorn.1.dylib */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C1855A8F1D015E0B004539B7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C12143711D000FEE00702861 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C167A8F21D00E78500AD05D5;
+			remoteInfo = Unicorn;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C1855A951D016210004539B7 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				C1855A991D016320004539B7 /* libunicorn.1.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		C12143791D000FEE00702861 /* VitaEmulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VitaEmulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -24,6 +49,8 @@
 		C12143851D000FEE00702861 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C12143881D000FEE00702861 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C121438A1D000FEE00702861 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C1855A911D015F05004539B7 /* libunicorn.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libunicorn.a; path = unicorn/libunicorn.a; sourceTree = "<group>"; };
+		C1855A971D016245004539B7 /* libunicorn.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libunicorn.1.dylib; path = unicorn/libunicorn.1.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,6 +58,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1855A921D015F05004539B7 /* libunicorn.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -41,6 +69,7 @@
 			isa = PBXGroup;
 			children = (
 				C121437B1D000FEE00702861 /* osx */,
+				C1855A931D015F21004539B7 /* Frameworks */,
 				C121437A1D000FEE00702861 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -68,7 +97,33 @@
 			path = osx;
 			sourceTree = "<group>";
 		};
+		C1855A931D015F21004539B7 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C1855A971D016245004539B7 /* libunicorn.1.dylib */,
+				C1855A911D015F05004539B7 /* libunicorn.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		C167A8F21D00E78500AD05D5 /* Unicorn */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = C167A8F51D00E78500AD05D5 /* Build configuration list for PBXLegacyTarget "Unicorn" */;
+			buildPhases = (
+			);
+			buildToolPath = make;
+			buildWorkingDirectory = "${PROJECT_DIR}/unicorn";
+			dependencies = (
+			);
+			name = Unicorn;
+			passBuildSettingsInEnvironment = 1;
+			productName = Unicorn;
+		};
+/* End PBXLegacyTarget section */
 
 /* Begin PBXNativeTarget section */
 		C12143781D000FEE00702861 /* VitaEmulator */ = {
@@ -78,10 +133,12 @@
 				C12143751D000FEE00702861 /* Sources */,
 				C12143761D000FEE00702861 /* Frameworks */,
 				C12143771D000FEE00702861 /* Resources */,
+				C1855A951D016210004539B7 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				C1855A901D015E0B004539B7 /* PBXTargetDependency */,
 			);
 			name = VitaEmulator;
 			productName = VitaEmulator;
@@ -100,6 +157,9 @@
 					C12143781D000FEE00702861 = {
 						CreatedOnToolsVersion = 7.0;
 					};
+					C167A8F21D00E78500AD05D5 = {
+						CreatedOnToolsVersion = 7.0;
+					};
 				};
 			};
 			buildConfigurationList = C12143741D000FEE00702861 /* Build configuration list for PBXProject "VitaEmulator" */;
@@ -116,6 +176,7 @@
 			projectRoot = "";
 			targets = (
 				C12143781D000FEE00702861 /* VitaEmulator */,
+				C167A8F21D00E78500AD05D5 /* Unicorn */,
 			);
 		};
 /* End PBXProject section */
@@ -144,6 +205,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C1855A901D015E0B004539B7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C167A8F21D00E78500AD05D5 /* Unicorn */;
+			targetProxy = C1855A8F1D015E0B004539B7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		C12143871D000FEE00702861 /* Main.storyboard */ = {
@@ -193,6 +262,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "${PROJECT_DIR}/unicorn/include";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -230,6 +300,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "${PROJECT_DIR}/unicorn/include";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
@@ -243,6 +314,10 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = osx/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/unicorn",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = mackay.pete.VitaEmulator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -255,8 +330,37 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = osx/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/unicorn",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = mackay.pete.VitaEmulator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		C167A8F31D00E78500AD05D5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				UNICORN_ARCHS = arm;
+			};
+			name = Debug;
+		};
+		C167A8F41D00E78500AD05D5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				UNICORN_ARCHS = arm;
 			};
 			name = Release;
 		};
@@ -277,6 +381,15 @@
 			buildConfigurations = (
 				C121438E1D000FEE00702861 /* Debug */,
 				C121438F1D000FEE00702861 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C167A8F51D00E78500AD05D5 /* Build configuration list for PBXLegacyTarget "Unicorn" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C167A8F31D00E78500AD05D5 /* Debug */,
+				C167A8F41D00E78500AD05D5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
