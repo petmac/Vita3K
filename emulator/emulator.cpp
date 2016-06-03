@@ -1,7 +1,9 @@
 #include "emulator.h"
 
 #include <elfio/elfio.hpp>
+#include <unicorn/unicorn.h>
 
+#include <assert.h>
 #include <algorithm>
 #include <iostream>
 
@@ -44,9 +46,11 @@ typedef std::vector<Segment> SegmentList;
 
 struct Module
 {
-    Address entry_point;
+    Address entry_point = 0;
     SegmentList segments;
 };
+
+static const size_t alignment = 4096;
 
 static bool load(Module *module, const char *path)
 {
@@ -68,10 +72,11 @@ static bool load(Module *module, const char *path)
         const ELFIO::segment &src = *elf.segments[segment_index];
         if (src.get_type() == PT_LOAD)
         {
+            const size_t size = ((src.get_memory_size() + (alignment - 1)) / alignment) * alignment;
             Segment dst;
             dst.address = static_cast<Address>(src.get_virtual_address());
             dst.flags = src.get_flags();
-            dst.data.resize(src.get_memory_size(), 0);
+            dst.data.resize(size, 0);
             std::copy_n(src.get_data(), src.get_file_size(), dst.data.begin());
             
             module->segments.push_back(dst);
@@ -88,6 +93,24 @@ bool emulate(const char *path)
     if (!load(&module, path))
     {
         return false;
+    }
+    
+    uc_engine *uc = nullptr;
+    uc_err err = uc_open(UC_ARCH_ARM, module.entry_point & 1 ? UC_MODE_THUMB : UC_MODE_ARM, &uc);
+    assert(err == UC_ERR_OK);
+    
+    for (Segment &segment : module.segments)
+    {
+        assert((segment.address % alignment) == 0);
+        assert((segment.data.size() % alignment) == 0);
+        err = uc_mem_map_ptr(uc, segment.address, segment.data.size(), UC_PROT_ALL, &segment.data.front());
+        assert(err == UC_ERR_OK);
+    }
+    
+    err = uc_emu_start(uc, (module.entry_point >> 1) << 1, 0, 0, 0);
+    if (err != UC_ERR_OK)
+    {
+        std::cerr << uc_strerror(err) << std::endl;
     }
     
     std::cout << "Emulation finished." << std::endl;
