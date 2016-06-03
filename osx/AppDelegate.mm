@@ -8,10 +8,7 @@
 
 #import "AppDelegate.h"
 
-#include <unicorn/unicorn.h>
-
-#include <array>
-#include <vector>
+#include "../emulator/emulator.h"
 
 @interface AppDelegate ()
 
@@ -20,27 +17,16 @@
 @implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    typedef std::array<uc_engine *, 2> Contexts;
-    Contexts ucs;
-    for (Contexts::iterator uc = ucs.begin(); uc != ucs.end(); ++uc)
-    {
-        uc_open(UC_ARCH_ARM, UC_MODE_THUMB, &*uc);
-    }
-	
-	const uint64 address = 4096;
-	std::vector<uint8_t> mapped(8192);
-    for (uc_engine *uc : ucs)
-    {
-        uc_mem_map_ptr(uc, address, mapped.size(), UC_PROT_ALL, &mapped.front());
-    }
+    NSArray<NSString *> *args = [NSProcessInfo processInfo].arguments;
     
-	const uint8_t expected = 123;
-    uc_mem_write(ucs[0], address, &expected, sizeof(expected));
-	
-	uint8_t actual = 231;
-	uc_mem_read(ucs[1], address, &actual, sizeof(actual));
-	
-	assert(actual == expected);
+    const dispatch_block_t block = ^{
+        if ((args.count < 2) || !emulate(args[1].UTF8String))
+        {
+            exit(1);
+        }
+    };
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0), dispatch_get_main_queue(), block);
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {

@@ -14,6 +14,7 @@
 		C12143891D000FEE00702861 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C12143871D000FEE00702861 /* Main.storyboard */; };
 		C1855A921D015F05004539B7 /* libunicorn.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1855A911D015F05004539B7 /* libunicorn.a */; };
 		C1855A991D016320004539B7 /* libunicorn.1.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = C1855A971D016245004539B7 /* libunicorn.1.dylib */; };
+		C1855A9D1D01ED3F004539B7 /* emulator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1855A9B1D01ED3F004539B7 /* emulator.cpp */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,8 @@
 		C121438A1D000FEE00702861 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C1855A911D015F05004539B7 /* libunicorn.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libunicorn.a; path = unicorn/libunicorn.a; sourceTree = "<group>"; };
 		C1855A971D016245004539B7 /* libunicorn.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libunicorn.1.dylib; path = unicorn/libunicorn.1.dylib; sourceTree = "<group>"; };
+		C1855A9B1D01ED3F004539B7 /* emulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = emulator.cpp; sourceTree = "<group>"; };
+		C1855A9C1D01ED3F004539B7 /* emulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = emulator.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +71,7 @@
 		C12143701D000FEE00702861 = {
 			isa = PBXGroup;
 			children = (
+				C1855A9A1D01ED1D004539B7 /* emulator */,
 				C121437B1D000FEE00702861 /* osx */,
 				C1855A931D015F21004539B7 /* Frameworks */,
 				C121437A1D000FEE00702861 /* Products */,
@@ -104,6 +108,15 @@
 				C1855A911D015F05004539B7 /* libunicorn.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C1855A9A1D01ED1D004539B7 /* emulator */ = {
+			isa = PBXGroup;
+			children = (
+				C1855A9B1D01ED3F004539B7 /* emulator.cpp */,
+				C1855A9C1D01ED3F004539B7 /* emulator.h */,
+			);
+			path = emulator;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -200,6 +213,7 @@
 			files = (
 				C12143841D000FEE00702861 /* ViewController.m in Sources */,
 				C12143811D000FEE00702861 /* main.m in Sources */,
+				C1855A9D1D01ED3F004539B7 /* emulator.cpp in Sources */,
 				C121437E1D000FEE00702861 /* AppDelegate.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -262,7 +276,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "${PROJECT_DIR}/unicorn/include";
+				HEADER_SEARCH_PATHS = (
+					"${PROJECT_DIR}/elfio",
+					"${PROJECT_DIR}/unicorn/include",
+					"${inherited}",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -300,7 +318,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "${PROJECT_DIR}/unicorn/include";
+				HEADER_SEARCH_PATHS = (
+					"${PROJECT_DIR}/elfio",
+					"${PROJECT_DIR}/unicorn/include",
+					"${inherited}",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
