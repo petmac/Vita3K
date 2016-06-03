@@ -35,14 +35,20 @@ typedef std::vector<uint8_t> Buffer;
 
 struct Segment
 {
-    Address address;
-    ELFIO::Elf_Word flags;
+    Address address = 0;
+    ELFIO::Elf_Word flags = 0;
     Buffer data;
 };
 
 typedef std::vector<Segment> SegmentList;
 
-bool emulate(const char *path)
+struct Module
+{
+    Address entry_point;
+    SegmentList segments;
+};
+
+static bool load(Module *module, const char *path)
 {
     ELFIO::elfio elf;
     if (!elf.load(path))
@@ -51,15 +57,12 @@ bool emulate(const char *path)
         return false;
     }
     
-    std::cout << "Loaded '" << path << "'." << std::endl;
-    
     const unsigned int module_info_segment_index = static_cast<unsigned int>(elf.get_entry() >> 30);
     const Address module_info_offset = elf.get_entry() & 0x3fffffff;
     const ELFIO::segment *const module_info_segment = elf.segments[module_info_segment_index];
     const ModuleInfo *const module_info = reinterpret_cast<const ModuleInfo *>(module_info_segment->get_data() + module_info_offset);
-    const Address entry_point = static_cast<Address>(module_info_segment->get_virtual_address() + module_info->mod_start);
-
-    SegmentList segments;
+    module->entry_point = static_cast<Address>(module_info_segment->get_virtual_address() + module_info->mod_start);
+    
     for (ELFIO::Elf_Half segment_index = 0; segment_index < elf.segments.size(); ++segment_index)
     {
         const ELFIO::segment &src = *elf.segments[segment_index];
@@ -71,8 +74,20 @@ bool emulate(const char *path)
             dst.data.resize(src.get_memory_size(), 0);
             std::copy_n(src.get_data(), src.get_file_size(), dst.data.begin());
             
-            segments.push_back(dst);
+            module->segments.push_back(dst);
         }
+    }
+    
+    std::cout << "Loaded '" << path << "'." << std::endl;
+    return true;
+}
+
+bool emulate(const char *path)
+{
+    Module module;
+    if (!load(&module, path))
+    {
+        return false;
     }
     
     std::cout << "Emulation finished." << std::endl;
