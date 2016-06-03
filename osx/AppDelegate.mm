@@ -24,10 +24,10 @@
 	
 	const uint64 address = 4096;
 	std::vector<uint8_t> mapped(8192);
-	uc_mem_map(uc, address, mapped.size(), UC_PROT_ALL);
+	uc_mem_map_ptr(uc, address, mapped.size(), UC_PROT_ALL, &mapped.front());
 	
 	const uint8_t expected = 123;
-	uc_mem_write(uc, address, &expected, sizeof(expected));
+    mapped.front() = expected;
 	
 	uint8_t actual = 231;
 	uc_mem_read(uc, address, &actual, sizeof(actual));
