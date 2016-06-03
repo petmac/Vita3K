@@ -10,6 +10,8 @@
 
 #include "../emulator/emulator.h"
 
+#include <iostream>
+
 @interface AppDelegate ()
 
 @end
@@ -20,10 +22,18 @@
     NSArray<NSString *> *args = [NSProcessInfo processInfo].arguments;
     
     const dispatch_block_t block = ^{
-        if ((args.count < 2) || !emulate(args[1].UTF8String))
+        if (args.count < 2)
         {
+            std::cerr << "Not enough arguments." << std::endl;
             exit(1);
         }
+        
+        if (!emulate(args[1].UTF8String))
+        {
+            exit(2);
+        }
+        
+        exit(0);
     };
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0), dispatch_get_main_queue(), block);
