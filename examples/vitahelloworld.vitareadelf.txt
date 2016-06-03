@@ -1,0 +1,337 @@
+ELF Header:
+  Class:                             0x1
+  Data:                              0x1
+  Version:                           0x1
+  OS/ABI:                            0x0
+  ABI Version:                       0x0
+  Type:                              0xFE04
+  Machine:                           0x28
+  Version:                           0x1
+  Entry point address:               0x4000AC08
+  Start of program headers:          0x34
+  Start of section headers:          0x2E9A6
+  Flags:                             0x5000402
+  Size of this header:               0x34 (bytes)
+  Size of program headers:           0x20 (bytes)
+  Number of program headers:         0x4
+  Size of section headers:           0x28 (bytes)
+  Number of section headers:         0x24
+  Section header string table index: 0x19
+
+Program Header 0:
+  Type:                              0x70000001
+  File offset:                       0x12B8C
+  Virtual address:                   0x12B8C
+  Physical address:                  0x12B8C
+  File size:                         0x8 (bytes)
+  Memory size:                       0x8 (bytes)
+  Flags:                             0x4
+  Alignment:                         0x4
+
+Program Header 1:
+  Type:                              0x1
+  File offset:                       0x8000
+  Virtual address:                   0x8000
+  Physical address:                  0x8000
+  File size:                         0xB00C (bytes)
+  Memory size:                       0xB00C (bytes)
+  Flags:                             0x5
+  Alignment:                         0x8000
+
+Program Header 2:
+  Type:                              0x1
+  File offset:                       0x18404
+  Virtual address:                   0x20000
+  Physical address:                  0x20000
+  File size:                         0x8D8 (bytes)
+  Memory size:                       0x12A20 (bytes)
+  Flags:                             0x6
+  Alignment:                         0x8000
+
+Program Header 3:
+  Type:                              0x60000000
+  File offset:                       0x2AEA2
+  Virtual address:                   0x0
+  Physical address:                  0x0
+  File size:                         0x3B04 (bytes)
+  Memory size:                       0x0 (bytes)
+  Flags:                             0x0
+  Alignment:                         0x10
+
+Segment containing sce_module_info: 1, offset: 0xAC08
+
+sce_module_info:
+  Attributes                           0x0
+  Version                              0x101
+  Name                                 vitahelloworld.elf
+  Type                                 0x0
+  gp_value                             0x0
+  export_top                           0xAC64
+  export_end                           0xAC84
+  import_top                           0xAC94
+  import_end                           0xAE9C
+  library_nid                          0x0
+  field_38                             0x0
+  field_3C                             0x0
+  field_40                             0x0
+  module_start                         0x4A5
+  module_stop                          0x0
+  exidx_top                            0x0
+  exidx_end                            0x0
+  extab_top                            0x0
+  extab_end                            0x0
+
+Exports base: 0x12C64
+Exports end: 0x12C84
+
+Read 1 exports:
+
+sce_module_exports 0 (ELF)
+  size                                 0x20
+  version                              0x0
+  flags                                0x8000
+  num_syms_funcs                       0x1
+  num_syms_vars                        0x1
+  num_syms_unk                         0x0
+  module_nid                           0x0
+  module_name_off                      0x0
+  nid_table                            0x12C84
+  entry_table                          0x12C8C
+
+    Number of NIDS: 2
+      Function NID 0: 0x935CD196
+      Variable NID 0: 0x6C2224BA
+
+Imports base: 0x12C94
+Imports end: 0x12E9C
+
+Read 10 imports:
+
+sce_module_imports 0 (SceTouch)
+  size                                 0x34
+  version                              0x1
+  flags                                0x0
+  num_syms_funcs                       0x1
+  num_syms_vars                        0x0
+  num_syms_unk                         0x0
+  reserved1                            0x0
+  module_nid                           0xE6
+  module_name_off                      0x12E9C
+  reserved2                            0x0
+  func_nid_table                       0x12F2C
+  func_entry_table                     0x12F9C
+  var_nid_table                        0x0
+  var_entry_table                      0x0
+  unk_nid_table                        0x0
+  unk_entry_table                      0x0
+
+    Number of NIDS: 1
+      Function NID 0: 0xFF082DF0
+
+sce_module_imports 1 (SceThreadmgrCoredumpTime)
+  size                                 0x34
+  version                              0x1
+  flags                                0x0
+  num_syms_funcs                       0x1
+  num_syms_vars                        0x0
+  num_syms_unk                         0x0
+  reserved1                            0x0
+  module_nid                           0xE4
+  module_name_off                      0x12EA8
+  reserved2                            0x0
+  func_nid_table                       0x12F30
+  func_entry_table                     0x12FA0
+  var_nid_table                        0x0
+  var_entry_table                      0x0
+  unk_nid_table                        0x0
+  unk_entry_table                      0x0
+
+    Number of NIDS: 1
+      Function NID 0: 0x0C8A38E1
+
+sce_module_imports 2 (SceThreadmgr)
+  size                                 0x34
+  version                              0x1
+  flags                                0x0
+  num_syms_funcs                       0x3
+  num_syms_vars                        0x0
+  num_syms_unk                         0x0
+  reserved1                            0x0
+  module_nid                           0xE2
+  module_name_off                      0x12EC4
+  reserved2                            0x0
+  func_nid_table                       0x12F34
+  func_entry_table                     0x12FA4
+  var_nid_table                        0x0
+  var_entry_table                      0x0
+  unk_nid_table                        0x0
+  unk_entry_table                      0x0
+
+    Number of NIDS: 3
+      Function NID 0: 0x9DCB4B7A
+      Function NID 1: 0x1D17DECF
+      Function NID 2: 0x1A372EC8
+
+sce_module_imports 3 (SceSysmem)
+  size                                 0x34
+  version                              0x1
+  flags                                0x0
+  num_syms_funcs                       0x2
+  num_syms_vars                        0x0
+  num_syms_unk                         0x0
+  reserved1                            0x0
+  module_nid                           0xDC
+  module_name_off                      0x12ED4
+  reserved2                            0x0
+  func_nid_table                       0x12F40
+  func_entry_table                     0x12FB0
+  var_nid_table                        0x0
+  var_entry_table                      0x0
+  unk_nid_table                        0x0
+  unk_entry_table                      0x0
+
+    Number of NIDS: 2
+      Function NID 0: 0xB9D5EBDE
+      Function NID 1: 0xB8EF5818
+
+sce_module_imports 4 (SceLibKernel)
+  size                                 0x34
+  version                              0x1
+  flags                                0x0
+  num_syms_funcs                       0xA
+  num_syms_vars                        0x0
+  num_syms_unk                         0x0
+  reserved1                            0x0
+  module_nid                           0x52
+  module_name_off                      0x12EE0
+  reserved2                            0x0
+  func_nid_table                       0x12F48
+  func_entry_table                     0x12FB8
+  var_nid_table                        0x0
+  var_entry_table                      0x0
+  unk_nid_table                        0x0
+  unk_entry_table                      0x0
+
+    Number of NIDS: 10
+      Function NID 0: 0xED53334A
+      Function NID 1: 0xDA6EC8EF
+      Function NID 2: 0xB295EB61
+      Function NID 3: 0xB110C123
+      Function NID 4: 0x7595D9AA
+      Function NID 5: 0x6C60AC61
+      Function NID 6: 0x46E7BE7B
+      Function NID 7: 0x1D8D7945
+      Function NID 8: 0x120AFC8C
+      Function NID 9: 0x0FB972F9
+
+sce_module_imports 5 (SceIofilemgr)
+  size                                 0x34
+  version                              0x1
+  flags                                0x0
+  num_syms_funcs                       0x4
+  num_syms_vars                        0x0
+  num_syms_unk                         0x0
+  reserved1                            0x0
+  module_nid                           0x4C
+  module_name_off                      0x12EF0
+  reserved2                            0x0
+  func_nid_table                       0x12F70
+  func_entry_table                     0x12FE0
+  var_nid_table                        0x0
+  var_entry_table                      0x0
+  unk_nid_table                        0x0
+  unk_entry_table                      0x0
+
+    Number of NIDS: 4
+      Function NID 0: 0xFDB32293
+      Function NID 1: 0xC70B8886
+      Function NID 2: 0x49252B9B
+      Function NID 3: 0x34EFD876
+
+sce_module_imports 6 (SceGxm)
+  size                                 0x34
+  version                              0x1
+  flags                                0x0
+  num_syms_funcs                       0x4
+  num_syms_vars                        0x0
+  num_syms_unk                         0x0
+  reserved1                            0x0
+  module_nid                           0x40
+  module_name_off                      0x12F00
+  reserved2                            0x0
+  func_nid_table                       0x12F80
+  func_entry_table                     0x12FF0
+  var_nid_table                        0x0
+  var_entry_table                      0x0
+  unk_nid_table                        0x0
+  unk_entry_table                      0x0
+
+    Number of NIDS: 4
+      Function NID 0: 0xC61E34FC
+      Function NID 1: 0xB627DE66
+      Function NID 2: 0xB0F1E4EC
+      Function NID 3: 0x828C68E8
+
+sce_module_imports 7 (SceDisplayUser)
+  size                                 0x34
+  version                              0x1
+  flags                                0x0
+  num_syms_funcs                       0x1
+  num_syms_vars                        0x0
+  num_syms_unk                         0x0
+  reserved1                            0x0
+  module_nid                           0x34
+  module_name_off                      0x12F08
+  reserved2                            0x0
+  func_nid_table                       0x12F90
+  func_entry_table                     0x13000
+  var_nid_table                        0x0
+  var_entry_table                      0x0
+  unk_nid_table                        0x0
+  unk_entry_table                      0x0
+
+    Number of NIDS: 1
+      Function NID 0: 0x7A410B64
+
+sce_module_imports 8 (SceDisplay)
+  size                                 0x34
+  version                              0x1
+  flags                                0x0
+  num_syms_funcs                       0x1
+  num_syms_vars                        0x0
+  num_syms_unk                         0x0
+  reserved1                            0x0
+  module_nid                           0x32
+  module_name_off                      0x12F18
+  reserved2                            0x0
+  func_nid_table                       0x12F94
+  func_entry_table                     0x13004
+  var_nid_table                        0x0
+  var_entry_table                      0x0
+  unk_nid_table                        0x0
+  unk_entry_table                      0x0
+
+    Number of NIDS: 1
+      Function NID 0: 0x5795E898
+
+sce_module_imports 9 (SceCtrl)
+  size                                 0x34
+  version                              0x1
+  flags                                0x0
+  num_syms_funcs                       0x1
+  num_syms_vars                        0x0
+  num_syms_unk                         0x0
+  reserved1                            0x0
+  module_nid                           0x24
+  module_name_off                      0x12F24
+  reserved2                            0x0
+  func_nid_table                       0x12F98
+  func_entry_table                     0x13008
+  var_nid_table                        0x0
+  var_entry_table                      0x0
+  unk_nid_table                        0x0
+  unk_entry_table                      0x0
+
+    Number of NIDS: 1
+      Function NID 0: 0xA9C3CED6
+
