@@ -15,6 +15,7 @@
 		C1855A921D015F05004539B7 /* libunicorn.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1855A911D015F05004539B7 /* libunicorn.a */; };
 		C1855A991D016320004539B7 /* libunicorn.1.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = C1855A971D016245004539B7 /* libunicorn.1.dylib */; };
 		C1855A9D1D01ED3F004539B7 /* emulator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1855A9B1D01ED3F004539B7 /* emulator.cpp */; settings = {ASSET_TAGS = (); }; };
+		C1AD18EF1D07869800064A1F /* libcapstone.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1AD18EE1D07869800064A1F /* libcapstone.a */; };
 		C1B4A0451D02FFFC00F53D2C /* mem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1B4A0431D02FFFC00F53D2C /* mem.cpp */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
@@ -25,6 +26,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = C167A8F21D00E78500AD05D5;
 			remoteInfo = Unicorn;
+		};
+		C1AD18EC1D07867F00064A1F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C12143711D000FEE00702861 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C1AD18E81D07809D00064A1F;
+			remoteInfo = Capstone;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -55,6 +63,7 @@
 		C1855A971D016245004539B7 /* libunicorn.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libunicorn.1.dylib; path = unicorn/libunicorn.1.dylib; sourceTree = "<group>"; };
 		C1855A9B1D01ED3F004539B7 /* emulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = emulator.cpp; sourceTree = "<group>"; };
 		C1855A9C1D01ED3F004539B7 /* emulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = emulator.h; sourceTree = "<group>"; };
+		C1AD18EE1D07869800064A1F /* libcapstone.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcapstone.a; path = capstone/libcapstone.a; sourceTree = "<group>"; };
 		C1B4A0431D02FFFC00F53D2C /* mem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mem.cpp; sourceTree = "<group>"; };
 		C1B4A0441D02FFFC00F53D2C /* mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mem.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -64,6 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1AD18EF1D07869800064A1F /* libcapstone.a in Frameworks */,
 				C1855A921D015F05004539B7 /* libunicorn.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -107,6 +117,7 @@
 		C1855A931D015F21004539B7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C1AD18EE1D07869800064A1F /* libcapstone.a */,
 				C1855A971D016245004539B7 /* libunicorn.1.dylib */,
 				C1855A911D015F05004539B7 /* libunicorn.a */,
 			);
@@ -141,6 +152,20 @@
 			passBuildSettingsInEnvironment = 1;
 			productName = Unicorn;
 		};
+		C1AD18E81D07809D00064A1F /* Capstone */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = C1AD18E91D07809D00064A1F /* Build configuration list for PBXLegacyTarget "Capstone" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "${PROJECT_DIR}/capstone";
+			dependencies = (
+			);
+			name = Capstone;
+			passBuildSettingsInEnvironment = 1;
+			productName = Capstone;
+		};
 /* End PBXLegacyTarget section */
 
 /* Begin PBXNativeTarget section */
@@ -156,6 +181,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				C1AD18ED1D07867F00064A1F /* PBXTargetDependency */,
 				C1855A901D015E0B004539B7 /* PBXTargetDependency */,
 			);
 			name = VitaEmulator;
@@ -178,6 +204,9 @@
 					C167A8F21D00E78500AD05D5 = {
 						CreatedOnToolsVersion = 7.0;
 					};
+					C1AD18E81D07809D00064A1F = {
+						CreatedOnToolsVersion = 7.0;
+					};
 				};
 			};
 			buildConfigurationList = C12143741D000FEE00702861 /* Build configuration list for PBXProject "VitaEmulator" */;
@@ -195,6 +224,7 @@
 			targets = (
 				C12143781D000FEE00702861 /* VitaEmulator */,
 				C167A8F21D00E78500AD05D5 /* Unicorn */,
+				C1AD18E81D07809D00064A1F /* Capstone */,
 			);
 		};
 /* End PBXProject section */
@@ -231,6 +261,11 @@
 			isa = PBXTargetDependency;
 			target = C167A8F21D00E78500AD05D5 /* Unicorn */;
 			targetProxy = C1855A8F1D015E0B004539B7 /* PBXContainerItemProxy */;
+		};
+		C1AD18ED1D07867F00064A1F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C1AD18E81D07809D00064A1F /* Capstone */;
+			targetProxy = C1AD18EC1D07867F00064A1F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -283,6 +318,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
+					"${PROJECT_DIR}/capstone/include",
 					"${PROJECT_DIR}/elfio",
 					"${PROJECT_DIR}/unicorn/include",
 					"${inherited}",
@@ -325,6 +361,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
+					"${PROJECT_DIR}/capstone/include",
 					"${PROJECT_DIR}/elfio",
 					"${PROJECT_DIR}/unicorn/include",
 					"${inherited}",
@@ -345,6 +382,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/unicorn",
+					"$(PROJECT_DIR)/capstone",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = mackay.pete.VitaEmulator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -361,6 +399,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/unicorn",
+					"$(PROJECT_DIR)/capstone",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = mackay.pete.VitaEmulator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -396,6 +435,37 @@
 			};
 			name = Release;
 		};
+		C1AD18EA1D07809D00064A1F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CAPSTONE_ARCHS = arm;
+				CAPSTONE_BUILD_CORE_ONLY = yes;
+				CAPSTONE_SHARED = no;
+				CAPSTONE_STATIC = yes;
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		C1AD18EB1D07809D00064A1F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CAPSTONE_ARCHS = arm;
+				CAPSTONE_BUILD_CORE_ONLY = yes;
+				CAPSTONE_SHARED = no;
+				CAPSTONE_STATIC = yes;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -425,6 +495,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		C1AD18E91D07809D00064A1F /* Build configuration list for PBXLegacyTarget "Capstone" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C1AD18EA1D07809D00064A1F /* Debug */,
+				C1AD18EB1D07809D00064A1F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
