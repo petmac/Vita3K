@@ -111,14 +111,14 @@ static bool run_thread(MemState *mem, Address entry_point)
     assert(err == UC_ERR_OK);
     
     err = uc_emu_start(uc, (entry_point >> 1) << 1, 0, 0, 0);
-    assert(err == UC_ERR_OK);
     if (err != UC_ERR_OK)
     {
+        std::cerr << "Emulation failed:" << std::endl;
         std::cerr << uc_strerror(err) << std::endl;
         return false;
     }
     
-    std::cout << "Emulation finished." << std::endl;
+    std::cout << "Emulation succeeded." << std::endl;
     return true;
 }
 
