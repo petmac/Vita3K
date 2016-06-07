@@ -378,6 +378,7 @@
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				UNICORN_ARCHS = arm;
+				UNICORN_BUILD_CORE_ONLY = yes;
 				UNICORN_DEBUG = yes;
 			};
 			name = Debug;
@@ -390,6 +391,7 @@
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				UNICORN_ARCHS = arm;
+				UNICORN_BUILD_CORE_ONLY = yes;
 				UNICORN_DEBUG = no;
 			};
 			name = Release;
