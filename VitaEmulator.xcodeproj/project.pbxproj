@@ -15,6 +15,7 @@
 		C1855A921D015F05004539B7 /* libunicorn.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1855A911D015F05004539B7 /* libunicorn.a */; };
 		C1855A991D016320004539B7 /* libunicorn.1.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = C1855A971D016245004539B7 /* libunicorn.1.dylib */; };
 		C1855A9D1D01ED3F004539B7 /* emulator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1855A9B1D01ED3F004539B7 /* emulator.cpp */; settings = {ASSET_TAGS = (); }; };
+		C1B4A0451D02FFFC00F53D2C /* mem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1B4A0431D02FFFC00F53D2C /* mem.cpp */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +55,8 @@
 		C1855A971D016245004539B7 /* libunicorn.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libunicorn.1.dylib; path = unicorn/libunicorn.1.dylib; sourceTree = "<group>"; };
 		C1855A9B1D01ED3F004539B7 /* emulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = emulator.cpp; sourceTree = "<group>"; };
 		C1855A9C1D01ED3F004539B7 /* emulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = emulator.h; sourceTree = "<group>"; };
+		C1B4A0431D02FFFC00F53D2C /* mem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mem.cpp; sourceTree = "<group>"; };
+		C1B4A0441D02FFFC00F53D2C /* mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mem.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +118,8 @@
 			children = (
 				C1855A9B1D01ED3F004539B7 /* emulator.cpp */,
 				C1855A9C1D01ED3F004539B7 /* emulator.h */,
+				C1B4A0431D02FFFC00F53D2C /* mem.cpp */,
+				C1B4A0441D02FFFC00F53D2C /* mem.h */,
 			);
 			path = emulator;
 			sourceTree = "<group>";
@@ -214,6 +219,7 @@
 				C12143841D000FEE00702861 /* ViewController.m in Sources */,
 				C12143811D000FEE00702861 /* main.m in Sources */,
 				C1855A9D1D01ED3F004539B7 /* emulator.cpp in Sources */,
+				C1B4A0451D02FFFC00F53D2C /* mem.cpp in Sources */,
 				C121437E1D000FEE00702861 /* AppDelegate.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

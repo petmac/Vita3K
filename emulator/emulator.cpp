@@ -1,10 +1,11 @@
 #include "emulator.h"
 
+#include "mem.h"
+
 #include <elfio/elfio.hpp>
 #include <unicorn/unicorn.h>
 
 #include <assert.h>
-#include <algorithm>
 #include <iostream>
 
 // From UVLoader
@@ -32,14 +33,10 @@ struct ModuleInfo // thanks roxfan
     uint32_t extab_end; //
 };
 
-typedef uint32_t Address;
-typedef std::vector<uint8_t> Buffer;
-
 struct Segment
 {
     Address address = 0;
-    ELFIO::Elf_Word flags = 0;
-    Buffer data;
+    size_t size = 0;
 };
 
 typedef std::vector<Segment> SegmentList;
@@ -50,9 +47,17 @@ struct Module
     SegmentList segments;
 };
 
-static const size_t alignment = 4096;
+struct EmulatorState
+{
+    MemState mem;
+};
 
-static bool load(Module *module, const char *path)
+static bool init(EmulatorState *state)
+{
+    return init(&state->mem);
+}
+
+static bool load(Module *module, MemState *mem, const char *path)
 {
     ELFIO::elfio elf;
     if (!elf.load(path))
@@ -72,12 +77,14 @@ static bool load(Module *module, const char *path)
         const ELFIO::segment &src = *elf.segments[segment_index];
         if (src.get_type() == PT_LOAD)
         {
-            const size_t size = ((src.get_memory_size() + (alignment - 1)) / alignment) * alignment;
+            assert((src.get_virtual_address() % mem->page_size) == 0);
+            
             Segment dst;
             dst.address = static_cast<Address>(src.get_virtual_address());
-            dst.flags = src.get_flags();
-            dst.data.resize(size, 0);
-            std::copy_n(src.get_data(), src.get_file_size(), dst.data.begin());
+            dst.size = ((src.get_memory_size() + (mem->page_size - 1)) / mem->page_size) * mem->page_size;
+            
+            reserve(mem, dst.address, dst.size);
+            std::copy_n(src.get_data(), src.get_file_size(), &mem->memory[dst.address]);
             
             module->segments.push_back(dst);
         }
@@ -87,33 +94,47 @@ static bool load(Module *module, const char *path)
     return true;
 }
 
+static bool run_thread(MemState *mem, Address entry_point)
+{
+    uc_engine *uc = nullptr;
+    uc_err err = uc_open(UC_ARCH_ARM, entry_point & 1 ? UC_MODE_THUMB : UC_MODE_ARM, &uc);
+    assert(err == UC_ERR_OK);
+    
+    const size_t stack_size = MB(1);
+    const Address stack_bottom = alloc(mem, stack_size);
+    const Address stack_top = stack_bottom + stack_size;
+    
+    err = uc_reg_write(uc, UC_ARM_REG_SP, &stack_top);
+    assert(err == UC_ERR_OK);
+    
+    err = uc_mem_map_ptr(uc, 0, GB(4), UC_PROT_ALL, &mem->memory[0]);
+    assert(err == UC_ERR_OK);
+    
+    err = uc_emu_start(uc, (entry_point >> 1) << 1, 0, 0, 0);
+    assert(err == UC_ERR_OK);
+    if (err != UC_ERR_OK)
+    {
+        std::cerr << uc_strerror(err) << std::endl;
+        return false;
+    }
+    
+    std::cout << "Emulation finished." << std::endl;
+    return true;
+}
+
 bool emulate(const char *path)
 {
-    Module module;
-    if (!load(&module, path))
+    EmulatorState state;
+    if (!init(&state))
     {
         return false;
     }
     
-    uc_engine *uc = nullptr;
-    uc_err err = uc_open(UC_ARCH_ARM, module.entry_point & 1 ? UC_MODE_THUMB : UC_MODE_ARM, &uc);
-    assert(err == UC_ERR_OK);
-    
-    for (Segment &segment : module.segments)
+    Module module;
+    if (!load(&module, &state.mem, path))
     {
-        assert((segment.address % alignment) == 0);
-        assert((segment.data.size() % alignment) == 0);
-        err = uc_mem_map_ptr(uc, segment.address, segment.data.size(), UC_PROT_ALL, &segment.data.front());
-        assert(err == UC_ERR_OK);
+        return false;
     }
     
-    err = uc_emu_start(uc, (module.entry_point >> 1) << 1, 0, 0, 0);
-    if (err != UC_ERR_OK)
-    {
-        std::cerr << uc_strerror(err) << std::endl;
-    }
-    
-    std::cout << "Emulation finished." << std::endl;
-    
-    return true;
+    return run_thread(&state.mem, module.entry_point);
 }
