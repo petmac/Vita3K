@@ -4,3 +4,6 @@
 [submodule "elfio"]
 	path = elfio
 	url = https://github.com/serge1/ELFIO.git
+[submodule "capstone"]
+	path = capstone
+	url = https://github.com/aquynh/capstone.git
