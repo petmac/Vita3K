@@ -94,10 +94,19 @@ static bool load(Module *module, MemState *mem, const char *path)
     return true;
 }
 
+static void code_hook(uc_engine *uc, uint64_t address, uint32_t size, void *user_data)
+{
+    std::cout << "0x" << std::hex << address << std::dec << std::endl;
+}
+
 static bool run_thread(MemState *mem, Address entry_point)
 {
     uc_engine *uc = nullptr;
     uc_err err = uc_open(UC_ARCH_ARM, entry_point & 1 ? UC_MODE_THUMB : UC_MODE_ARM, &uc);
+    assert(err == UC_ERR_OK);
+    
+    uc_hook hh = 0;
+    err = uc_hook_add(uc, &hh, UC_HOOK_CODE, (void *)&code_hook, nullptr, 1, 0);
     assert(err == UC_ERR_OK);
     
     const size_t stack_size = MB(1);
