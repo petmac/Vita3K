@@ -1,11 +1,13 @@
 #include "emulator.h"
 
+#include "disasm.h"
 #include "mem.h"
 
 #include <elfio/elfio.hpp>
 #include <unicorn/unicorn.h>
 
 #include <assert.h>
+#include <iomanip>
 #include <iostream>
 
 // From UVLoader
@@ -49,12 +51,13 @@ struct Module
 
 struct EmulatorState
 {
+    DisasmState disasm;
     MemState mem;
 };
 
 static bool init(EmulatorState *state)
 {
-    return init(&state->mem);
+    return init(&state->disasm) && init(&state->mem);
 }
 
 static bool load(Module *module, MemState *mem, const char *path)
@@ -96,27 +99,30 @@ static bool load(Module *module, MemState *mem, const char *path)
 
 static void code_hook(uc_engine *uc, uint64_t address, uint32_t size, void *user_data)
 {
-    std::cout << "0x" << std::hex << address << std::dec << std::endl;
+    EmulatorState *const state = static_cast<EmulatorState *>(user_data);
+    const void *const code = &state->mem.memory[address];
+    const std::string disassembly = disassemble(&state->disasm, code, size, address);
+    std::cout << std::hex << std::setw(8) << address << std::dec << " " << disassembly << std::endl;
 }
 
-static bool run_thread(MemState *mem, Address entry_point)
+static bool run_thread(EmulatorState *state, Address entry_point)
 {
     uc_engine *uc = nullptr;
     uc_err err = uc_open(UC_ARCH_ARM, entry_point & 1 ? UC_MODE_THUMB : UC_MODE_ARM, &uc);
     assert(err == UC_ERR_OK);
     
     uc_hook hh = 0;
-    err = uc_hook_add(uc, &hh, UC_HOOK_CODE, (void *)&code_hook, nullptr, 1, 0);
+    err = uc_hook_add(uc, &hh, UC_HOOK_CODE, (void *)&code_hook, state, 1, 0);
     assert(err == UC_ERR_OK);
     
     const size_t stack_size = MB(1);
-    const Address stack_bottom = alloc(mem, stack_size);
+    const Address stack_bottom = alloc(&state->mem, stack_size);
     const Address stack_top = stack_bottom + stack_size;
     
     err = uc_reg_write(uc, UC_ARM_REG_SP, &stack_top);
     assert(err == UC_ERR_OK);
     
-    err = uc_mem_map_ptr(uc, 0, GB(4), UC_PROT_ALL, &mem->memory[0]);
+    err = uc_mem_map_ptr(uc, 0, GB(4), UC_PROT_ALL, &state->mem.memory[0]);
     assert(err == UC_ERR_OK);
     
     err = uc_emu_start(uc, (entry_point >> 1) << 1, 0, 0, 0);
@@ -145,5 +151,5 @@ bool emulate(const char *path)
         return false;
     }
     
-    return run_thread(&state.mem, module.entry_point);
+    return run_thread(&state, module.entry_point);
 }
