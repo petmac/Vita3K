@@ -130,6 +130,10 @@ static bool run_thread(EmulatorState *state, Address entry_point)
     {
         std::cerr << "Emulation failed:" << std::endl;
         std::cerr << uc_strerror(err) << std::endl;
+        uint64_t pc = 0;
+        uc_reg_read(uc, UC_ARM_REG_PC, &pc);
+        std::cerr << "PC = " << std::hex << pc << std::dec << std::endl;
+        
         return false;
     }
     
