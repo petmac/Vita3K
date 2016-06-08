@@ -100,7 +100,7 @@ static bool load(Module *module, MemState *mem, const char *path)
 static void code_hook(uc_engine *uc, uint64_t address, uint32_t size, void *user_data)
 {
     EmulatorState *const state = static_cast<EmulatorState *>(user_data);
-    const void *const code = &state->mem.memory[address];
+    const uint8_t *const code = &state->mem.memory[address];
     const std::string disassembly = disassemble(&state->disasm, code, size, address);
     std::cout << std::hex << std::setw(8) << address << std::dec << " " << disassembly << std::endl;
 }

@@ -31,11 +31,9 @@ bool init(DisasmState *state)
     return true;
 }
 
-std::string disassemble(DisasmState *state, const void *code, size_t size, uint32_t address)
+std::string disassemble(DisasmState *state, const uint8_t *code, size_t size, uint64_t address)
 {
-    const uint8_t *code_copy = static_cast<const uint8_t *>(code);
-    uint64_t address_copy = address;
-    const bool success = cs_disasm_iter(state->csh, &code_copy, &size, &address_copy, state->insn.get());
+    const bool success = cs_disasm_iter(state->csh, &code, &size, &address, state->insn.get());
     
     std::ostringstream out;
     out << state->insn->mnemonic << " " << state->insn->op_str;
