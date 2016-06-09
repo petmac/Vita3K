@@ -101,7 +101,8 @@ static void code_hook(uc_engine *uc, uint64_t address, uint32_t size, void *user
 {
     EmulatorState *const state = static_cast<EmulatorState *>(user_data);
     const uint8_t *const code = &state->mem.memory[address];
-    const std::string disassembly = disassemble(&state->disasm, code, size, address);
+    const size_t buffer_size = GB(4) - address;
+    const std::string disassembly = disassemble(&state->disasm, code, buffer_size, address);
     std::cout << std::hex << std::setw(8) << address << std::dec << " " << disassembly << std::endl;
 }
 
