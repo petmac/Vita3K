@@ -1,6 +1,6 @@
 [submodule "unicorn"]
 	path = unicorn
-	url = https://github.com/unicorn-engine/unicorn.git
+	url = https://github.com/petmac/unicorn.git
 [submodule "elfio"]
 	path = elfio
 	url = https://github.com/serge1/ELFIO.git
