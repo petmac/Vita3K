@@ -144,6 +144,16 @@ static void code_hook(uc_engine *uc, uint64_t address, uint32_t size, void *user
     std::cout << std::hex << std::setw(8) << address << std::dec << " " << disassembly << std::endl;
 }
 
+static void read_hook(uc_engine *uc, uc_mem_type type, uint64_t address, int size, int64_t value, void *user_data)
+{
+    std::cout << "READ " << size << " bytes from " << std::hex << address << std::dec << std::endl;
+}
+
+static void write_hook(uc_engine *uc, uc_mem_type type, uint64_t address, int size, int64_t value, void *user_data)
+{
+    std::cout << "WRITE " << size << " bytes to " << std::hex << address << ", value " << value << std::dec << std::endl;
+}
+
 static bool run_thread(EmulatorState *state, Address entry_point)
 {
     const bool thumb = entry_point & 1;
@@ -153,6 +163,12 @@ static bool run_thread(EmulatorState *state, Address entry_point)
     
     uc_hook hh = 0;
     err = uc_hook_add(uc, &hh, UC_HOOK_CODE, (void *)&code_hook, state, 1, 0);
+    assert(err == UC_ERR_OK);
+    
+    err = uc_hook_add(uc, &hh, UC_HOOK_MEM_READ, (void *)&read_hook, state, 1, 0);
+    assert(err == UC_ERR_OK);
+    
+    err = uc_hook_add(uc, &hh, UC_HOOK_MEM_WRITE, (void *)&write_hook, state, 1, 0);
     assert(err == UC_ERR_OK);
     
     const size_t stack_size = MB(1);
