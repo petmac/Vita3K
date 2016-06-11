@@ -137,10 +137,15 @@ static bool load(Module *module, MemState *mem, const char *path)
 
 static void code_hook(uc_engine *uc, uint64_t address, uint32_t size, void *user_data)
 {
+    size_t mode;
+    const uc_err err = uc_query(uc, UC_QUERY_MODE, &mode);
+    assert(err == UC_ERR_OK);
+    
     EmulatorState *const state = static_cast<EmulatorState *>(user_data);
     const uint8_t *const code = &state->mem.memory[address];
     const size_t buffer_size = GB(4) - address;
-    const std::string disassembly = disassemble(&state->disasm, code, buffer_size, address);
+    const bool thumb = mode & UC_MODE_THUMB;
+    const std::string disassembly = disassemble(&state->disasm, code, buffer_size, address, thumb);
     std::cout << std::hex << std::setw(8) << address << std::dec << " " << disassembly << std::endl;
 }
 
