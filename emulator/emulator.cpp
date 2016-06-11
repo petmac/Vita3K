@@ -55,6 +55,44 @@ struct EmulatorState
     MemState mem;
 };
 
+// Copied from
+// http://processors.wiki.ti.com/index.php/Cortex-A8#How_to_enable_NEON
+//
+// Converted to hex using
+// http://armconverter.com/
+//
+// MRC p15, #0, r1, c1, c0, #2
+// ORR r1, r1, #(0xf << 20)
+// MCR p15, #0, r1, c1, c0, #2
+// MOV r1, #0
+// MCR p15, #0, r1, c7, c5, #4
+// MOV r0,#0x40000000
+// FMXR FPEXC, r0 ; FPEXC = r0
+
+// ARM GDB/LLDB
+static const uint32_t bootstrap_arm[] =
+{
+    0xEE111F50,
+    0xE381160F,
+    0xEE011F50,
+    0xE3A01000,
+    0xEE071F95,
+    0xE3A00101,
+    0xEEE80A10
+};
+
+// Thumb-2 GDB/LLDB
+static const uint32_t bootstrap_thumb[] =
+{
+    0x1F50EE11,
+    0x0170F441,
+    0x1F50EE01,
+    0x0100F04F,
+    0x1F95EE07,
+    0x4080F04F,
+    0x0A10EEE8
+};
+
 static bool init(EmulatorState *state)
 {
     return init(&state->disasm) && init(&state->mem);
@@ -108,8 +146,9 @@ static void code_hook(uc_engine *uc, uint64_t address, uint32_t size, void *user
 
 static bool run_thread(EmulatorState *state, Address entry_point)
 {
+    const bool thumb = entry_point & 1;
     uc_engine *uc = nullptr;
-    uc_err err = uc_open(UC_ARCH_ARM, entry_point & 1 ? UC_MODE_THUMB : UC_MODE_ARM, &uc);
+    uc_err err = uc_open(UC_ARCH_ARM, thumb ? UC_MODE_THUMB : UC_MODE_ARM, &uc);
     assert(err == UC_ERR_OK);
     
     uc_hook hh = 0;
@@ -123,7 +162,15 @@ static bool run_thread(EmulatorState *state, Address entry_point)
     err = uc_reg_write(uc, UC_ARM_REG_SP, &stack_top);
     assert(err == UC_ERR_OK);
     
+    const size_t bootstrap_size = sizeof(thumb ? bootstrap_thumb : bootstrap_arm);
+    const Address bootstrap_address = alloc(&state->mem, bootstrap_size);
+    const void *const bootstrap = thumb ? bootstrap_thumb : bootstrap_arm;
+    memcpy(&state->mem.memory[bootstrap_address], bootstrap, bootstrap_size);
+    
     err = uc_mem_map_ptr(uc, 0, GB(4), UC_PROT_ALL, &state->mem.memory[0]);
+    assert(err == UC_ERR_OK);
+    
+    err = uc_emu_start(uc, bootstrap_address, bootstrap_address + bootstrap_size, 0, 0);
     assert(err == UC_ERR_OK);
     
     err = uc_emu_start(uc, (entry_point >> 1) << 1, 0, 0, 0);
@@ -137,6 +184,8 @@ static bool run_thread(EmulatorState *state, Address entry_point)
         
         return false;
     }
+    
+    // TODO Free bootstrap and stack.
     
     std::cout << "Emulation succeeded." << std::endl;
     return true;
