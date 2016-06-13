@@ -64,6 +64,12 @@
 		C173D8951D0E92A4001F9EF7 /* module.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = module.cpp; sourceTree = "<group>"; };
 		C173D8961D0E92A4001F9EF7 /* module.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = module.h; sourceTree = "<group>"; };
 		C173D8981D0E92F3001F9EF7 /* types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
+		C173D89E1D0F256F001F9EF7 /* NES4Vita.readelf.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NES4Vita.readelf.txt; sourceTree = "<group>"; };
+		C173D89F1D0F256F001F9EF7 /* NES4Vita.vitareadelf.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NES4Vita.vitareadelf.txt; sourceTree = "<group>"; };
+		C173D8A01D0F256F001F9EF7 /* vitahelloworld.readelf.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vitahelloworld.readelf.txt; sourceTree = "<group>"; };
+		C173D8A21D0F256F001F9EF7 /* vitahelloworld.vitareadelf.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vitahelloworld.vitareadelf.txt; sourceTree = "<group>"; };
+		C173D8A31D0F256F001F9EF7 /* VitaScreenFlasher.readelf.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = VitaScreenFlasher.readelf.txt; sourceTree = "<group>"; };
+		C173D8A51D0F256F001F9EF7 /* VitaScreenFlasher.vitareadelf.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = VitaScreenFlasher.vitareadelf.txt; sourceTree = "<group>"; };
 		C1855A911D015F05004539B7 /* libunicorn.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libunicorn.a; path = unicorn/libunicorn.a; sourceTree = "<group>"; };
 		C1855A971D016245004539B7 /* libunicorn.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libunicorn.1.dylib; path = unicorn/libunicorn.1.dylib; sourceTree = "<group>"; };
 		C1855A9B1D01ED3F004539B7 /* emulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = emulator.cpp; sourceTree = "<group>"; };
@@ -92,6 +98,7 @@
 			isa = PBXGroup;
 			children = (
 				C1855A9A1D01ED1D004539B7 /* emulator */,
+				C173D89C1D0F256F001F9EF7 /* examples */,
 				C121437B1D000FEE00702861 /* osx */,
 				C1855A931D015F21004539B7 /* Frameworks */,
 				C121437A1D000FEE00702861 /* Products */,
@@ -119,6 +126,19 @@
 				C12143831D000FEE00702861 /* ViewController.m */,
 			);
 			path = osx;
+			sourceTree = "<group>";
+		};
+		C173D89C1D0F256F001F9EF7 /* examples */ = {
+			isa = PBXGroup;
+			children = (
+				C173D89E1D0F256F001F9EF7 /* NES4Vita.readelf.txt */,
+				C173D89F1D0F256F001F9EF7 /* NES4Vita.vitareadelf.txt */,
+				C173D8A01D0F256F001F9EF7 /* vitahelloworld.readelf.txt */,
+				C173D8A21D0F256F001F9EF7 /* vitahelloworld.vitareadelf.txt */,
+				C173D8A31D0F256F001F9EF7 /* VitaScreenFlasher.readelf.txt */,
+				C173D8A51D0F256F001F9EF7 /* VitaScreenFlasher.vitareadelf.txt */,
+			);
+			path = examples;
 			sourceTree = "<group>";
 		};
 		C1855A931D015F21004539B7 /* Frameworks */ = {
