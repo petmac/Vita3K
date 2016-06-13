@@ -1,10 +1,11 @@
 #pragma once
 
+#include "types.h"
+
 #include <functional>
 #include <memory>
 #include <vector>
 
-typedef uint32_t Address;
 typedef std::unique_ptr<uint8_t[], std::function<void(uint8_t *)>> Memory;
 typedef std::vector<size_t> Allocated;
 
