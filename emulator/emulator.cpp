@@ -107,6 +107,7 @@ static bool run_thread(EmulatorState *state, Address entry_point)
     const size_t stack_size = MB(1);
     const Address stack_bottom = alloc(&state->mem, stack_size);
     const Address stack_top = stack_bottom + stack_size;
+    memset(&state->mem.memory[stack_bottom], 0xcc, stack_size);
     
     err = uc_reg_write(uc, UC_ARM_REG_SP, &stack_top);
     assert(err == UC_ERR_OK);
