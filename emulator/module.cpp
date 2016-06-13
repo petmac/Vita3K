@@ -58,7 +58,7 @@ bool load(Module *module, MemState *mem, const char *path)
             dst.address = static_cast<Address>(src.get_virtual_address());
             dst.size = ((src.get_memory_size() + (mem->page_size - 1)) / mem->page_size) * mem->page_size;
             
-            reserve(mem, dst.address, dst.size);
+            reserve(mem, dst.address, dst.size, "segment");
             std::copy_n(src.get_data(), src.get_file_size(), &mem->memory[dst.address]);
             
             module->segments.push_back(dst);

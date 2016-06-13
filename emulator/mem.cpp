@@ -16,12 +16,15 @@ static void delete_memory(uint8_t *memory)
     }
 }
 
-static void alloc_inner(MemState *state, size_t address, size_t page_count, Allocated::iterator block)
+static void alloc_inner(MemState *state, size_t address, size_t page_count, Allocated::iterator block, const char *name)
 {
     uint8_t *const memory = &state->memory[address];
     const size_t aligned_size = page_count * state->page_size;
     
-    std::fill_n(block, page_count, ++state->generation);
+    const Generation generation = ++state->generation;
+    std::fill_n(block, page_count, generation);
+    state->generation_names[generation] = name;
+    
     mprotect(memory, aligned_size, PROT_READ | PROT_WRITE);
     std::fill_n(memory, aligned_size, 0);
 }
@@ -45,12 +48,14 @@ bool init(MemState *state)
     }
     
     state->allocated_pages.resize(length / state->page_size);
-    state->allocated_pages[0] = true; // Prevent allocation succeeding and returning null.
+    const Address null_address = alloc(state, 1, "NULL");
+    assert(null_address == 0);
+    mprotect(&state->memory[null_address], state->page_size, PROT_NONE);
     
     return true;
 }
 
-Address alloc(MemState *state, size_t size)
+Address alloc(MemState *state, size_t size, const char *name)
 {
     const size_t page_count = (size + (state->page_size - 1)) / state->page_size;
     const Allocated::iterator block = std::search_n(state->allocated_pages.begin(), state->allocated_pages.end(), page_count, 0);
@@ -63,12 +68,12 @@ Address alloc(MemState *state, size_t size)
     const size_t block_page_index = block - state->allocated_pages.begin();
     const size_t address = block_page_index * state->page_size;
     
-    alloc_inner(state, address, page_count, block);
+    alloc_inner(state, address, page_count, block, name);
     
     return static_cast<Address>(address);
 }
 
-void reserve(MemState *state, Address address, size_t size)
+void reserve(MemState *state, Address address, size_t size, const char *name)
 {
     assert((address % state->page_size) == 0);
     
@@ -76,5 +81,27 @@ void reserve(MemState *state, Address address, size_t size)
     const size_t block_page_index = address / state->page_size;
     const Allocated::iterator block = state->allocated_pages.begin() + block_page_index;
     
-    alloc_inner(state, address, page_count, block);
+    alloc_inner(state, address, page_count, block, name);
+}
+
+const char *mem_name(Address address, const MemState *state)
+{
+    const size_t page = address / state->page_size;
+    assert(page >= 0);
+    assert(page < state->allocated_pages.size());
+    
+    const Generation generation = state->allocated_pages[page];
+    if (generation == 0)
+    {
+        return "UNALLOCATED";
+    }
+    
+    const GenerationNames::const_iterator found = state->generation_names.find(generation);
+    assert(found != state->generation_names.end());
+    if (found == state->generation_names.end())
+    {
+        return "UNNAMED";
+    }
+    
+    return found->second.c_str();
 }

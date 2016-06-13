@@ -3,18 +3,23 @@
 #include "types.h"
 
 #include <functional>
+#include <map>
 #include <memory>
+#include <string>
 #include <vector>
 
+typedef size_t Generation;
 typedef std::unique_ptr<uint8_t[], std::function<void(uint8_t *)>> Memory;
-typedef std::vector<size_t> Allocated;
+typedef std::vector<Generation> Allocated;
+typedef std::map<Generation, std::string> GenerationNames;
 
 struct MemState
 {
     size_t page_size = 0;
-    size_t generation = 0;
+    Generation generation = 0;
     Memory memory;
     Allocated allocated_pages;
+    GenerationNames generation_names;
 };
 
 constexpr size_t KB(size_t kb)
@@ -33,5 +38,6 @@ constexpr size_t GB(size_t gb)
 }
 
 bool init(MemState *state);
-Address alloc(MemState *state, size_t size);
-void reserve(MemState *state, Address address, size_t size);
+Address alloc(MemState *state, size_t size, const char *name);
+void reserve(MemState *state, Address address, size_t size, const char *name);
+const char *mem_name(Address address, const MemState *state);

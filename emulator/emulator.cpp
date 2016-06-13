@@ -73,18 +73,25 @@ static void code_hook(uc_engine *uc, uint64_t address, uint32_t size, void *user
     std::cout << std::hex << std::setw(8) << address << std::dec << " " << disassembly << std::endl;
 }
 
+static void log_memory_access(const char *type, Address address, int size, int64_t value, const MemState *mem)
+{
+    const char *const name = mem_name(address, mem);
+    std::cout << type << " " << size << " bytes, address 0x" << std::hex << address << " (" << name << "), value 0x" << value << std::dec << std::endl;
+}
+
 static void read_hook(uc_engine *uc, uc_mem_type type, uint64_t address, int size, int64_t value, void *user_data)
 {
     assert(value == 0);
     
     const MemState *mem = static_cast<const MemState *>(user_data);
     memcpy(&value, &mem->memory[address], size);
-    std::cout << "READ " << size << " bytes from 0x" << std::hex << address << ", value 0x" << value << std::dec << std::endl;
+    log_memory_access("Read", static_cast<Address>(address), size, value, mem);
 }
 
 static void write_hook(uc_engine *uc, uc_mem_type type, uint64_t address, int size, int64_t value, void *user_data)
 {
-    std::cout << "WRITE " << size << " bytes to 0x" << std::hex << address << ", value 0x" << value << std::dec << std::endl;
+    const MemState *mem = static_cast<const MemState *>(user_data);
+    log_memory_access("Write", static_cast<Address>(address), size, value, mem);
 }
 
 static bool run_thread(EmulatorState *state, Address entry_point)
@@ -101,11 +108,11 @@ static bool run_thread(EmulatorState *state, Address entry_point)
     err = uc_hook_add(uc, &hh, UC_HOOK_MEM_READ, (void *)&read_hook, &state->mem, 1, 0);
     assert(err == UC_ERR_OK);
     
-    err = uc_hook_add(uc, &hh, UC_HOOK_MEM_WRITE, (void *)&write_hook, nullptr, 1, 0);
+    err = uc_hook_add(uc, &hh, UC_HOOK_MEM_WRITE, (void *)&write_hook, &state->mem, 1, 0);
     assert(err == UC_ERR_OK);
     
     const size_t stack_size = MB(1);
-    const Address stack_bottom = alloc(&state->mem, stack_size);
+    const Address stack_bottom = alloc(&state->mem, stack_size, "stack");
     const Address stack_top = stack_bottom + stack_size;
     memset(&state->mem.memory[stack_bottom], 0xcc, stack_size);
     
@@ -113,7 +120,7 @@ static bool run_thread(EmulatorState *state, Address entry_point)
     assert(err == UC_ERR_OK);
     
     const size_t bootstrap_size = sizeof(thumb ? bootstrap_thumb : bootstrap_arm);
-    const Address bootstrap_address = alloc(&state->mem, bootstrap_size);
+    const Address bootstrap_address = alloc(&state->mem, bootstrap_size, "bootstrap");
     const void *const bootstrap = thumb ? bootstrap_thumb : bootstrap_arm;
     memcpy(&state->mem.memory[bootstrap_address], bootstrap, bootstrap_size);
     
