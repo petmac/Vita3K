@@ -8,7 +8,7 @@
 #include <iostream>
 
 // From UVLoader
-// https://github.com/yifanlu/UVLoader
+// https://github.com/yifanlu/UVLoader/blob/master/resolve.h
 struct ModuleInfo // thanks roxfan
 {
     uint16_t modattribute; // ??
@@ -32,6 +32,65 @@ struct ModuleInfo // thanks roxfan
     uint32_t extab_end; //
 };
 
+// From UVLoader
+// https://github.com/yifanlu/UVLoader/blob/master/resolve.h
+struct ModuleImports // thanks roxfan
+{
+    uint16_t size;               // size of this structure; 0x34 for Vita 1.x
+    uint16_t lib_version;        //
+    uint16_t attribute;          //
+    uint16_t num_functions;      // number of imported functions
+    uint16_t num_vars;           // number of imported variables
+    uint16_t num_tls_vars;       // number of imported TLS variables
+    uint32_t reserved1;          // ?
+    uint32_t module_nid;         // NID of the module to link to
+    uint32_t lib_name;          // name of module
+    uint32_t reserved2;          // ?
+    uint32_t func_nid_table;    // array of function NIDs (numFuncs)
+    uint32_t func_entry_table; // parallel array of pointers to stubs; they're patched by the loader to jump to the final code
+    uint32_t var_nid_table;     // NIDs of the imported variables (numVars)
+    uint32_t var_entry_table;  // array of pointers to "ref tables" for each variable
+    uint32_t tls_nid_table;     // NIDs of the imported TLS variables (numTlsVars)
+    uint32_t tls_entry_table;  // array of pointers to ???
+};
+
+static bool load_func_imports(const uint32_t *nids, const Address *entries, size_t count)
+{
+    for (size_t i = 0; i < count; ++i)
+    {
+        const uint32_t nid = nids[i];
+        const Address entry = entries[i];
+        std::cout << "\tNID " << std::hex << nid << " at 0x" << entry << std::dec << std::endl;
+    }
+    
+    return true;
+}
+
+static bool load_imports(const ModuleInfo &module, Address segment_address, const MemState &mem)
+{
+    const uint8_t *const base = &mem.memory[segment_address];
+    const ModuleImports *const imports_begin = reinterpret_cast<const ModuleImports *>(base + module.stub_top);
+    const ModuleImports *const imports_end = reinterpret_cast<const ModuleImports *>(base + module.stub_end);
+    
+    for (const ModuleImports *imports = imports_begin; imports < imports_end; imports = reinterpret_cast<const ModuleImports *>(reinterpret_cast<const uint8_t *>(imports) + imports->size))
+    {
+        const char *const lib_name = reinterpret_cast<const char *>(&mem.memory[imports->lib_name]);
+        std::cout << "Loading imports from " << lib_name << std::endl;
+        assert(imports->lib_version == 1);
+        assert(imports->num_vars == 0);
+        assert(imports->num_tls_vars == 0);
+        
+        const uint32_t *const nids = reinterpret_cast<const uint32_t *>(&mem.memory[imports->func_nid_table]);
+        const uint32_t *const entries = reinterpret_cast<const uint32_t *>(&mem.memory[imports->func_entry_table]);
+        if (!load_func_imports(nids, entries, imports->num_functions))
+        {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
 bool load(Module *module, MemState *mem, const char *path)
 {
     ELFIO::elfio elf;
@@ -45,7 +104,8 @@ bool load(Module *module, MemState *mem, const char *path)
     const Address module_info_offset = elf.get_entry() & 0x3fffffff;
     const ELFIO::segment *const module_info_segment = elf.segments[module_info_segment_index];
     const ModuleInfo *const module_info = reinterpret_cast<const ModuleInfo *>(module_info_segment->get_data() + module_info_offset);
-    module->entry_point = static_cast<Address>(module_info_segment->get_virtual_address() + module_info->mod_start);
+    const Address module_info_segment_address = static_cast<Address>(module_info_segment->get_virtual_address());
+    module->entry_point = module_info_segment_address + module_info->mod_start;
     
     for (ELFIO::Elf_Half segment_index = 0; segment_index < elf.segments.size(); ++segment_index)
     {
@@ -63,6 +123,11 @@ bool load(Module *module, MemState *mem, const char *path)
             
             module->segments.push_back(dst);
         }
+    }
+    
+    if (!load_imports(*module_info, module_info_segment_address, *mem))
+    {
+        return false;
     }
     
     std::cout << "Loaded '" << path << "'." << std::endl;
