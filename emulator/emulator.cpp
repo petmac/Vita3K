@@ -94,6 +94,18 @@ static void write_hook(uc_engine *uc, uc_mem_type type, uint64_t address, int si
     log_memory_access("Write", static_cast<Address>(address), size, value, mem);
 }
 
+static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
+{
+    assert(intno == 2);
+    
+    uint32_t pc = 0;
+    uc_reg_read(uc, UC_ARM_REG_PC, &pc);
+    uint32_t nid;
+    uc_mem_read(uc, pc + 4, &nid, sizeof(nid));
+    
+    std::cout << "NID " << std::hex << std::setw(8) << std::setfill('0') << nid << std::dec << " called." << std::endl;
+}
+
 static bool run_thread(EmulatorState *state, Address entry_point)
 {
     const bool thumb = entry_point & 1;
@@ -102,13 +114,16 @@ static bool run_thread(EmulatorState *state, Address entry_point)
     assert(err == UC_ERR_OK);
     
     uc_hook hh = 0;
-    err = uc_hook_add(uc, &hh, UC_HOOK_CODE, (void *)&code_hook, state, 1, 0);
+    err = uc_hook_add(uc, &hh, UC_HOOK_CODE, reinterpret_cast<void *>(&code_hook), state, 1, 0);
     assert(err == UC_ERR_OK);
     
-    err = uc_hook_add(uc, &hh, UC_HOOK_MEM_READ, (void *)&read_hook, &state->mem, 1, 0);
+    err = uc_hook_add(uc, &hh, UC_HOOK_MEM_READ, reinterpret_cast<void *>(&read_hook), &state->mem, 1, 0);
     assert(err == UC_ERR_OK);
     
-    err = uc_hook_add(uc, &hh, UC_HOOK_MEM_WRITE, (void *)&write_hook, &state->mem, 1, 0);
+    err = uc_hook_add(uc, &hh, UC_HOOK_MEM_WRITE, reinterpret_cast<void *>(&write_hook), &state->mem, 1, 0);
+    assert(err == UC_ERR_OK);
+    
+    err = uc_hook_add(uc, &hh, UC_HOOK_INTR, reinterpret_cast<void *>(&intr_hook), nullptr, 1, 0);
     assert(err == UC_ERR_OK);
     
     const size_t stack_size = MB(1);
@@ -143,6 +158,7 @@ static bool run_thread(EmulatorState *state, Address entry_point)
     }
     
     // TODO Free bootstrap and stack.
+    // TODO Free hooks?
     
     std::cout << "Emulation succeeded." << std::endl;
     return true;

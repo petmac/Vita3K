@@ -5,6 +5,7 @@
 #include <elfio/elfio.hpp>
 
 #include <assert.h>
+#include <iomanip>
 #include <iostream>
 
 // From UVLoader
@@ -54,13 +55,18 @@ struct ModuleImports // thanks roxfan
     uint32_t tls_entry_table;  // array of pointers to ???
 };
 
-static bool load_func_imports(const uint32_t *nids, const Address *entries, size_t count)
+static bool load_func_imports(const uint32_t *nids, const Address *entries, size_t count, const MemState &mem)
 {
     for (size_t i = 0; i < count; ++i)
     {
         const uint32_t nid = nids[i];
         const Address entry = entries[i];
-        std::cout << "\tNID " << std::hex << nid << " at 0x" << entry << std::dec << std::endl;
+        std::cout << "\tNID " << std::hex << std::setw(8) << std::setfill('0') << nid << " at 0x" << entry << std::dec << std::endl;
+        
+        uint32_t *const stub = reinterpret_cast<uint32_t *>(&mem.memory[entry]);
+        stub[0] = 0xef000000; // svc #0 - Call our interrupt hook.
+        stub[1] = 0xe1a0f00e; // mov pc, lr - Return to the caller.
+        stub[2] = nid; // Our interrupt hook will read this.
     }
     
     return true;
@@ -82,7 +88,7 @@ static bool load_imports(const ModuleInfo &module, Address segment_address, cons
         
         const uint32_t *const nids = reinterpret_cast<const uint32_t *>(&mem.memory[imports->func_nid_table]);
         const uint32_t *const entries = reinterpret_cast<const uint32_t *>(&mem.memory[imports->func_entry_table]);
-        if (!load_func_imports(nids, entries, imports->num_functions))
+        if (!load_func_imports(nids, entries, imports->num_functions, mem))
         {
             return false;
         }
