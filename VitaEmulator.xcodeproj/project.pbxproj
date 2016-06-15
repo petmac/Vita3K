@@ -70,6 +70,7 @@
 		C173D8A21D0F256F001F9EF7 /* vitahelloworld.vitareadelf.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vitahelloworld.vitareadelf.txt; sourceTree = "<group>"; };
 		C173D8A31D0F256F001F9EF7 /* VitaScreenFlasher.readelf.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = VitaScreenFlasher.readelf.txt; sourceTree = "<group>"; };
 		C173D8A51D0F256F001F9EF7 /* VitaScreenFlasher.vitareadelf.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = VitaScreenFlasher.vitareadelf.txt; sourceTree = "<group>"; };
+		C173D8B01D11CEA8001F9EF7 /* gen_nids.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = gen_nids.py; sourceTree = "<group>"; };
 		C1855A911D015F05004539B7 /* libunicorn.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libunicorn.a; path = unicorn/libunicorn.a; sourceTree = "<group>"; };
 		C1855A971D016245004539B7 /* libunicorn.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libunicorn.1.dylib; path = unicorn/libunicorn.1.dylib; sourceTree = "<group>"; };
 		C1855A9B1D01ED3F004539B7 /* emulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = emulator.cpp; sourceTree = "<group>"; };
@@ -158,6 +159,7 @@
 				C1AD18F31D07ED2100064A1F /* disasm.h */,
 				C1855A9B1D01ED3F004539B7 /* emulator.cpp */,
 				C1855A9C1D01ED3F004539B7 /* emulator.h */,
+				C173D8B01D11CEA8001F9EF7 /* gen_nids.py */,
 				C1B4A0431D02FFFC00F53D2C /* mem.cpp */,
 				C1B4A0441D02FFFC00F53D2C /* mem.h */,
 				C173D8951D0E92A4001F9EF7 /* module.cpp */,
