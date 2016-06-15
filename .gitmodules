@@ -7,3 +7,6 @@
 [submodule "capstone"]
 	path = capstone
 	url = https://github.com/aquynh/capstone.git
+[submodule "vita-headers"]
+	path = vita-headers
+	url = https://github.com/vitasdk/vita-headers.git
