@@ -16,9 +16,9 @@ static void delete_memory(uint8_t *memory)
     }
 }
 
-static void alloc_inner(MemState *state, size_t address, size_t page_count, Allocated::iterator block, const char *name)
+static void alloc_inner(MemState *state, Address address, size_t page_count, Allocated::iterator block, const char *name)
 {
-    uint8_t *const memory = &state->memory[address];
+    uint8_t *const memory = mem_ptr<uint8_t>(address, state);
     const size_t aligned_size = page_count * state->page_size;
     
     const Generation generation = ++state->generation;
@@ -50,7 +50,7 @@ bool init(MemState *state)
     state->allocated_pages.resize(length / state->page_size);
     const Address null_address = alloc(state, 1, "NULL");
     assert(null_address == 0);
-    mprotect(&state->memory[null_address], state->page_size, PROT_NONE);
+    mprotect(mem_ptr<void>(null_address, state), state->page_size, PROT_NONE);
     
     return true;
 }

@@ -41,3 +41,9 @@ bool init(MemState *state);
 Address alloc(MemState *state, size_t size, const char *name);
 void reserve(MemState *state, Address address, size_t size, const char *name);
 const char *mem_name(Address address, const MemState *state);
+
+template <typename T>
+T *mem_ptr(Address address, const MemState *state)
+{
+    return reinterpret_cast<T *>(&state->memory[address]);
+}

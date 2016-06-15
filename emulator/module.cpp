@@ -63,7 +63,7 @@ static bool load_func_imports(const uint32_t *nids, const Address *entries, size
         const Address entry = entries[i];
         std::cout << "\tNID " << std::hex << std::setw(8) << std::setfill('0') << nid << " at 0x" << entry << std::dec << std::endl;
         
-        uint32_t *const stub = reinterpret_cast<uint32_t *>(&mem.memory[entry]);
+        uint32_t *const stub = mem_ptr<uint32_t>(entry, &mem);
         stub[0] = 0xef000000; // svc #0 - Call our interrupt hook.
         stub[1] = 0xe1a0f00e; // mov pc, lr - Return to the caller.
         stub[2] = nid; // Our interrupt hook will read this.
@@ -74,20 +74,20 @@ static bool load_func_imports(const uint32_t *nids, const Address *entries, size
 
 static bool load_imports(const ModuleInfo &module, Address segment_address, const MemState &mem)
 {
-    const uint8_t *const base = &mem.memory[segment_address];
+    const uint8_t *const base = mem_ptr<const uint8_t>(segment_address, &mem);
     const ModuleImports *const imports_begin = reinterpret_cast<const ModuleImports *>(base + module.stub_top);
     const ModuleImports *const imports_end = reinterpret_cast<const ModuleImports *>(base + module.stub_end);
     
     for (const ModuleImports *imports = imports_begin; imports < imports_end; imports = reinterpret_cast<const ModuleImports *>(reinterpret_cast<const uint8_t *>(imports) + imports->size))
     {
-        const char *const lib_name = reinterpret_cast<const char *>(&mem.memory[imports->lib_name]);
+        const char *const lib_name = mem_ptr<const char>(imports->lib_name, &mem);
         std::cout << "Loading imports from " << lib_name << std::endl;
         assert(imports->lib_version == 1);
         assert(imports->num_vars == 0);
         assert(imports->num_tls_vars == 0);
         
-        const uint32_t *const nids = reinterpret_cast<const uint32_t *>(&mem.memory[imports->func_nid_table]);
-        const uint32_t *const entries = reinterpret_cast<const uint32_t *>(&mem.memory[imports->func_entry_table]);
+        const uint32_t *const nids = mem_ptr<const uint32_t>(imports->func_nid_table, &mem);
+        const uint32_t *const entries = mem_ptr<const uint32_t>(imports->func_entry_table, &mem);
         if (!load_func_imports(nids, entries, imports->num_functions, mem))
         {
             return false;
@@ -125,7 +125,7 @@ bool load(Module *module, MemState *mem, const char *path)
             dst.size = ((src.get_memory_size() + (mem->page_size - 1)) / mem->page_size) * mem->page_size;
             
             reserve(mem, dst.address, dst.size, "segment");
-            std::copy_n(src.get_data(), src.get_file_size(), &mem->memory[dst.address]);
+            std::copy_n(src.get_data(), src.get_file_size(), mem_ptr<uint8_t>(dst.address, mem));
             
             module->segments.push_back(dst);
         }
