@@ -4,12 +4,14 @@ import json
 
 with open("../vita-headers/db.json") as file:
     data = json.load(file)
-    libraries = data.values()
     with open("nids.h", "w") as header:
+        libraries = data.values()
+        functions = {}
         for library in libraries:
             for module in library["modules"].values():
-                for function in module["functions"].items():
-                    name = function[0]
-                    nid = function[1]
-                    line = "NID(" + name + ", " + hex(nid) + ")\n"
-                    header.write(line)
+                functions.update(module["functions"])
+
+        for name in sorted(functions):
+            nid = functions[name]
+            line = "NID(" + name + ", " + hex(nid) + ")\n"
+            header.write(line)
