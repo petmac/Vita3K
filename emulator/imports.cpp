@@ -1,6 +1,6 @@
-#include "nid.h"
+#include "imports.h"
 
-const char *nid_name(uint32_t nid)
+const char *import_name(uint32_t nid)
 {
     switch (nid)
     {
