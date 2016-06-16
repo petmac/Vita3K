@@ -11,3 +11,8 @@ const char *import_name(uint32_t nid)
             return "UNRECOGNISED";
     }
 }
+
+ImportFn *import_fn(uint32_t nid)
+{
+    return nullptr;
+}
