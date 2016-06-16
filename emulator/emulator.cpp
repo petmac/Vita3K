@@ -3,6 +3,7 @@
 #include "disasm.h"
 #include "mem.h"
 #include "module.h"
+#include "nid.h"
 
 #include <unicorn/unicorn.h>
 
@@ -103,8 +104,9 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
     uint32_t nid;
     uc_mem_read(uc, pc + 4, &nid, sizeof(nid));
     
+    const char *const name = nid_name(nid);
     const char prev_fill = std::cout.fill();
-    std::cout << "NID " << std::hex << std::setw(8) << std::setfill('0') << nid << std::setfill(prev_fill) << std::dec << " called." << std::endl;
+    std::cout << "NID " << std::hex << std::setw(8) << std::setfill('0') << nid << std::setfill(prev_fill) << std::dec << " (" << name << ") called." << std::endl;
 }
 
 static bool run_thread(EmulatorState *state, Address entry_point)
