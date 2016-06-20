@@ -21,6 +21,7 @@
 		C1AD18F41D07ED2100064A1F /* disasm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1AD18F21D07ED2100064A1F /* disasm.cpp */; settings = {ASSET_TAGS = (); }; };
 		C1B4A0451D02FFFC00F53D2C /* mem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1B4A0431D02FFFC00F53D2C /* mem.cpp */; settings = {ASSET_TAGS = (); }; };
 		C1EA5B7D1D17CBF2000CE42E /* unimplemented.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1EA5B7C1D17CBF2000CE42E /* unimplemented.cpp */; settings = {ASSET_TAGS = (); }; };
+		C1EA5B7F1D17CE74000CE42E /* imports_kernel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1EA5B7E1D17CE74000CE42E /* imports_kernel.cpp */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,6 +88,7 @@
 		C1B4A0441D02FFFC00F53D2C /* mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mem.h; sourceTree = "<group>"; };
 		C1EA5B7B1D17CB48000CE42E /* import.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = import.h; sourceTree = "<group>"; };
 		C1EA5B7C1D17CBF2000CE42E /* unimplemented.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = unimplemented.cpp; sourceTree = "<group>"; };
+		C1EA5B7E1D17CE74000CE42E /* imports_kernel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imports_kernel.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,6 +170,7 @@
 				C1855A9C1D01ED3F004539B7 /* emulator.h */,
 				C173D8B01D11CEA8001F9EF7 /* gen_nids.py */,
 				C1EA5B7B1D17CB48000CE42E /* import.h */,
+				C1EA5B7E1D17CE74000CE42E /* imports_kernel.cpp */,
 				C173D8B21D1306EA001F9EF7 /* imports.cpp */,
 				C173D8B31D1306EA001F9EF7 /* imports.h */,
 				C1B4A0431D02FFFC00F53D2C /* mem.cpp */,
@@ -295,6 +298,7 @@
 				C1AD18F41D07ED2100064A1F /* disasm.cpp in Sources */,
 				C12143841D000FEE00702861 /* ViewController.m in Sources */,
 				C12143811D000FEE00702861 /* main.m in Sources */,
+				C1EA5B7F1D17CE74000CE42E /* imports_kernel.cpp in Sources */,
 				C173D8B41D1306EA001F9EF7 /* imports.cpp in Sources */,
 				C1855A9D1D01ED3F004539B7 /* emulator.cpp in Sources */,
 				C1B4A0451D02FFFC00F53D2C /* mem.cpp in Sources */,

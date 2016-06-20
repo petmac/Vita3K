@@ -112,7 +112,7 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
     assert(fn != nullptr);
     if (fn != nullptr)
     {
-        (*fn)();
+        (*fn)(uc);
     }
 }
 
