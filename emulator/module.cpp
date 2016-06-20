@@ -3,7 +3,10 @@
 #include "imports.h"
 #include "mem.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
 #include <elfio/elfio.hpp>
+#pragma GCC diagnostic pop
 
 #include <assert.h>
 #include <iomanip>
