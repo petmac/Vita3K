@@ -66,7 +66,7 @@ Address alloc(MemState *state, size_t size, const char *name)
     }
     
     const size_t block_page_index = block - state->allocated_pages.begin();
-    const size_t address = block_page_index * state->page_size;
+    const Address address = static_cast<Address>(block_page_index * state->page_size);
     
     alloc_inner(state, address, page_count, block, name);
     
