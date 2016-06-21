@@ -22,6 +22,7 @@
 		C1B4A0451D02FFFC00F53D2C /* mem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1B4A0431D02FFFC00F53D2C /* mem.cpp */; settings = {ASSET_TAGS = (); }; };
 		C1EA5B7D1D17CBF2000CE42E /* unimplemented.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1EA5B7C1D17CBF2000CE42E /* unimplemented.cpp */; settings = {ASSET_TAGS = (); }; };
 		C1EA5B7F1D17CE74000CE42E /* imports_kernel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1EA5B7E1D17CE74000CE42E /* imports_kernel.cpp */; settings = {ASSET_TAGS = (); }; };
+		C1EA5B841D19202F000CE42E /* call.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1EA5B831D19202F000CE42E /* call.cpp */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,6 +90,8 @@
 		C1EA5B7B1D17CB48000CE42E /* import.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = import.h; sourceTree = "<group>"; };
 		C1EA5B7C1D17CBF2000CE42E /* unimplemented.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = unimplemented.cpp; sourceTree = "<group>"; };
 		C1EA5B7E1D17CE74000CE42E /* imports_kernel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imports_kernel.cpp; sourceTree = "<group>"; };
+		C1EA5B811D185320000CE42E /* call.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = call.h; sourceTree = "<group>"; };
+		C1EA5B831D19202F000CE42E /* call.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = call.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,6 +167,8 @@
 		C1855A9A1D01ED1D004539B7 /* emulator */ = {
 			isa = PBXGroup;
 			children = (
+				C1EA5B831D19202F000CE42E /* call.cpp */,
+				C1EA5B811D185320000CE42E /* call.h */,
 				C1AD18F21D07ED2100064A1F /* disasm.cpp */,
 				C1AD18F31D07ED2100064A1F /* disasm.h */,
 				C1855A9B1D01ED3F004539B7 /* emulator.cpp */,
@@ -300,6 +305,7 @@
 				C12143811D000FEE00702861 /* main.m in Sources */,
 				C1EA5B7F1D17CE74000CE42E /* imports_kernel.cpp in Sources */,
 				C173D8B41D1306EA001F9EF7 /* imports.cpp in Sources */,
+				C1EA5B841D19202F000CE42E /* call.cpp in Sources */,
 				C1855A9D1D01ED3F004539B7 /* emulator.cpp in Sources */,
 				C1B4A0451D02FFFC00F53D2C /* mem.cpp in Sources */,
 				C121437E1D000FEE00702861 /* AppDelegate.mm in Sources */,
