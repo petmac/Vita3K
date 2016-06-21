@@ -1,5 +1,6 @@
 #include "emulator.h"
 
+#include "call.h"
 #include "disasm.h"
 #include "imports.h"
 #include "mem.h"
@@ -112,7 +113,9 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
     assert(fn != nullptr);
     if (fn != nullptr)
     {
-        (*fn)(uc);
+        const Args args = read_args(uc);
+        const uint32_t result = (*fn)(args.r0, args.r1, args.r2, args.r3, args.sp);
+        write_result(uc, result);
     }
 }
 

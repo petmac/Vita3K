@@ -1,10 +1,8 @@
 #pragma once
 
-#include <stdint.h>
+#include "types.h"
 
-struct uc_struct;
-
-typedef void ImportFn(uc_struct *);
+typedef uint32_t ImportFn(uint32_t, uint32_t, uint32_t, uint32_t, Address);
 
 const char *import_name(uint32_t nid);
 ImportFn *import_fn(uint32_t nid);
