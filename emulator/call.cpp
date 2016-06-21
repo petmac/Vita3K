@@ -9,7 +9,7 @@ static int regs[] = { UC_ARM_REG_R0, UC_ARM_REG_R1, UC_ARM_REG_R2, UC_ARM_REG_R3
 Args read_args(uc_struct *uc)
 {
     Args args;
-    void *vals[] = { &args.r0, &args.r1, &args.r2, &args.r3 };
+    void *vals[] = { &args.r0, &args.r1, &args.r2, &args.r3, &args.sp };
     const int count = sizeof(regs) / sizeof(regs[0]);
     
     const uc_err err = uc_reg_read_batch(uc, regs, vals, count);
