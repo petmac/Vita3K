@@ -11,9 +11,12 @@ enum ResultCode : int32_t
 
 typedef uint32_t SceUID;
 typedef std::map<SceUID, Address> Blocks;
+typedef std::map<SceUID, Address> SlotToAddress;
+typedef std::map<SceUID, SlotToAddress> ThreadToSlotToAddress;
 
 static Blocks blocks;
 static SceUID next_uid;
+static ThreadToSlotToAddress tls;
 
 IMP_SIG(sceKernelAllocMemBlock)
 {
@@ -72,6 +75,26 @@ IMP_SIG(sceKernelGetMemBlockBase)
     *address = block->second;
     
     return SCE_OK;
+}
+
+IMP_SIG(sceKernelGetTLSAddr)
+{
+    const SceUID slot = r0;
+    const SceUID thread = 0; // TODO Use the real thread ID.
+    SlotToAddress *const slot_to_address = &tls[thread];
+    
+    const SlotToAddress::const_iterator existing = slot_to_address->find(slot);
+    if (existing != slot_to_address->end())
+    {
+        return existing->second;
+    }
+    
+    // TODO Use a finer-grained allocator.
+    // TODO This is a memory leak.
+    const Address address = alloc(mem, sizeof(Address), "TLS");
+    slot_to_address->insert(SlotToAddress::value_type(slot, address));
+    
+    return address;
 }
 
 IMP_SIG(sceKernelGetThreadId)
