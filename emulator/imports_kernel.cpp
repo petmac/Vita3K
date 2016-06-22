@@ -45,6 +45,13 @@ IMP_SIG(sceKernelAllocMemBlock)
 
 IMP_SIG(sceKernelCreateLwMutex)
 {
+    // TODO Create.
+    return 0;
+}
+
+IMP_SIG(sceKernelCreateMutex)
+{
+    // TODO Create.
     return 0;
 }
 
