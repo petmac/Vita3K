@@ -16,6 +16,5 @@ IMP_SIG(sceGxmInitialize)
     (void)params;
     
     // TODO Implement.
-    // TODO Move SCE_OK to its own file.
-    return 0;
+    return SCE_OK;
 }

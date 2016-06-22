@@ -3,13 +3,6 @@
 #include <iostream>
 #include <map>
 
-enum ResultCode : int32_t
-{
-    SCE_OK,
-    UNKNOWN_UID
-};
-
-typedef uint32_t SceUID;
 typedef std::map<SceUID, Address> Blocks;
 typedef std::map<SceUID, Address> SlotToAddress;
 typedef std::map<SceUID, SlotToAddress> ThreadToSlotToAddress;
