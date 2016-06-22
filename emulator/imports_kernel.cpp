@@ -3,8 +3,13 @@
 #include <iostream>
 #include <map>
 
-typedef uint32_t SceUID;
+enum ResultCode : int32_t
+{
+    SCE_OK,
+    UNKNOWN_UID
+};
 
+typedef uint32_t SceUID;
 typedef std::map<SceUID, Address> Blocks;
 
 static Blocks blocks;
@@ -41,4 +46,23 @@ IMP_SIG(sceKernelAllocMemBlock)
     blocks.insert(Blocks::value_type(uid, address));
     
     return uid;
+}
+
+IMP_SIG(sceKernelGetMemBlockBase)
+{
+    const SceUID uid = r0;
+    Address *const address = mem_ptr<Address>(r1, mem);
+    assert(uid >= 0);
+    assert(address != nullptr);
+    
+    const Blocks::const_iterator block = blocks.find(uid);
+    if (block == blocks.end())
+    {
+        // TODO Write address?
+        return UNKNOWN_UID;
+    }
+    
+    *address = block->second;
+    
+    return SCE_OK;
 }
