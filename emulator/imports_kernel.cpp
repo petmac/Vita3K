@@ -73,3 +73,9 @@ IMP_SIG(sceKernelGetMemBlockBase)
     
     return SCE_OK;
 }
+
+IMP_SIG(sceKernelGetThreadId)
+{
+    // TODO What should this be?
+    return 0;
+}
