@@ -15,11 +15,6 @@ typedef std::map<SceUID, Address> Blocks;
 static Blocks blocks;
 static SceUID next_uid;
 
-IMP_SIG(sceKernelCreateLwMutex)
-{
-    return 0;
-}
-
 IMP_SIG(sceKernelAllocMemBlock)
 {
     const char *const name = mem_ptr<const char>(r0, mem);
@@ -46,6 +41,11 @@ IMP_SIG(sceKernelAllocMemBlock)
     blocks.insert(Blocks::value_type(uid, address));
     
     return uid;
+}
+
+IMP_SIG(sceKernelCreateLwMutex)
+{
+    return 0;
 }
 
 IMP_SIG(sceKernelGetMemBlockBase)
