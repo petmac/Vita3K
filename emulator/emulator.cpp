@@ -12,6 +12,7 @@
 #include <iomanip>
 #include <iostream>
 
+static const bool LOG_CODE = false;
 static const bool LOG_MEM_ACCESS = false;
 
 struct EmulatorState
@@ -131,8 +132,11 @@ static bool run_thread(EmulatorState *state, Address entry_point)
     assert(err == UC_ERR_OK);
     
     uc_hook hh = 0;
-    err = uc_hook_add(uc, &hh, UC_HOOK_CODE, reinterpret_cast<void *>(&code_hook), state, 1, 0);
-    assert(err == UC_ERR_OK);
+    if (LOG_CODE)
+    {
+        err = uc_hook_add(uc, &hh, UC_HOOK_CODE, reinterpret_cast<void *>(&code_hook), state, 1, 0);
+        assert(err == UC_ERR_OK);
+    }
     
     if (LOG_MEM_ACCESS)
     {
