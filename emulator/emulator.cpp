@@ -154,7 +154,7 @@ static bool run_thread(EmulatorState *state, Address entry_point)
     const void *const bootstrap = thumb ? bootstrap_thumb : bootstrap_arm;
     memcpy(mem_ptr<void>(bootstrap_address, &state->mem), bootstrap, bootstrap_size);
     
-    err = uc_mem_map_ptr(uc, 0, GB(4), UC_PROT_ALL, mem_ptr<void>(0, &state->mem));
+    err = uc_mem_map_ptr(uc, 0, GB(4), UC_PROT_ALL, &state->mem.memory[0]);
     assert(err == UC_ERR_OK);
     
     err = uc_emu_start(uc, bootstrap_address, bootstrap_address + bootstrap_size, 0, 0);

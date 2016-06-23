@@ -59,12 +59,12 @@ IMP_SIG(sceKernelCreateLwMutex)
     const LWMutexAttr attr = static_cast<LWMutexAttr>(r2);
     const int32_t count = r3;
     const Address *const stack = mem_ptr<Address>(sp, mem);
-    const Address options_addr = *stack;
+    const void *const options = mem_ptr<const void>(*stack, mem);
     
     assert(workarea != nullptr);
     assert((attr == LW_MUTEX_ATTR_A) || (attr == LW_MUTEX_ATTR_B));
     assert(count == 0);
-    assert(options_addr == 0);
+    assert(options == nullptr);
     
     strncpy(workarea->name, name, MAX_NAME_LEN);
     workarea->name[MAX_NAME_LEN - 1] = '\0';
@@ -131,7 +131,7 @@ IMP_SIG(sceKernelLockLwMutex)
     uint32_t *const timeout = mem_ptr<uint32_t>(r2, mem);
     assert(workarea != nullptr);
     assert(count == 1);
-    (void)timeout;
+    assert(timeout == nullptr);
     
     // TODO Investigate further and implement.
     return 0;
