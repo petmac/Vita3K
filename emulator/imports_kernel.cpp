@@ -136,3 +136,14 @@ IMP_SIG(sceKernelLockLwMutex)
     // TODO Investigate further and implement.
     return 0;
 }
+
+IMP_SIG(sceKernelUnlockLwMutex)
+{
+    LWMutexWorkArea *const workarea = mem_ptr<LWMutexWorkArea>(r0, mem);
+    const int32_t count = r1;
+    assert(workarea != nullptr);
+    assert(count == 1);
+    
+    // TODO Investigate further and implement.
+    return 0;
+}
