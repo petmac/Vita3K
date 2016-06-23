@@ -12,6 +12,8 @@
 #include <iomanip>
 #include <iostream>
 
+static const bool LOG_MEM_ACCESS = false;
+
 struct EmulatorState
 {
     DisasmState disasm;
@@ -132,11 +134,14 @@ static bool run_thread(EmulatorState *state, Address entry_point)
     err = uc_hook_add(uc, &hh, UC_HOOK_CODE, reinterpret_cast<void *>(&code_hook), state, 1, 0);
     assert(err == UC_ERR_OK);
     
-    err = uc_hook_add(uc, &hh, UC_HOOK_MEM_READ, reinterpret_cast<void *>(&read_hook), &state->mem, 1, 0);
-    assert(err == UC_ERR_OK);
-    
-    err = uc_hook_add(uc, &hh, UC_HOOK_MEM_WRITE, reinterpret_cast<void *>(&write_hook), &state->mem, 1, 0);
-    assert(err == UC_ERR_OK);
+    if (LOG_MEM_ACCESS)
+    {
+        err = uc_hook_add(uc, &hh, UC_HOOK_MEM_READ, reinterpret_cast<void *>(&read_hook), &state->mem, 1, 0);
+        assert(err == UC_ERR_OK);
+        
+        err = uc_hook_add(uc, &hh, UC_HOOK_MEM_WRITE, reinterpret_cast<void *>(&write_hook), &state->mem, 1, 0);
+        assert(err == UC_ERR_OK);
+    }
     
     err = uc_hook_add(uc, &hh, UC_HOOK_INTR, reinterpret_cast<void *>(&intr_hook), &state->mem, 1, 0);
     assert(err == UC_ERR_OK);
