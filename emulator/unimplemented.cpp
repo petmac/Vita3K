@@ -5,8 +5,8 @@
 
 static void unimplemented(const char *name)
 {
-    std::cerr << "Unimplemented import '" << name << "' called." << std::endl;
-    assert(!"Unimplemented.");
+    std::cerr << ">>> " << name << " <<< Unimplemented import called." << std::endl;
+    assert(false);
 }
 
 #define UNIMPLEMENTED(name) IMP_SIG(name) { unimplemented(#name); return 0; }
