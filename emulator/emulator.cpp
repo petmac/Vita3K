@@ -119,7 +119,7 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
     if (fn != nullptr)
     {
         const Args args = read_args(uc);
-        const uint32_t result = (*fn)(args.r0, args.r1, args.r2, args.r3, args.sp, mem);
+        const uint32_t result = (*fn)(args.r0, args.r1, args.r2, args.r3, args.sp, uc, mem);
         write_result(uc, result);
     }
 }

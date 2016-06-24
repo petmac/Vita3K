@@ -1,7 +1,10 @@
 #include "import.h"
 
+#include <unicorn/unicorn.h>
+
 #include <iostream>
 #include <map>
+#include <time.h>
 
 static const size_t MAX_NAME_LEN = 32;
 
@@ -96,6 +99,21 @@ IMP_SIG(sceKernelGetMemBlockBase)
     *address = block->second;
     
     return SCE_OK;
+}
+
+IMP_SIG(sceKernelGetProcessTimeWide)
+{
+    static_assert(CLOCKS_PER_SEC == 1000000, "CLOCKS_PER_SEC doesn't match Vita.");
+    
+    const clock_t clocks = clock();
+    
+    r0 = static_cast<uint32_t>(clocks);
+    r1 = static_cast<uint32_t>(clocks >> 32);
+    
+    const uc_err err = uc_reg_write(uc, UC_ARM_REG_R1, &r1);
+    assert(err == UC_ERR_OK);
+    
+    return r0;
 }
 
 IMP_SIG(sceKernelGetTLSAddr)
