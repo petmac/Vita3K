@@ -21,6 +21,7 @@
 		C1855A991D016320004539B7 /* libunicorn.1.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = C1855A971D016245004539B7 /* libunicorn.1.dylib */; };
 		C1855A9D1D01ED3F004539B7 /* emulator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1855A9B1D01ED3F004539B7 /* emulator.cpp */; settings = {ASSET_TAGS = (); }; };
 		C188F8851D1D0E9400D16550 /* imports_touch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C188F8841D1D0E9400D16550 /* imports_touch.cpp */; settings = {ASSET_TAGS = (); }; };
+		C188F88A1D1D9EB600D16550 /* display.mm in Sources */ = {isa = PBXBuildFile; fileRef = C188F8891D1D9EB600D16550 /* display.mm */; settings = {ASSET_TAGS = (); }; };
 		C1AD18EF1D07869800064A1F /* libcapstone.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1AD18EE1D07869800064A1F /* libcapstone.a */; };
 		C1AD18F41D07ED2100064A1F /* disasm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1AD18F21D07ED2100064A1F /* disasm.cpp */; settings = {ASSET_TAGS = (); }; };
 		C1B4A0451D02FFFC00F53D2C /* mem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1B4A0431D02FFFC00F53D2C /* mem.cpp */; settings = {ASSET_TAGS = (); }; };
@@ -90,6 +91,8 @@
 		C1855A9B1D01ED3F004539B7 /* emulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = emulator.cpp; sourceTree = "<group>"; };
 		C1855A9C1D01ED3F004539B7 /* emulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = emulator.h; sourceTree = "<group>"; };
 		C188F8841D1D0E9400D16550 /* imports_touch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imports_touch.cpp; sourceTree = "<group>"; };
+		C188F8861D1D9E2500D16550 /* display.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = display.h; sourceTree = "<group>"; };
+		C188F8891D1D9EB600D16550 /* display.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = display.mm; sourceTree = "<group>"; };
 		C1AD18EE1D07869800064A1F /* libcapstone.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcapstone.a; path = capstone/libcapstone.a; sourceTree = "<group>"; };
 		C1AD18F21D07ED2100064A1F /* disasm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = disasm.cpp; sourceTree = "<group>"; };
 		C1AD18F31D07ED2100064A1F /* disasm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = disasm.h; sourceTree = "<group>"; };
@@ -140,6 +143,7 @@
 				C121437C1D000FEE00702861 /* AppDelegate.h */,
 				C121437D1D000FEE00702861 /* AppDelegate.mm */,
 				C12143851D000FEE00702861 /* Assets.xcassets */,
+				C188F8891D1D9EB600D16550 /* display.mm */,
 				C121438A1D000FEE00702861 /* Info.plist */,
 				C12143801D000FEE00702861 /* main.m */,
 				C12143871D000FEE00702861 /* Main.storyboard */,
@@ -179,6 +183,7 @@
 				C1EA5B811D185320000CE42E /* call.h */,
 				C1AD18F21D07ED2100064A1F /* disasm.cpp */,
 				C1AD18F31D07ED2100064A1F /* disasm.h */,
+				C188F8861D1D9E2500D16550 /* display.h */,
 				C1855A9B1D01ED3F004539B7 /* emulator.cpp */,
 				C1855A9C1D01ED3F004539B7 /* emulator.h */,
 				C173D8B01D11CEA8001F9EF7 /* gen_nids.py */,
@@ -320,6 +325,7 @@
 				C1EA5B7F1D17CE74000CE42E /* imports_kernel.cpp in Sources */,
 				C173D8B41D1306EA001F9EF7 /* imports.cpp in Sources */,
 				C1EA5B841D19202F000CE42E /* call.cpp in Sources */,
+				C188F88A1D1D9EB600D16550 /* display.mm in Sources */,
 				C1855A9D1D01ED3F004539B7 /* emulator.cpp in Sources */,
 				C1B4A0451D02FFFC00F53D2C /* mem.cpp in Sources */,
 				C121437E1D000FEE00702861 /* AppDelegate.mm in Sources */,

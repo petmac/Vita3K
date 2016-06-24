@@ -1,5 +1,7 @@
 #include "import.h"
 
+#include "display.h"
+
 enum PixelFormat : uint32_t
 {
     SCE_DISPLAY_PIXELFORMAT_A8B8G8R8
@@ -32,6 +34,13 @@ IMP_SIG(sceDisplaySetFrameBuf)
     assert(fb->width == 960);
     assert(fb->height == 544);
     assert(set == SCE_DISPLAY_SETBUF_NEXTFRAME);
+    
+    return SCE_OK;
+}
+
+IMP_SIG(sceDisplayWaitVblankStart)
+{
+    wait_vblank_start();
     
     return SCE_OK;
 }
