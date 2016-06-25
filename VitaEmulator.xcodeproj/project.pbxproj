@@ -404,6 +404,7 @@
 					"${PROJECT_DIR}/capstone/include",
 					"${PROJECT_DIR}/elfio",
 					"${PROJECT_DIR}/unicorn/include",
+					/usr/local/opt/sdl2/include,
 					"${inherited}",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
@@ -448,6 +449,7 @@
 					"${PROJECT_DIR}/capstone/include",
 					"${PROJECT_DIR}/elfio",
 					"${PROJECT_DIR}/unicorn/include",
+					/usr/local/opt/sdl2/include,
 					"${inherited}",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
@@ -464,9 +466,14 @@
 				INFOPLIST_FILE = osx/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(PROJECT_DIR)/unicorn",
 					"$(PROJECT_DIR)/capstone",
+					/usr/local/opt/sdl2/lib,
+					"$(inherited)",
+				);
+				OTHER_LDFLAGS = (
+					"-lSDL2",
+					"${inherited}",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = mackay.pete.VitaEmulator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -481,9 +488,14 @@
 				INFOPLIST_FILE = osx/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(PROJECT_DIR)/unicorn",
 					"$(PROJECT_DIR)/capstone",
+					/usr/local/opt/sdl2/lib,
+					"$(inherited)",
+				);
+				OTHER_LDFLAGS = (
+					"-lSDL2",
+					"${inherited}",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = mackay.pete.VitaEmulator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
