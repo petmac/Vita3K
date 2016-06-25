@@ -4,6 +4,9 @@
 #include <SDL2/SDL_opengl.h>
 #include <unicorn/unicorn.h>
 
+// TODO This is a bit gross.
+extern SDL_Window *window;
+
 enum PixelFormat : uint32_t
 {
     SCE_DISPLAY_PIXELFORMAT_A8B8G8R8
@@ -37,7 +40,10 @@ IMP_SIG(sceDisplaySetFrameBuf)
     assert(fb->height == 544);
     assert(set == SCE_DISPLAY_SETBUF_NEXTFRAME);
     
-    //SDL_GL_SwapWindow(window);
+    const void *const pixels = mem_ptr<const void>(fb->base, mem);
+    glDrawPixels(fb->width, fb->height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    
+    SDL_GL_SwapWindow(window);
     
     return SCE_OK;
 }

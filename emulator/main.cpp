@@ -3,6 +3,10 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 
+// TODO This is a bit gross.
+extern SDL_Window *window;
+SDL_Window *window = nullptr;
+
 int main(int argc, const char * argv[])
 {
     if (argc <= 2)
@@ -15,7 +19,7 @@ int main(int argc, const char * argv[])
         return 1;
     }
     
-    SDL_Window *window = SDL_CreateWindow("Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 960, 544, SDL_WINDOW_OPENGL);
+    window = SDL_CreateWindow("Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 960, 544, SDL_WINDOW_OPENGL);
     if (window == nullptr)
     {
         return 2;
@@ -30,6 +34,8 @@ int main(int argc, const char * argv[])
     SDL_GL_MakeCurrent(window, context);
     
     glClearColor(0.0625f, 0.125f, 0.25f, 1);
+    glPixelZoom(1, -1);
+    glRasterPos2f(-1, 1);
     
     const char *const path = argv[1];
     const bool result = emulate(path);
