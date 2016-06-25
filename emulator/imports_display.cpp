@@ -1,5 +1,9 @@
 #include "import.h"
 
+#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_opengl.h>
+#include <unicorn/unicorn.h>
+
 enum PixelFormat : uint32_t
 {
     SCE_DISPLAY_PIXELFORMAT_A8B8G8R8
@@ -33,10 +37,22 @@ IMP_SIG(sceDisplaySetFrameBuf)
     assert(fb->height == 544);
     assert(set == SCE_DISPLAY_SETBUF_NEXTFRAME);
     
+    //SDL_GL_SwapWindow(window);
+    
     return SCE_OK;
 }
 
 IMP_SIG(sceDisplayWaitVblankStart)
 {
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
+    {
+        if (event.type == SDL_QUIT)
+        {
+            uc_emu_stop(uc);
+            break;
+        }
+    }
+    
     return SCE_OK;
 }

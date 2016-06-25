@@ -1,8 +1,15 @@
+#include "emulator.h"
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 
 int main(int argc, const char * argv[])
 {
+    if (argc <= 2)
+    {
+        return 1;
+    }
+    
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         return 1;
@@ -24,22 +31,8 @@ int main(int argc, const char * argv[])
     
     glClearColor(0.0625f, 0.125f, 0.25f, 1);
     
-    bool quit = false;
-    while (!quit)
-    {
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_QUIT)
-            {
-                quit = true;
-            }
-        }
-        
-        glClear(GL_COLOR_BUFFER_BIT);
-        
-        SDL_GL_SwapWindow(window);
-    }
+    const char *const path = argv[1];
+    const bool result = emulate(path);
     
     SDL_GL_MakeCurrent(window, nullptr);
     SDL_GL_DeleteContext(context);
@@ -50,5 +43,5 @@ int main(int argc, const char * argv[])
     
     SDL_Quit();
     
-    return 0;
+    return result ? 0 : 1;
 }
