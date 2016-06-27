@@ -38,11 +38,6 @@ IMP_SIG(sceKernelAllocMemBlock)
     assert(size != 0);
     assert(unknown == 0);
     
-    std::cout << "name = " << name << std::endl;
-    std::cout << "type = " << type << std::endl;
-    std::cout << "size = " << size << std::endl;
-    std::cout << "unknown = " << unknown << std::endl;
-    
     const Address address = alloc(mem, size, name);
     if (address == 0)
     {
@@ -63,7 +58,6 @@ IMP_SIG(sceKernelCreateLwMutex)
     const int32_t count = r3;
     const Address *const stack = mem_ptr<Address>(sp, mem);
     const void *const options = mem_ptr<const void>(*stack, mem);
-    
     assert(workarea != nullptr);
     assert((attr == LW_MUTEX_ATTR_A) || (attr == LW_MUTEX_ATTR_B));
     assert(count == 0);

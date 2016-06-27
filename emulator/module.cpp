@@ -65,9 +65,6 @@ static bool load_func_imports(const uint32_t *nids, const Address *entries, size
     {
         const uint32_t nid = nids[i];
         const Address entry = entries[i];
-        const char *const name = import_name(nid);
-        const char prev_fill = std::cout.fill();
-        std::cout << "\tNID " << std::hex << std::setw(8) << std::setfill('0') << nid << std::setfill(prev_fill) << " (" << name << ") at 0x" << entry << std::dec << std::endl;
         
         uint32_t *const stub = mem_ptr<uint32_t>(entry, &mem);
         stub[0] = 0xef000000; // svc #0 - Call our interrupt hook.
@@ -86,8 +83,6 @@ static bool load_imports(const ModuleInfo &module, Address segment_address, cons
     
     for (const ModuleImports *imports = imports_begin; imports < imports_end; imports = reinterpret_cast<const ModuleImports *>(reinterpret_cast<const uint8_t *>(imports) + imports->size))
     {
-        const char *const lib_name = mem_ptr<const char>(imports->lib_name, &mem);
-        std::cout << "Loading imports from " << lib_name << std::endl;
         assert(imports->lib_version == 1);
         assert(imports->num_vars == 0);
         assert(imports->num_tls_vars == 0);
