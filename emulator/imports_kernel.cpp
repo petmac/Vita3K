@@ -76,6 +76,15 @@ IMP_SIG(sceKernelCreateMutex)
     return 0;
 }
 
+IMP_SIG(sceKernelExitProcess)
+{
+    // TODO Handle exit code?
+    // TODO Stop all threads, not just this one.
+    uc_emu_stop(uc);
+    
+    return SCE_OK;
+}
+
 IMP_SIG(sceKernelGetMemBlockBase)
 {
     const SceUID uid = r0;
