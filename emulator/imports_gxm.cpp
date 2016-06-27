@@ -36,3 +36,11 @@ IMP_SIG(sceGxmMapMemory)
     
     return SCE_OK;
 }
+
+IMP_SIG(sceGxmUnmapMemory)
+{
+    const void *const address = mem_ptr<const void>(r0, mem);
+    assert(address != nullptr);
+    
+    return SCE_OK;
+}
