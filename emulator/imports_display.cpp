@@ -55,6 +55,7 @@ IMP_SIG(sceDisplayWaitVblankStart)
     {
         if (event.type == SDL_QUIT)
         {
+            // TODO Stop all threads, not just this one.
             uc_emu_stop(uc);
             break;
         }
