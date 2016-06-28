@@ -73,17 +73,6 @@ Address alloc(MemState *state, size_t size, const char *name)
     return static_cast<Address>(address);
 }
 
-void reserve(MemState *state, Address address, size_t size, const char *name)
-{
-    assert((address % state->page_size) == 0);
-    
-    const size_t page_count = (size + (state->page_size - 1)) / state->page_size;
-    const size_t block_page_index = address / state->page_size;
-    const Allocated::iterator block = state->allocated_pages.begin() + block_page_index;
-    
-    alloc_inner(state, address, page_count, block, name);
-}
-
 const char *mem_name(Address address, const MemState *state)
 {
     const size_t page = address / state->page_size;

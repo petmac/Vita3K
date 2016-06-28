@@ -2,6 +2,7 @@
 
 #include "imports.h"
 #include "mem.h"
+#include "relocation.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
@@ -129,21 +130,23 @@ bool load(Module *module, MemState *mem, const char *path)
     const Address module_info_segment_address = static_cast<Address>(module_info_segment->get_virtual_address());
     module->entry_point = module_info_segment_address + module_info->mod_start;
     
+    SegmentAddresses segments;
     for (ELFIO::Elf_Half segment_index = 0; segment_index < elf.segments.size(); ++segment_index)
     {
         const ELFIO::segment &src = *elf.segments[segment_index];
-        if (src.get_type() == PT_LOAD)
+        const uint32_t type = src.get_type();
+        if (type == PT_LOAD)
         {
             assert((src.get_virtual_address() % mem->page_size) == 0);
             
-            Segment dst;
-            dst.address = static_cast<Address>(src.get_virtual_address());
-            dst.size = ((src.get_memory_size() + (mem->page_size - 1)) / mem->page_size) * mem->page_size;
+            const Address address = alloc(mem, src.get_memory_size(), "segment");
+            std::copy_n(src.get_data(), src.get_file_size(), mem_ptr<uint8_t>(address, mem));
             
-            reserve(mem, dst.address, dst.size, "segment");
-            std::copy_n(src.get_data(), src.get_file_size(), mem_ptr<uint8_t>(dst.address, mem));
-            
-            module->segments.push_back(dst);
+            segments[segment_index] = address;
+        }
+        else if (type == PT_LOOS)
+        {
+            relocate(src.get_data(), src.get_file_size(), segments, mem);
         }
     }
     
