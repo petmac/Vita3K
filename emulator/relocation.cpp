@@ -94,6 +94,23 @@ static void write_thumb_call(void *data, uint32_t symbol)
     pair->lower.j1 = pair->upper.sign ^ ((~symbol) >> 23);
 }
 
+static void write_mov_abs(void *data, uint16_t symbol)
+{
+    struct Instruction
+    {
+        uint32_t imm12 : 12;
+        uint32_t ignored1 : 4;
+        uint32_t imm4 : 4;
+        uint32_t ignored2 : 12;
+    };
+    
+    static_assert(sizeof(Instruction) == 4, "Incorrect size.");
+    
+    Instruction *const instruction = static_cast<Instruction *>(data);
+    instruction->imm12 = symbol;
+    instruction->imm4 = symbol >> 12;
+}
+
 static void write_thumb_mov_abs(void *data, uint16_t symbol)
 {
     // This is cribbed from UVLoader, but I used bitfields to get rid of some shifting and masking.
@@ -152,6 +169,19 @@ static void relocate(void *data, Code code, uint32_t s, uint32_t a, uint32_t p)
             write_thumb_call(data, s + a - p);
             break;
             
+        case Call:
+        case Jump24:
+            write_masked(data, (s + a - p) >> 2, 0xffffff);
+            break;
+            
+        case MovwAbsNc:
+            write_mov_abs(data, s + a);
+            break;
+            
+        case MovtAbs:
+            write_mov_abs(data, (s + a) >> 16);
+            break;
+            
         case ThumbMovwAbsNc:
             write_thumb_mov_abs(data, s + a);
             break;
@@ -173,7 +203,6 @@ void relocate(const void *entries, size_t size, const SegmentAddresses &segments
     while (entry < end)
     {
         assert(entry->is_short == 0);
-        assert(entry->symbol_segment != 0xf);
         
         const Address symbol_start = segments.find(entry->symbol_segment)->second;
         const Address s = (entry->symbol_segment == 0xf) ? 0 : symbol_start;
