@@ -3,7 +3,6 @@
 #include "mem.h"
 
 #include <assert.h>
-#include <stdint.h>
 
 enum Code
 {
@@ -50,12 +49,86 @@ struct LongEntry : Entry
 static_assert(sizeof(ShortEntry) == 8, "Short entry has incorrect size.");
 static_assert(sizeof(LongEntry) == 12, "Long entry has incorrect size.");
 
-static void relocate(uint32_t *data, uint32_t symbol, uint32_t mask)
+static void write(void *data, uint32_t value)
 {
-    *data = (*data & ~mask) | (symbol & mask);
+    memcpy(data, &value, sizeof(value));
 }
 
-static void relocate(uint32_t *data, Code code, uint32_t s, uint32_t a, uint32_t p)
+static void write_masked(void *data, uint32_t symbol, uint32_t mask)
+{
+    write(data, symbol & mask);
+}
+
+static void write_thumb_call(void *data, uint32_t symbol)
+{
+    // This is cribbed from UVLoader, but I used bitfields to get rid of some shifting and masking.
+    struct Upper
+    {
+        uint16_t imm10 : 10;
+        uint16_t sign : 1;
+        uint16_t ignored : 5;
+    };
+    
+    struct Lower
+    {
+        uint16_t imm11 : 11;
+        uint16_t j2 : 1;
+        uint16_t unknown : 1;
+        uint16_t j1 : 1;
+        uint16_t unknown2 : 2;
+    };
+    
+    struct Pair
+    {
+        Upper upper;
+        Lower lower;
+    };
+    
+    static_assert(sizeof(Pair) == 4, "Incorrect size.");
+    
+    Pair *const pair = static_cast<Pair *>(data);
+    pair->lower.imm11 = symbol >> 1;
+    pair->upper.imm10 = symbol >> 12;
+    pair->upper.sign = symbol >> 24;
+    pair->lower.j2 = pair->upper.sign ^ ((~symbol) >> 22);
+    pair->lower.j1 = pair->upper.sign ^ ((~symbol) >> 23);
+}
+
+static void write_thumb_mov_abs(void *data, uint16_t symbol)
+{
+    // This is cribbed from UVLoader, but I used bitfields to get rid of some shifting and masking.
+    struct Upper
+    {
+        uint16_t imm4 : 4;
+        uint16_t ignored1 : 6;
+        uint16_t i : 1;
+        uint16_t ignored2 : 5;
+    };
+    
+    struct Lower
+    {
+        uint16_t imm8 : 8;
+        uint16_t ignored1 : 4;
+        uint16_t imm3 : 3;
+        uint16_t ignored2 : 1;
+    };
+    
+    struct Pair
+    {
+        Upper upper;
+        Lower lower;
+    };
+    
+    static_assert(sizeof(Pair) == 4, "Incorrect size.");
+    
+    Pair *const pair = static_cast<Pair *>(data);
+    pair->lower.imm8 = symbol;
+    pair->lower.imm3 = symbol >> 8;
+    pair->upper.i = symbol >> 11;
+    pair->upper.imm4 = symbol >> 12;
+}
+
+static void relocate(void *data, Code code, uint32_t s, uint32_t a, uint32_t p)
 {
     switch (code)
     {
@@ -64,29 +137,27 @@ static void relocate(uint32_t *data, Code code, uint32_t s, uint32_t a, uint32_t
             
         case Abs32:
         case Target1:
-            *data = s + a;
+            write(data, s + a);
             break;
             
         case Rel32:
-            *data = s + a - p;
+            write(data, s + a - p);
             break;
             
         case Prel31:
-            relocate(data, s + a - p, 0x7fffffff);
+            write_masked(data, s + a - p, INT32_MAX);
             break;
             
         case ThumbCall:
-            relocate(data, s + a - p, 0x1fffffe);
+            write_thumb_call(data, s + a - p);
             break;
             
         case ThumbMovwAbsNc:
-            // TODO This is wrong.
-            relocate(data, s + a, 0xffff);
+            write_thumb_mov_abs(data, s + a);
             break;
             
         case ThumbMovtAbs:
-            // TODO This is wrong.
-            relocate(data, s + a, 0xffff0000);
+            write_thumb_mov_abs(data, (s + a) >> 16);
             break;
             
         default:

@@ -127,8 +127,6 @@ bool load(Module *module, MemState *mem, const char *path)
     const Address module_info_offset = elf.get_entry() & 0x3fffffff;
     const ELFIO::segment *const module_info_segment = elf.segments[module_info_segment_index];
     const ModuleInfo *const module_info = reinterpret_cast<const ModuleInfo *>(module_info_segment->get_data() + module_info_offset);
-    const Address module_info_segment_address = static_cast<Address>(module_info_segment->get_virtual_address());
-    module->entry_point = module_info_segment_address + module_info->mod_start;
     
     SegmentAddresses segments;
     for (ELFIO::Elf_Half segment_index = 0; segment_index < elf.segments.size(); ++segment_index)
@@ -137,8 +135,6 @@ bool load(Module *module, MemState *mem, const char *path)
         const uint32_t type = src.get_type();
         if (type == PT_LOAD)
         {
-            assert((src.get_virtual_address() % mem->page_size) == 0);
-            
             const Address address = alloc(mem, src.get_memory_size(), "segment");
             std::copy_n(src.get_data(), src.get_file_size(), mem_ptr<uint8_t>(address, mem));
             
@@ -149,6 +145,9 @@ bool load(Module *module, MemState *mem, const char *path)
             relocate(src.get_data(), src.get_file_size(), segments, mem);
         }
     }
+    
+    const Address module_info_segment_address = segments[module_info_segment_index];
+    module->entry_point = module_info_segment_address + module_info->mod_start;
     
     if (!load_imports(*module_info, module_info_segment_address, *mem))
     {
