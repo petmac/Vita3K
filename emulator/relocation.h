@@ -9,4 +9,4 @@ class MemState;
 
 typedef std::map<size_t, Address> SegmentAddresses;
 
-void relocate(const void *entries, size_t size, const SegmentAddresses &segments, const MemState *mem);
+bool relocate(const void *entries, size_t size, const SegmentAddresses &segments, const MemState *mem);

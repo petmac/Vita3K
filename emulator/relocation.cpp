@@ -3,6 +3,7 @@
 #include "mem.h"
 
 #include <assert.h>
+#include <iostream>
 
 enum Code
 {
@@ -145,7 +146,7 @@ static void write_thumb_mov_abs(void *data, uint16_t symbol)
     pair->upper.imm4 = symbol >> 12;
 }
 
-static void relocate(void *data, Code code, uint32_t s, uint32_t a, uint32_t p)
+static bool relocate(void *data, Code code, uint32_t s, uint32_t a, uint32_t p)
 {
     switch (code)
     {
@@ -191,12 +192,14 @@ static void relocate(void *data, Code code, uint32_t s, uint32_t a, uint32_t p)
             break;
             
         default:
-            assert(!"Unhandled relocation code.");
-            break;
+            std::cerr << "Unhandled relocation code " << code << "." << std::endl;
+            return false;
     }
+    
+    return true;
 }
 
-void relocate(const void *entries, size_t size, const SegmentAddresses &segments, const MemState *mem)
+bool relocate(const void *entries, size_t size, const SegmentAddresses &segments, const MemState *mem)
 {
     const void *const end = static_cast<const uint8_t *>(entries) + size;
     const Entry *entry = static_cast<const Entry *>(entries);
@@ -220,9 +223,14 @@ void relocate(const void *entries, size_t size, const SegmentAddresses &segments
             const Address segment_start = segments.find(long_entry->data_segment)->second;
             const Address p = segment_start + long_entry->offset;
             const Address a = long_entry->addend;
-            relocate(mem_ptr<uint32_t>(p, mem), static_cast<Code>(entry->code), s, a, p);
+            if (!relocate(mem_ptr<uint32_t>(p, mem), static_cast<Code>(entry->code), s, a, p))
+            {
+                return false;
+            }
             
             entry = long_entry + 1;
         }
     }
+    
+    return true;
 }

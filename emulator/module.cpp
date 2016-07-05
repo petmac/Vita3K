@@ -136,13 +136,22 @@ bool load(Module *module, MemState *mem, const char *path)
         if (type == PT_LOAD)
         {
             const Address address = alloc(mem, src.get_memory_size(), "segment");
+            if (address == 0)
+            {
+                std::cerr << "Failed to allocate memory for segment." << std::endl;
+                return false;
+            }
+            
             std::copy_n(src.get_data(), src.get_file_size(), mem_ptr<uint8_t>(address, mem));
             
             segments[segment_index] = address;
         }
         else if (type == PT_LOOS)
         {
-            relocate(src.get_data(), src.get_file_size(), segments, mem);
+            if (!relocate(src.get_data(), src.get_file_size(), segments, mem))
+            {
+                return false;
+            }
         }
     }
     
