@@ -1,4 +1,5 @@
 #include "emulator.h"
+#include "module.h"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
@@ -37,8 +38,20 @@ int main(int argc, const char * argv[])
     glPixelZoom(1, -1);
     glRasterPos2f(-1, 1);
     
+    EmulatorState state;
+    if (!init(&state))
+    {
+        return 4;
+    }
+    
+    Module module;
     const char *const path = argv[1];
-    const bool result = emulate(path);
+    if (!load(&module, &state.mem, path))
+    {
+        return 5;
+    }
+    
+    const bool result = run_thread(&state, module.entry_point);
     
     SDL_GL_MakeCurrent(window, nullptr);
     SDL_GL_DeleteContext(context);

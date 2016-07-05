@@ -1,10 +1,7 @@
 #include "emulator.h"
 
 #include "call.h"
-#include "disasm.h"
 #include "imports.h"
-#include "mem.h"
-#include "module.h"
 
 #include <unicorn/unicorn.h>
 
@@ -15,12 +12,6 @@
 static const bool LOG_CODE = false;
 static const bool LOG_MEM_ACCESS = false;
 static const bool LOG_IMPORT_CALLS = false;
-
-struct EmulatorState
-{
-    DisasmState disasm;
-    MemState mem;
-};
 
 // Copied from
 // http://processors.wiki.ti.com/index.php/Cortex-A8#How_to_enable_NEON
@@ -59,11 +50,6 @@ static const uint32_t bootstrap_thumb[] =
     0x4080F04F,
     0x0A10EEE8
 };
-
-static bool init(EmulatorState *state)
-{
-    return init(&state->disasm) && init(&state->mem);
-}
 
 static void code_hook(uc_engine *uc, uint64_t address, uint32_t size, void *user_data)
 {
@@ -128,7 +114,12 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
     }
 }
 
-static bool run_thread(EmulatorState *state, Address entry_point)
+bool init(EmulatorState *state)
+{
+    return init(&state->disasm) && init(&state->mem);
+}
+
+bool run_thread(EmulatorState *state, Address entry_point)
 {
     const bool thumb = entry_point & 1;
     uc_engine *uc = nullptr;
@@ -190,21 +181,4 @@ static bool run_thread(EmulatorState *state, Address entry_point)
     
     std::cout << "Emulation succeeded." << std::endl;
     return true;
-}
-
-bool emulate(const char *path)
-{
-    EmulatorState state;
-    if (!init(&state))
-    {
-        return false;
-    }
-    
-    Module module;
-    if (!load(&module, &state.mem, path))
-    {
-        return false;
-    }
-    
-    return run_thread(&state, module.entry_point);
 }
