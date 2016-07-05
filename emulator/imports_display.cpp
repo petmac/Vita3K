@@ -5,6 +5,7 @@
 #include <unicorn/unicorn.h>
 
 // TODO This is a bit gross.
+// TODO Move elsewhere.
 extern SDL_Window *window;
 
 enum PixelFormat : uint32_t

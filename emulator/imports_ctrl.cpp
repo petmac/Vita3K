@@ -2,6 +2,7 @@
 
 #include <SDL2/SDL_keyboard.h>
 
+// TODO Move elsewhere.
 static uint64_t timestamp;
 
 // https://github.com/vitasdk/vita-headers/blob/master/include/psp2/ctrl.h

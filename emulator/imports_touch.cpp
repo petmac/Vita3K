@@ -3,6 +3,7 @@
 #include <SDL2/SDL_mouse.h>
 #include <SDL2/SDL_video.h>
 
+// TODO Move elsewhere.
 static uint64_t timestamp;
 
 // https://github.com/vitasdk/vita-headers/blob/master/include/psp2/touch.h
