@@ -3,7 +3,6 @@
 #include <unicorn/unicorn.h>
 
 #include <iostream>
-#include <map>
 #include <time.h>
 
 static const size_t MAX_NAME_LEN = 32;
@@ -18,14 +17,6 @@ enum LWMutexAttr : uint32_t
     LW_MUTEX_ATTR_A = 0,
     LW_MUTEX_ATTR_B = 2,
 };
-
-typedef std::map<SceUID, Address> Blocks;
-typedef std::map<SceUID, Address> SlotToAddress;
-typedef std::map<SceUID, SlotToAddress> ThreadToSlotToAddress;
-
-static Blocks blocks;
-static SceUID next_uid;
-static ThreadToSlotToAddress tls;
 
 IMP_SIG(sceKernelAllocMemBlock)
 {
@@ -45,8 +36,9 @@ IMP_SIG(sceKernelAllocMemBlock)
         return -1; // TODO What should this be?
     }
     
-    const SceUID uid = next_uid++;
-    blocks.insert(Blocks::value_type(uid, address));
+    KernelState *const state = &emu->kernel;
+    const SceUID uid = state->next_uid++;
+    state->blocks.insert(Blocks::value_type(uid, address));
     
     return uid;
 }
@@ -95,8 +87,9 @@ IMP_SIG(sceKernelGetMemBlockBase)
     assert(uid >= 0);
     assert(address != nullptr);
     
-    const Blocks::const_iterator block = blocks.find(uid);
-    if (block == blocks.end())
+    const KernelState *const state = &emu->kernel;
+    const Blocks::const_iterator block = state->blocks.find(uid);
+    if (block == state->blocks.end())
     {
         // TODO Write address?
         return UNKNOWN_UID;
@@ -126,7 +119,8 @@ IMP_SIG(sceKernelGetTLSAddr)
 {
     const SceUID slot = r0;
     const SceUID thread = 0; // TODO Use the real thread ID.
-    SlotToAddress *const slot_to_address = &tls[thread];
+    KernelState *const state = &emu->kernel;
+    SlotToAddress *const slot_to_address = &state->tls[thread];
     
     const SlotToAddress::const_iterator existing = slot_to_address->find(slot);
     if (existing != slot_to_address->end())

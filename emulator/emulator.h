@@ -1,11 +1,13 @@
 #pragma once
 
 #include "disasm.h"
+#include "kernel.h"
 #include "mem.h"
 
 struct EmulatorState
 {
     DisasmState disasm;
+    KernelState kernel;
     MemState mem;
 };
 

@@ -92,6 +92,7 @@
 		C1B4A0441D02FFFC00F53D2C /* mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mem.h; sourceTree = "<group>"; };
 		C1DD5EEB1D1E6B0800FCE19A /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		C1DD5EED1D1E6C4500FCE19A /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		C1E11F221D2C1E6700D49E5B /* kernel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = kernel.h; sourceTree = "<group>"; };
 		C1EA5B7B1D17CB48000CE42E /* import.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = import.h; sourceTree = "<group>"; };
 		C1EA5B7C1D17CBF2000CE42E /* unimplemented.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = unimplemented.cpp; sourceTree = "<group>"; };
 		C1EA5B7E1D17CE74000CE42E /* imports_kernel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imports_kernel.cpp; sourceTree = "<group>"; };
@@ -183,6 +184,7 @@
 				C188F8841D1D0E9400D16550 /* imports_touch.cpp */,
 				C173D8B21D1306EA001F9EF7 /* imports.cpp */,
 				C173D8B31D1306EA001F9EF7 /* imports.h */,
+				C1E11F221D2C1E6700D49E5B /* kernel.h */,
 				C1DD5EEB1D1E6B0800FCE19A /* main.cpp */,
 				C1B4A0431D02FFFC00F53D2C /* mem.cpp */,
 				C1B4A0441D02FFFC00F53D2C /* mem.h */,
