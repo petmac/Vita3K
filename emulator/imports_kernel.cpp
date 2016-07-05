@@ -29,6 +29,7 @@ static ThreadToSlotToAddress tls;
 
 IMP_SIG(sceKernelAllocMemBlock)
 {
+    MemState *const mem = &emu->mem;
     const char *const name = mem_ptr<const char>(r0, mem);
     const uint32_t type = r1;
     const uint32_t size = r2;
@@ -52,6 +53,7 @@ IMP_SIG(sceKernelAllocMemBlock)
 
 IMP_SIG(sceKernelCreateLwMutex)
 {
+    const MemState *const mem = &emu->mem;
     LWMutexWorkArea *const workarea = mem_ptr<LWMutexWorkArea>(r0, mem);
     const char *const name = mem_ptr<const char>(r1, mem);
     const LWMutexAttr attr = static_cast<LWMutexAttr>(r2);
@@ -88,6 +90,7 @@ IMP_SIG(sceKernelExitProcess)
 IMP_SIG(sceKernelGetMemBlockBase)
 {
     const SceUID uid = r0;
+    const MemState *const mem = &emu->mem;
     Address *const address = mem_ptr<Address>(r1, mem);
     assert(uid >= 0);
     assert(address != nullptr);
@@ -133,6 +136,7 @@ IMP_SIG(sceKernelGetTLSAddr)
     
     // TODO Use a finer-grained allocator.
     // TODO This is a memory leak.
+    MemState *const mem = &emu->mem;
     const Address address = alloc(mem, sizeof(Address), "TLS");
     slot_to_address->insert(SlotToAddress::value_type(slot, address));
     
@@ -147,6 +151,7 @@ IMP_SIG(sceKernelGetThreadId)
 
 IMP_SIG(sceKernelLockLwMutex)
 {
+    const MemState *const mem = &emu->mem;
     LWMutexWorkArea *const workarea = mem_ptr<LWMutexWorkArea>(r0, mem);
     const int32_t count = r1;
     uint32_t *const timeout = mem_ptr<uint32_t>(r2, mem);
@@ -160,6 +165,7 @@ IMP_SIG(sceKernelLockLwMutex)
 
 IMP_SIG(sceKernelUnlockLwMutex)
 {
+    const MemState *const mem = &emu->mem;
     LWMutexWorkArea *const workarea = mem_ptr<LWMutexWorkArea>(r0, mem);
     const int32_t count = r1;
     assert(workarea != nullptr);

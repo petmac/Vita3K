@@ -90,7 +90,7 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
 {
     assert(intno == 2);
     
-    MemState *const mem = static_cast<MemState *>(user_data);
+    EmulatorState *const state = static_cast<EmulatorState *>(user_data);
     
     uint32_t pc = 0;
     uc_reg_read(uc, UC_ARM_REG_PC, &pc);
@@ -109,7 +109,7 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
     if (fn != nullptr)
     {
         const Args args = read_args(uc);
-        const uint32_t result = (*fn)(args.r0, args.r1, args.r2, args.r3, args.sp, uc, mem);
+        const uint32_t result = (*fn)(args.r0, args.r1, args.r2, args.r3, args.sp, uc, state);
         write_result(uc, result);
     }
 }
@@ -142,7 +142,7 @@ bool run_thread(EmulatorState *state, Address entry_point)
         assert(err == UC_ERR_OK);
     }
     
-    err = uc_hook_add(uc, &hh, UC_HOOK_INTR, reinterpret_cast<void *>(&intr_hook), &state->mem, 1, 0);
+    err = uc_hook_add(uc, &hh, UC_HOOK_INTR, reinterpret_cast<void *>(&intr_hook), state, 1, 0);
     assert(err == UC_ERR_OK);
     
     const size_t stack_size = MB(1);

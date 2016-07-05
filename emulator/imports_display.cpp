@@ -29,6 +29,7 @@ enum SetBuf : uint32_t
 
 IMP_SIG(sceDisplaySetFrameBuf)
 {
+    const MemState *const mem = &emu->mem;
     const SceDisplayFrameBuf *const fb = mem_ptr<const SceDisplayFrameBuf>(r0, mem);
     const SetBuf set = static_cast<SetBuf>(r1);
     assert(fb != nullptr);

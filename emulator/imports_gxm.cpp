@@ -18,7 +18,7 @@ struct SceGxmInitializeParams
 
 IMP_SIG(sceGxmInitialize)
 {
-    const SceGxmInitializeParams *const params = mem_ptr<const SceGxmInitializeParams>(r0, mem);
+    const SceGxmInitializeParams *const params = mem_ptr<const SceGxmInitializeParams>(r0, &emu->mem);
     (void)params;
     
     // TODO Implement.
@@ -27,7 +27,7 @@ IMP_SIG(sceGxmInitialize)
 
 IMP_SIG(sceGxmMapMemory)
 {
-    const void *const address = mem_ptr<const void>(r0, mem);
+    const void *const address = mem_ptr<const void>(r0, &emu->mem);
     const size_t size = r1;
     const GxmMemoryAttrib attributes = static_cast<GxmMemoryAttrib>(r2);
     assert(address != nullptr);
@@ -44,7 +44,7 @@ IMP_SIG(sceGxmTerminate)
 
 IMP_SIG(sceGxmUnmapMemory)
 {
-    const void *const address = mem_ptr<const void>(r0, mem);
+    const void *const address = mem_ptr<const void>(r0, &emu->mem);
     assert(address != nullptr);
     
     return SCE_OK;

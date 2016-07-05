@@ -79,6 +79,7 @@ static uint8_t keys_to_axis(const uint8_t *keys, SDL_Scancode code1, SDL_Scancod
 IMP_SIG(sceCtrlPeekBufferPositive)
 {
     const int32_t port = r0;
+    const MemState *const mem = &emu->mem;
     SceCtrlData *const data = mem_ptr<SceCtrlData>(r1, mem);
     const int32_t count = r2;
     assert(port == 0);
