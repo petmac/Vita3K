@@ -45,6 +45,12 @@ int main(int argc, const char * argv[])
         return IncorrectArgs;
     }
     
+    const SDLPtr sdl(reinterpret_cast<const void *>(SDL_Init(SDL_INIT_GAMECONTROLLER | SDL_INIT_VIDEO) >= 0), term_sdl);
+    if (!sdl)
+    {
+        return SDLInitFailed;
+    }
+    
     EmulatorState state;
     if (!init(&state))
     {
@@ -56,12 +62,6 @@ int main(int argc, const char * argv[])
     if (!load(&module, &state.mem, path))
     {
         return ModuleLoadFailed;
-    }
-    
-    const SDLPtr sdl(reinterpret_cast<const void *>(SDL_Init(SDL_INIT_VIDEO) >= 0), term_sdl);
-    if (!sdl)
-    {
-        return SDLInitFailed;
     }
     
     const WindowPtr window(SDL_CreateWindow("Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 960, 544, SDL_WINDOW_OPENGL), SDL_DestroyWindow);

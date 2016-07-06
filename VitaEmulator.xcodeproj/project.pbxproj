@@ -83,6 +83,7 @@
 		C1855A9B1D01ED3F004539B7 /* emulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = emulator.cpp; sourceTree = "<group>"; };
 		C1855A9C1D01ED3F004539B7 /* emulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = emulator.h; sourceTree = "<group>"; };
 		C188F8841D1D0E9400D16550 /* imports_touch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imports_touch.cpp; sourceTree = "<group>"; };
+		C193EE101D2CE1BB00543CE7 /* ctrl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ctrl.h; sourceTree = "<group>"; };
 		C1AA7C6B1D2258C000FAF58D /* relocation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = relocation.cpp; sourceTree = "<group>"; };
 		C1AA7C6C1D2258C000FAF58D /* relocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = relocation.h; sourceTree = "<group>"; };
 		C1AD18EE1D07869800064A1F /* libcapstone.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcapstone.a; path = capstone/libcapstone.a; sourceTree = "<group>"; };
@@ -171,6 +172,7 @@
 			children = (
 				C1EA5B831D19202F000CE42E /* call.cpp */,
 				C1EA5B811D185320000CE42E /* call.h */,
+				C193EE101D2CE1BB00543CE7 /* ctrl.h */,
 				C1AD18F21D07ED2100064A1F /* disasm.cpp */,
 				C1AD18F31D07ED2100064A1F /* disasm.h */,
 				C1855A9B1D01ED3F004539B7 /* emulator.cpp */,
