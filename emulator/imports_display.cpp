@@ -2,11 +2,8 @@
 
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_opengl.h>
+#include <SDL2/SDL_video.h>
 #include <unicorn/unicorn.h>
-
-// TODO This is a bit gross.
-// TODO Move elsewhere.
-extern SDL_Window *window;
 
 enum PixelFormat : uint32_t
 {
@@ -45,7 +42,13 @@ IMP_SIG(sceDisplaySetFrameBuf)
     const void *const pixels = mem_ptr<const void>(fb->base, mem);
     glDrawPixels(fb->width, fb->height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
     
-    SDL_GL_SwapWindow(window);
+    SDL_Window *const window = SDL_GL_GetCurrentWindow();
+    assert(window != nullptr);
+    
+    if (window != nullptr)
+    {
+        SDL_GL_SwapWindow(window);
+    }
     
     return SCE_OK;
 }

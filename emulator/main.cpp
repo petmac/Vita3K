@@ -4,63 +4,88 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 
-// TODO This is a bit gross.
-extern SDL_Window *window;
-SDL_Window *window = nullptr;
+#include <assert.h>
+#include <memory>
+
+typedef std::unique_ptr<const void, void (*)(const void *)> SDLPtr;
+typedef std::unique_ptr<SDL_Window, void (*)(SDL_Window *)> WindowPtr;
+typedef std::unique_ptr<void, void (*)(SDL_GLContext)> GLContextPtr;
+
+enum ExitCode
+{
+    Success = 0,
+    IncorrectArgs,
+    EmulatorInitFailed,
+    ModuleLoadFailed,
+    SDLInitFailed,
+    CreateWindowFailed,
+    CreateContextFailed,
+    RunThreadFailed
+};
+
+static void term_sdl(const void *succeeded)
+{
+    assert(succeeded != nullptr);
+    
+    SDL_Quit();
+}
+
+static void term_gl(SDL_GLContext gl)
+{
+    assert(gl != nullptr);
+    
+    SDL_GL_MakeCurrent(nullptr, nullptr);
+    SDL_GL_DeleteContext(gl);
+}
 
 int main(int argc, const char * argv[])
 {
     if (argc <= 2)
     {
-        return 1;
+        return IncorrectArgs;
     }
-    
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        return 1;
-    }
-    
-    window = SDL_CreateWindow("Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 960, 544, SDL_WINDOW_OPENGL);
-    if (window == nullptr)
-    {
-        return 2;
-    }
-    
-    SDL_GLContext context = SDL_GL_CreateContext(window);
-    if (context == nullptr)
-    {
-        return 3;
-    }
-    
-    SDL_GL_MakeCurrent(window, context);
-    
-    glClearColor(0.0625f, 0.125f, 0.25f, 1);
-    glPixelZoom(1, -1);
-    glRasterPos2f(-1, 1);
     
     EmulatorState state;
     if (!init(&state))
     {
-        return 4;
+        return EmulatorInitFailed;
     }
     
     Module module;
     const char *const path = argv[1];
     if (!load(&module, &state.mem, path))
     {
-        return 5;
+        return ModuleLoadFailed;
     }
     
-    const bool result = run_thread(&state, module.entry_point);
+    const SDLPtr sdl(reinterpret_cast<const void *>(SDL_Init(SDL_INIT_VIDEO) >= 0), term_sdl);
+    if (!sdl)
+    {
+        return SDLInitFailed;
+    }
     
-    SDL_GL_MakeCurrent(window, nullptr);
-    SDL_GL_DeleteContext(context);
-    context = nullptr;
+    const WindowPtr window(SDL_CreateWindow("Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 960, 544, SDL_WINDOW_OPENGL), SDL_DestroyWindow);
+    if (!window)
+    {
+        return CreateWindowFailed;
+    }
     
-    SDL_DestroyWindow(window);
-    window = nullptr;
+    const GLContextPtr gl(SDL_GL_CreateContext(window.get()), term_gl);
+    if (!gl)
+    {
+        return CreateContextFailed;
+    }
     
-    SDL_Quit();
+    SDL_GL_MakeCurrent(window.get(), gl.get());
     
-    return result ? 0 : 1;
+    glClearColor(0.0625f, 0.125f, 0.25f, 1);
+    glPixelZoom(1, -1);
+    glRasterPos2f(-1, 1);
+    
+    if (!run_thread(&state, module.entry_point))
+    {
+        return RunThreadFailed;
+    }
+    
+    return Success;
 }
