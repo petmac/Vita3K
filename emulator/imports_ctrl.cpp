@@ -142,11 +142,6 @@ static float axis_to_axis(int16_t axis)
 
 static void apply_controller(uint32_t *buttons, float axes[4], SDL_GameController *controller)
 {
-    if (!SDL_GameControllerGetAttached(controller))
-    {
-        return;
-    }
-    
     for (int i = 0; i < controller_binding_count; ++i)
     {
         const ControllerBinding &binding = controller_bindings[i];
