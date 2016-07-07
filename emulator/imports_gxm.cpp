@@ -239,6 +239,10 @@ struct SceGxmRenderTargetParams
     SceUID driverMemBlock = SCE_UID_INVALID_UID;
 };
 
+struct SceGxmSyncObject
+{    
+};
+
 IMP_SIG(sceGxmColorSurfaceInit)
 {
     // https://psp2sdk.github.io/gxm_8h.html
@@ -340,6 +344,20 @@ IMP_SIG(sceGxmMapMemory)
     assert(address != nullptr);
     assert(size > 0);
     assert((attributes == SCE_GXM_MEMORY_ATTRIB_READ) || (attributes == SCE_GXM_MEMORY_ATTRIB_RW));
+    
+    return SCE_OK;
+}
+
+IMP_SIG(sceGxmSyncObjectCreate)
+{
+    Ptr<SceGxmSyncObject> *const syncObject = Ptr<Ptr<SceGxmSyncObject>>(r0).get(&emu->mem);
+    assert(syncObject != nullptr);
+    
+    *syncObject = Ptr<SceGxmSyncObject>(alloc(&emu->mem, sizeof(SceGxmSyncObject), __FUNCTION__));
+    if (!*syncObject)
+    {
+        return OUT_OF_MEMORY;
+    }
     
     return SCE_OK;
 }
