@@ -7,12 +7,15 @@ enum GxmMemoryAttrib
     SCE_GXM_MEMORY_ATTRIB_RW = 3
 };
 
+// https://psp2sdk.github.io/gxm_8h.html
+typedef void SceGxmDisplayQueueCallback(Ptr<const void> callbackData);
+
 struct SceGxmInitializeParams
 {
     // This is guesswork based on Napier tutorial 3 PDF.
     uint32_t flags = 0;
     uint32_t displayQueueMaxPendingCount = 0;
-    Ptr<const void> displayQueueCallback;
+    Ptr<SceGxmDisplayQueueCallback> displayQueueCallback;
     uint32_t displayQueueCallbackDataSize = 0;
     uint32_t parameterBufferSize = 0;
 };
@@ -23,6 +26,21 @@ IMP_SIG(sceGxmInitialize)
     (void)params;
     
     // TODO Implement.
+    return SCE_OK;
+}
+
+IMP_SIG(sceGxmMapFragmentUsseMemory)
+{
+    void *const base = Ptr<void>(r0).get(&emu->mem);
+    const uint32_t size = r1;
+    uint32_t *const offset = Ptr<uint32_t>(r2).get(&emu->mem);
+    assert(base != nullptr);
+    assert(size > 0);
+    assert(offset != nullptr);
+    
+    // TODO What should this be?
+    *offset = r0;
+    
     return SCE_OK;
 }
 
