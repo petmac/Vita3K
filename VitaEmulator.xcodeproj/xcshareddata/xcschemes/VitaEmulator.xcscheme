@@ -64,7 +64,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "examples/vitahelloworld.velf"
+            argument = "examples/VitaScreenFlasher.velf"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
