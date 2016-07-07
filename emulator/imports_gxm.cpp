@@ -3,6 +3,7 @@
 enum GxmMemoryAttrib
 {
     // https://github.com/xerpi/vitahelloworld/blob/master/draw.c
+    SCE_GXM_MEMORY_ATTRIB_READ = 1,
     SCE_GXM_MEMORY_ATTRIB_RW = 3
 };
 
@@ -32,7 +33,7 @@ IMP_SIG(sceGxmMapMemory)
     const GxmMemoryAttrib attributes = static_cast<GxmMemoryAttrib>(r2);
     assert(address != nullptr);
     assert(size > 0);
-    assert(attributes == SCE_GXM_MEMORY_ATTRIB_RW);
+    assert((attributes == SCE_GXM_MEMORY_ATTRIB_READ) || (attributes == SCE_GXM_MEMORY_ATTRIB_RW));
     
     return SCE_OK;
 }
