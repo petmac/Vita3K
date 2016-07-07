@@ -40,6 +40,23 @@ struct SceGxmInitializeParams
     uint32_t parameterBufferSize = 0;
 };
 
+struct SceGxmRenderTarget
+{
+};
+
+struct SceGxmRenderTargetParams
+{
+    // Napier tutorial 3.
+    // https://psp2sdk.github.io/structSceGxmRenderTargetParams.html
+    uint32_t flags = 0;
+    uint16_t width = 0;
+    uint16_t height = 0;
+    uint16_t scenesPerFrame = 1;
+    uint16_t multisampleMode = 0;
+    uint32_t multisampleLocations = 0;
+    SceUID driverMemBlock = SCE_UID_INVALID_UID;
+};
+
 IMP_SIG(sceGxmCreateContext)
 {
     // https://psp2sdk.github.io/gxm_8h.html
@@ -48,8 +65,25 @@ IMP_SIG(sceGxmCreateContext)
     assert(params != nullptr);
     assert(context != nullptr);
     
-    *context = Ptr<GxmContext>(alloc(&emu->mem, sizeof(GxmContext), "GxmContext"));
+    *context = Ptr<GxmContext>(alloc(&emu->mem, sizeof(GxmContext), __FUNCTION__));
     if (!*context)
+    {
+        return OUT_OF_MEMORY;
+    }
+    
+    return SCE_OK;
+}
+
+IMP_SIG(sceGxmCreateRenderTarget)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    const SceGxmRenderTargetParams *const params = Ptr<const SceGxmRenderTargetParams>(r0).get(&emu->mem);
+    Ptr<SceGxmRenderTarget> *const renderTarget = Ptr<Ptr<SceGxmRenderTarget>>(r1).get(&emu->mem);
+    assert(params != nullptr);
+    assert(renderTarget != nullptr);
+    
+    *renderTarget = Ptr<SceGxmRenderTarget>(alloc(&emu->mem, sizeof(SceGxmRenderTarget), __FUNCTION__));
+    if (!*renderTarget)
     {
         return OUT_OF_MEMORY;
     }
