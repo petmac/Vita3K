@@ -6,10 +6,12 @@
 
 struct uc_struct;
 
+// TODO What should these be?
 enum ResultCode : int32_t
 {
     SCE_OK,
-    UNKNOWN_UID
+    UNKNOWN_UID,
+    OUT_OF_MEMORY,
 };
 
 #define IMP_SIG(name) uint32_t import_##name(uint32_t r0, uint32_t r1, uint32_t r2, uint32_t r3, Ptr<void> sp, uc_struct *uc, EmulatorState *emu)

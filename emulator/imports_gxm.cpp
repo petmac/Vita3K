@@ -1,10 +1,30 @@
 #include "import.h"
 
+struct GxmContext
+{
+};
+
 enum GxmMemoryAttrib
 {
     // https://github.com/xerpi/vitahelloworld/blob/master/draw.c
     SCE_GXM_MEMORY_ATTRIB_READ = 1,
     SCE_GXM_MEMORY_ATTRIB_RW = 3
+};
+
+struct SceGxmContextParams
+{
+    // https://psp2sdk.github.io/structSceGxmContextParams.html
+    Ptr<void> hostMem;
+    uint32_t hostMemSize;
+    Ptr<void> vdmRingBufferMem;
+    uint32_t vdmRingBufferMemSize;
+    Ptr<void> vertexRingBufferMem;
+    uint32_t vertexRingBufferMemSize;
+    Ptr<void> fragmentRingBufferMem;
+    uint32_t fragmentRingBufferMemSize;
+    Ptr<void> fragmentUsseRingBufferMem;
+    uint32_t fragmentUsseRingBufferMemSize;
+    uint32_t fragmentUsseRingBufferOffset;
 };
 
 // https://psp2sdk.github.io/gxm_8h.html
@@ -19,6 +39,23 @@ struct SceGxmInitializeParams
     uint32_t displayQueueCallbackDataSize = 0;
     uint32_t parameterBufferSize = 0;
 };
+
+IMP_SIG(sceGxmCreateContext)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    const SceGxmContextParams *const params = Ptr<const SceGxmContextParams>(r0).get(&emu->mem);
+    Ptr<GxmContext> *const context = Ptr<Ptr<GxmContext>>(r1).get(&emu->mem);
+    assert(params != nullptr);
+    assert(context != nullptr);
+    
+    *context = Ptr<GxmContext>(alloc(&emu->mem, sizeof(GxmContext), "GxmContext"));
+    if (!*context)
+    {
+        return OUT_OF_MEMORY;
+    }
+    
+    return SCE_OK;
+}
 
 IMP_SIG(sceGxmInitialize)
 {
