@@ -255,6 +255,11 @@ struct SceGxmProgram
     uint32_t unknown[256]; // For debugging/reversing.
 };
 
+struct SceGxmRegisteredProgram
+{
+    // TODO This is an opaque type.
+};
+
 struct SceGxmRenderTarget
 {
 };
@@ -275,6 +280,8 @@ struct SceGxmRenderTargetParams
 struct SceGxmShaderPatcher
 {
 };
+
+typedef Ptr<SceGxmRegisteredProgram> SceGxmShaderPatcherId;
 
 // https://psp2sdk.github.io/gxm_8h.html
 typedef Ptr<void> SceGxmShaderPatcherHostAllocCallback(Ptr<void> userData, uint32_t size);
@@ -481,6 +488,26 @@ IMP_SIG(sceGxmShaderPatcherCreate)
     *shaderPatcher = Ptr<SceGxmShaderPatcher>(alloc(&emu->mem, sizeof(SceGxmShaderPatcher), __FUNCTION__));
     assert(*shaderPatcher);
     if (!*shaderPatcher)
+    {
+        return OUT_OF_MEMORY;
+    }
+    
+    return SCE_OK;
+}
+
+IMP_SIG(sceGxmShaderPatcherRegisterProgram)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    SceGxmShaderPatcher *const shaderPatcher = Ptr<SceGxmShaderPatcher>(r0).get(&emu->mem);
+    const SceGxmProgram *const programHeader = Ptr<const SceGxmProgram>(r1).get(&emu->mem);
+    SceGxmShaderPatcherId *const programId = Ptr<SceGxmShaderPatcherId>(r2).get(&emu->mem);
+    assert(shaderPatcher != nullptr);
+    assert(programHeader != nullptr);
+    assert(programId != nullptr);
+    
+    *programId = SceGxmShaderPatcherId(alloc(&emu->mem, sizeof(SceGxmRegisteredProgram), __FUNCTION__));
+    assert(*programId);
+    if (!*programId)
     {
         return OUT_OF_MEMORY;
     }
