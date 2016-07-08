@@ -202,6 +202,33 @@ struct SceGxmContextParams
     uint32_t fragmentUsseRingBufferOffset;
 };
 
+enum SceGxmDepthStencilFormat
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    SCE_GXM_DEPTH_STENCIL_FORMAT_DF32 = 0x00044000,
+    SCE_GXM_DEPTH_STENCIL_FORMAT_S8 = 0x00022000,
+    SCE_GXM_DEPTH_STENCIL_FORMAT_DF32_S8 = 0x00066000,
+    SCE_GXM_DEPTH_STENCIL_FORMAT_S8D24 = 0x01266000,
+    SCE_GXM_DEPTH_STENCIL_FORMAT_D16 = 0x02444000
+};
+
+struct SceGxmDepthStencilSurface
+{
+    // https://psp2sdk.github.io/structSceGxmDepthStencilSurface.html
+    uint32_t zlsControl;
+    Ptr<void> depthData;
+    Ptr<void> stencilData;
+    float backgroundDepth;
+    uint32_t backgroundControl;
+};
+
+enum SceGxmDepthStencilSurfaceType
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    SCE_GXM_DEPTH_STENCIL_SURFACE_LINEAR = 0x00000000,
+    SCE_GXM_DEPTH_STENCIL_SURFACE_TILED = 0x00011000
+};
+
 // https://psp2sdk.github.io/gxm_8h.html
 typedef void SceGxmDisplayQueueCallback(Ptr<const void> callbackData);
 
@@ -308,6 +335,37 @@ IMP_SIG(sceGxmCreateRenderTarget)
     {
         return OUT_OF_MEMORY;
     }
+    
+    return SCE_OK;
+}
+
+IMP_SIG(sceGxmDepthStencilSurfaceInit)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    struct Stack
+    {
+        Ptr<void> depthData;
+        Ptr<void> stencilData;
+    };
+    
+    SceGxmDepthStencilSurface *const surface = Ptr<SceGxmDepthStencilSurface>(r0).get(&emu->mem);
+    const SceGxmDepthStencilFormat depthStencilFormat = static_cast<SceGxmDepthStencilFormat>(r1);
+    const SceGxmDepthStencilSurfaceType surfaceType = static_cast<SceGxmDepthStencilSurfaceType>(r2);
+    const uint32_t strideInSamples = r3;
+    const Stack *const stack = sp.cast<const Stack>().get(&emu->mem);
+    void *const depthData = stack->depthData.get(&emu->mem);
+    void *const stencilData = stack->stencilData.get(&emu->mem);
+    assert(surface != nullptr);
+    assert(depthStencilFormat == SCE_GXM_DEPTH_STENCIL_FORMAT_S8D24);
+    assert(surfaceType == SCE_GXM_DEPTH_STENCIL_SURFACE_TILED);
+    assert(strideInSamples > 0);
+    assert(depthData != nullptr);
+    assert(stencilData == nullptr);
+    
+    // TODO What to do here?
+    memset(surface, 0, sizeof(*surface));
+    surface->depthData = stack->depthData;
+    surface->stencilData = stack->stencilData;
     
     return SCE_OK;
 }
