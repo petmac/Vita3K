@@ -494,6 +494,16 @@ IMP_SIG(sceGxmProgramFindParameterByName)
     return r0;
 }
 
+IMP_SIG(sceGxmProgramParameterGetResourceIndex)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    const SceGxmProgramParameter *const parameter = Ptr<const SceGxmProgramParameter>(r0).get(&emu->mem);
+    assert(parameter != nullptr);
+    
+    // TODO Reverse engineer SceGxmProgramParameter.
+    return 0;
+}
+
 IMP_SIG(sceGxmShaderPatcherCreate)
 {
     // https://psp2sdk.github.io/gxm_8h.html
