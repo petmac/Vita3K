@@ -11,6 +11,20 @@ enum GxmMemoryAttrib
     SCE_GXM_MEMORY_ATTRIB_RW = 3
 };
 
+enum SceGxmAttributeFormat
+{
+    SCE_GXM_ATTRIBUTE_FORMAT_U8,
+    SCE_GXM_ATTRIBUTE_FORMAT_S8,
+    SCE_GXM_ATTRIBUTE_FORMAT_U16,
+    SCE_GXM_ATTRIBUTE_FORMAT_S16,
+    SCE_GXM_ATTRIBUTE_FORMAT_U8N,
+    SCE_GXM_ATTRIBUTE_FORMAT_S8N,
+    SCE_GXM_ATTRIBUTE_FORMAT_U16N,
+    SCE_GXM_ATTRIBUTE_FORMAT_S16N,
+    SCE_GXM_ATTRIBUTE_FORMAT_F16,
+    SCE_GXM_ATTRIBUTE_FORMAT_F32
+};
+
 enum SceGxmColorBaseFormat
 {
     // https://psp2sdk.github.io/gxm_8h.html
@@ -322,6 +336,29 @@ struct SceGxmSyncObject
 {    
 };
 
+struct SceGxmVertexAttribute
+{
+    // https://psp2sdk.github.io/structSceGxmVertexAttribute.html
+    // TODO This structure might get oddly padded.
+    uint16_t streamIndex;
+    uint16_t offset;
+    SceGxmAttributeFormat format;
+    uint8_t componentCount;
+    uint16_t regIndex;
+};
+
+struct SceGxmVertexProgram
+{
+    // TODO I think this is an opaque type.
+};
+
+struct SceGxmVertexStream
+{
+    // https://psp2sdk.github.io/structSceGxmVertexStream.html
+    uint16_t stride;
+    uint16_t indexSource;
+};
+
 IMP_SIG(sceGxmColorSurfaceInit)
 {
     // https://psp2sdk.github.io/gxm_8h.html
@@ -515,6 +552,42 @@ IMP_SIG(sceGxmShaderPatcherCreate)
     *shaderPatcher = Ptr<SceGxmShaderPatcher>(alloc(&emu->mem, sizeof(SceGxmShaderPatcher), __FUNCTION__));
     assert(*shaderPatcher);
     if (!*shaderPatcher)
+    {
+        return OUT_OF_MEMORY;
+    }
+    
+    return SCE_OK;
+}
+
+IMP_SIG(sceGxmShaderPatcherCreateVertexProgram)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    struct Stack
+    {
+        Ptr<const SceGxmVertexStream> streams;
+        uint32_t streamCount;
+        Ptr<Ptr<SceGxmVertexProgram>> vertexProgram;
+    };
+    
+    MemState *const mem = &emu->mem;
+    SceGxmShaderPatcher *const shaderPatcher = Ptr<SceGxmShaderPatcher>(r0).get(mem);
+    const SceGxmRegisteredProgram *const programId = SceGxmShaderPatcherId(r1).get(mem);
+    const SceGxmVertexAttribute *const attributes = Ptr<const SceGxmVertexAttribute>(r2).get(mem);
+    const uint32_t attributeCount = r3;
+    const Stack *const stack = sp.cast<const Stack>().get(mem);
+    const SceGxmVertexStream *const streams = stack->streams.get(mem);
+    Ptr<SceGxmVertexProgram> *const vertexProgram = stack->vertexProgram.get(mem);
+    assert(shaderPatcher != nullptr);
+    assert(programId != 0);
+    assert(attributes != nullptr);
+    assert(attributeCount > 0);
+    assert(streams != nullptr);
+    assert(stack->streamCount > 0);
+    assert(vertexProgram != nullptr);
+    
+    *vertexProgram = Ptr<SceGxmVertexProgram>(alloc(mem, sizeof(SceGxmVertexProgram), __FUNCTION__));
+    assert(*vertexProgram);
+    if (!*vertexProgram)
     {
         return OUT_OF_MEMORY;
     }
