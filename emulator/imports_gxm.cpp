@@ -249,6 +249,12 @@ enum SceGxmOutputRegisterSize
     SCE_GXM_OUTPUT_REGISTER_SIZE_64BIT
 };
 
+struct SceGxmProgram
+{
+    // TODO This is an opaque struct.
+    uint32_t unknown[256]; // For debugging/reversing.
+};
+
 struct SceGxmRenderTarget
 {
 };
@@ -451,6 +457,15 @@ IMP_SIG(sceGxmMapVertexUsseMemory)
     
     // TODO What should this be?
     *offset = r0;
+    
+    return SCE_OK;
+}
+
+IMP_SIG(sceGxmProgramCheck)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    const SceGxmProgram *program = Ptr<const SceGxmProgram>(r0).get(&emu->mem);
+    assert(program != nullptr);
     
     return SCE_OK;
 }
