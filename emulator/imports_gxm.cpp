@@ -406,6 +406,21 @@ IMP_SIG(sceGxmMapMemory)
     return SCE_OK;
 }
 
+IMP_SIG(sceGxmMapVertexUsseMemory)
+{
+    void *const base = Ptr<void>(r0).get(&emu->mem);
+    const uint32_t size = r1;
+    uint32_t *const offset = Ptr<uint32_t>(r2).get(&emu->mem);
+    assert(base != nullptr);
+    assert(size > 0);
+    assert(offset != nullptr);
+    
+    // TODO What should this be?
+    *offset = r0;
+    
+    return SCE_OK;
+}
+
 IMP_SIG(sceGxmSyncObjectCreate)
 {
     Ptr<SceGxmSyncObject> *const syncObject = Ptr<Ptr<SceGxmSyncObject>>(r0).get(&emu->mem);
