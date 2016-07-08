@@ -266,6 +266,40 @@ struct SceGxmRenderTargetParams
     SceUID driverMemBlock = SCE_UID_INVALID_UID;
 };
 
+struct SceGxmShaderPatcher
+{
+};
+
+// https://psp2sdk.github.io/gxm_8h.html
+typedef Ptr<void> SceGxmShaderPatcherHostAllocCallback(Ptr<void> userData, uint32_t size);
+typedef void SceGxmShaderPatcherHostFreeCallback(Ptr<void> userData, Ptr<void> mem);
+typedef Ptr<void> SceGxmShaderPatcherBufferAllocCallback(Ptr<void> userData, uint32_t size);
+typedef void SceGxmShaderPatcherBufferFreeCallback(Ptr<void> userData, Ptr<void> mem);
+typedef Ptr<void> SceGxmShaderPatcherUsseAllocCallback(Ptr<void> userData, uint32_t size, Ptr<uint32_t> usseOffset);
+typedef void SceGxmShaderPatcherUsseFreeCallback(Ptr<void> userData, Ptr<void> mem);
+
+struct SceGxmShaderPatcherParams
+{
+    // https://psp2sdk.github.io/structSceGxmShaderPatcherParams.html
+    Ptr<void> userData;
+    Ptr<SceGxmShaderPatcherHostAllocCallback> hostAllocCallback;
+    Ptr<SceGxmShaderPatcherHostFreeCallback> hostFreeCallback;
+    Ptr<SceGxmShaderPatcherBufferAllocCallback> bufferAllocCallback;
+    Ptr<SceGxmShaderPatcherBufferFreeCallback> bufferFreeCallback;
+    Ptr<void> bufferMem;
+    uint32_t bufferMemSize;
+    Ptr<SceGxmShaderPatcherUsseAllocCallback> vertexUsseAllocCallback;
+    Ptr<SceGxmShaderPatcherUsseFreeCallback> vertexUsseFreeCallback;
+    Ptr<void> vertexUsseMem;
+    uint32_t vertexUsseMemSize;
+    uint32_t vertexUsseOffset;
+    Ptr<SceGxmShaderPatcherUsseAllocCallback> fragmentUsseAllocCallback;
+    Ptr<SceGxmShaderPatcherUsseFreeCallback> fragmentUsseFreeCallback;
+    Ptr<void> fragmentUsseMem;
+    uint32_t fragmentUsseMemSize;
+    uint32_t fragmentUsseOffset;
+};
+
 struct SceGxmSyncObject
 {    
 };
@@ -417,6 +451,24 @@ IMP_SIG(sceGxmMapVertexUsseMemory)
     
     // TODO What should this be?
     *offset = r0;
+    
+    return SCE_OK;
+}
+
+IMP_SIG(sceGxmShaderPatcherCreate)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    const SceGxmShaderPatcherParams *const params = Ptr<const SceGxmShaderPatcherParams>(r0).get(&emu->mem);
+    Ptr<SceGxmShaderPatcher> *const shaderPatcher = Ptr<Ptr<SceGxmShaderPatcher>>(r1).get(&emu->mem);
+    assert(params != nullptr);
+    assert(shaderPatcher != nullptr);
+    
+    *shaderPatcher = Ptr<SceGxmShaderPatcher>(alloc(&emu->mem, sizeof(SceGxmShaderPatcher), __FUNCTION__));
+    assert(*shaderPatcher);
+    if (!*shaderPatcher)
+    {
+        return OUT_OF_MEMORY;
+    }
     
     return SCE_OK;
 }
