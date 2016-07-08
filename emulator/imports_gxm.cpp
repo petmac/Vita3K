@@ -255,6 +255,11 @@ struct SceGxmProgram
     uint32_t unknown[256]; // For debugging/reversing.
 };
 
+struct SceGxmProgramParameter
+{
+    // TODO Reverse engineer SceGxmProgram.
+};
+
 struct SceGxmRegisteredProgram
 {
     // TODO This is an opaque type.
@@ -475,6 +480,18 @@ IMP_SIG(sceGxmProgramCheck)
     assert(program != nullptr);
     
     return SCE_OK;
+}
+
+IMP_SIG(sceGxmProgramFindParameterByName)
+{
+    const SceGxmProgram *const program = Ptr<const SceGxmProgram>(r0).get(&emu->mem);
+    const char *const name = Ptr<const char>(r1).get(&emu->mem);
+    assert(program != nullptr);
+    assert(name != nullptr);
+    
+    // TODO Reverse engineer SceGxmProgram!
+    // TODO This is a SceGxmProgramParameter *.
+    return r0;
 }
 
 IMP_SIG(sceGxmShaderPatcherCreate)
