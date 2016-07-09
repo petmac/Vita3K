@@ -30,8 +30,8 @@ IMP_SIG(sceKernelAllocMemBlock)
     assert(size != 0);
     assert(unknown == 0);
     
-    const Address address = alloc(mem, size, name);
-    if (address == 0)
+    const Ptr<void> address(alloc(mem, size, name));
+    if (!address)
     {
         return -1; // TODO What should this be?
     }
@@ -50,8 +50,8 @@ IMP_SIG(sceKernelCreateLwMutex)
     const char *const name = mem_ptr<const char>(r1, mem);
     const LWMutexAttr attr = static_cast<LWMutexAttr>(r2);
     const int32_t count = r3;
-    const Address *const stack = mem_ptr<Address>(sp, mem);
-    const void *const options = mem_ptr<const void>(*stack, mem);
+    const Ptr<Ptr<const void>> stack(sp);
+    const void *const options = stack.get(mem)->get(mem);
     assert(workarea != nullptr);
     assert((attr == LW_MUTEX_ATTR_A) || (attr == LW_MUTEX_ATTR_B));
     assert(count == 0);
@@ -83,7 +83,7 @@ IMP_SIG(sceKernelGetMemBlockBase)
 {
     const SceUID uid = r0;
     const MemState *const mem = &emu->mem;
-    Address *const address = mem_ptr<Address>(r1, mem);
+    Ptr<void> *const address = mem_ptr<Ptr<void>>(r1, mem);
     assert(uid >= 0);
     assert(address != nullptr);
     
@@ -125,16 +125,16 @@ IMP_SIG(sceKernelGetTLSAddr)
     const SlotToAddress::const_iterator existing = slot_to_address->find(slot);
     if (existing != slot_to_address->end())
     {
-        return existing->second;
+        return existing->second.address();
     }
     
     // TODO Use a finer-grained allocator.
     // TODO This is a memory leak.
     MemState *const mem = &emu->mem;
-    const Address address = alloc(mem, sizeof(Address), "TLS");
+    const Ptr<Ptr<void>> address(alloc(mem, sizeof(Ptr<void>), "TLS"));
     slot_to_address->insert(SlotToAddress::value_type(slot, address));
     
-    return address;
+    return address.address();
 }
 
 IMP_SIG(sceKernelGetThreadId)

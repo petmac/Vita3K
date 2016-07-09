@@ -1,12 +1,12 @@
 #pragma once
 
-#include "types.h"
+#include "ptr.h"
 
 struct MemState;
 
 struct Module
 {
-    Address entry_point = 0;
+    Ptr<void> entry_point;
 };
 
 bool load(Module *module, MemState *mem, const char *path);

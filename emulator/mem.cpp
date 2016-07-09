@@ -70,7 +70,7 @@ Address alloc(MemState *state, size_t size, const char *name)
     
     alloc_inner(state, address, page_count, block, name);
     
-    return static_cast<Address>(address);
+    return address;
 }
 
 const char *mem_name(Address address, const MemState *state)

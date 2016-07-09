@@ -3,7 +3,6 @@
 #include "ctrl.h"
 #include "disasm.h"
 #include "kernel.h"
-#include "mem.h"
 
 struct EmulatorState
 {
@@ -14,4 +13,4 @@ struct EmulatorState
 };
 
 bool init(EmulatorState *state);
-bool run_thread(EmulatorState *state, Address entry_point);
+bool run_thread(EmulatorState *state, Ptr<void> entry_point);

@@ -13,7 +13,7 @@ enum PixelFormat : uint32_t
 struct SceDisplayFrameBuf
 {
     uint32_t size = 0;
-    Address base = 0;
+    Ptr<const void> base;
     uint32_t pitch = 0;
     PixelFormat pixelformat = SCE_DISPLAY_PIXELFORMAT_A8B8G8R8;
     uint32_t width = 0;
@@ -32,14 +32,14 @@ IMP_SIG(sceDisplaySetFrameBuf)
     const SetBuf set = static_cast<SetBuf>(r1);
     assert(fb != nullptr);
     assert(fb->size == sizeof(SceDisplayFrameBuf));
-    assert(fb->base != 0);
+    assert(fb->base);
     assert(fb->pitch == fb->width);
     assert(fb->pixelformat == SCE_DISPLAY_PIXELFORMAT_A8B8G8R8);
     assert(fb->width == 960);
     assert(fb->height == 544);
     assert(set == SCE_DISPLAY_SETBUF_NEXTFRAME);
     
-    const void *const pixels = mem_ptr<const void>(fb->base, mem);
+    const void *const pixels = fb->base.get(mem);
     glDrawPixels(fb->width, fb->height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
     
     SDL_Window *const window = SDL_GL_GetCurrentWindow();

@@ -119,9 +119,9 @@ bool init(EmulatorState *state)
     return init(&state->disasm) && init(&state->mem);
 }
 
-bool run_thread(EmulatorState *state, Address entry_point)
+bool run_thread(EmulatorState *state, Ptr<void> entry_point)
 {
-    const bool thumb = entry_point & 1;
+    const bool thumb = entry_point.address() & 1;
     uc_engine *uc = nullptr;
     uc_err err = uc_open(UC_ARCH_ARM, thumb ? UC_MODE_THUMB : UC_MODE_ARM, &uc);
     assert(err == UC_ERR_OK);
@@ -164,7 +164,7 @@ bool run_thread(EmulatorState *state, Address entry_point)
     err = uc_emu_start(uc, bootstrap_address, bootstrap_address + bootstrap_size, 0, 0);
     assert(err == UC_ERR_OK);
     
-    err = uc_emu_start(uc, (entry_point >> 1) << 1, 0, 0, 0);
+    err = uc_emu_start(uc, (entry_point.address() >> 1) << 1, 0, 0, 0);
     if (err != UC_ERR_OK)
     {
         std::cerr << "Emulation failed:" << std::endl;

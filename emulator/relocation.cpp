@@ -1,7 +1,5 @@
 #include "relocation.h"
 
-#include "mem.h"
-
 #include <assert.h>
 #include <iostream>
 
@@ -207,8 +205,8 @@ bool relocate(const void *entries, size_t size, const SegmentAddresses &segments
     {
         assert(entry->is_short == 0);
         
-        const Address symbol_start = segments.find(entry->symbol_segment)->second;
-        const Address s = (entry->symbol_segment == 0xf) ? 0 : symbol_start;
+        const Ptr<void> symbol_start = segments.find(entry->symbol_segment)->second;
+        const Address s = (entry->symbol_segment == 0xf) ? 0 : symbol_start.address();
         
         if (entry->is_short)
         {
@@ -220,8 +218,8 @@ bool relocate(const void *entries, size_t size, const SegmentAddresses &segments
             const LongEntry *const long_entry = static_cast<const LongEntry *>(entry);
             assert(long_entry->code2 == 0);
             
-            const Address segment_start = segments.find(long_entry->data_segment)->second;
-            const Address p = segment_start + long_entry->offset;
+            const Ptr<void> segment_start = segments.find(long_entry->data_segment)->second;
+            const Address p = segment_start.address() + long_entry->offset;
             const Address a = long_entry->addend;
             if (!relocate(mem_ptr<uint32_t>(p, mem), static_cast<Code>(entry->code), s, a, p))
             {

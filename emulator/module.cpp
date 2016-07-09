@@ -1,7 +1,6 @@
 #include "module.h"
 
 #include "imports.h"
-#include "mem.h"
 #include "relocation.h"
 
 #pragma GCC diagnostic push
@@ -62,21 +61,21 @@ struct ModuleImports // thanks roxfan
     uint32_t tls_entry_table;  // array of pointers to ???
 };
 
-static bool load_func_imports(const uint32_t *nids, const Address *entries, size_t count, const MemState &mem)
+static bool load_func_imports(const uint32_t *nids, const Ptr<uint32_t> *entries, size_t count, const MemState &mem)
 {
     for (size_t i = 0; i < count; ++i)
     {
         const uint32_t nid = nids[i];
-        const Address entry = entries[i];
+        const Ptr<uint32_t> entry = entries[i];
         
         if (LOG_IMPORTS)
         {
             const char *const name = import_name(nid);
             const char prev_fill = std::cout.fill();
-            std::cout << "\tNID " << std::hex << std::setw(8) << std::setfill('0') << nid << std::setfill(prev_fill) << " (" << name << ") at 0x" << entry << std::dec << std::endl;
+            std::cout << "\tNID " << std::hex << std::setw(8) << std::setfill('0') << nid << std::setfill(prev_fill) << " (" << name << ") at 0x" << entry.address() << std::dec << std::endl;
         }
         
-        uint32_t *const stub = mem_ptr<uint32_t>(entry, &mem);
+        uint32_t *const stub = entry.get(&mem);
         stub[0] = 0xef000000; // svc #0 - Call our interrupt hook.
         stub[1] = 0xe1a0f00e; // mov pc, lr - Return to the caller.
         stub[2] = nid; // Our interrupt hook will read this.
@@ -85,9 +84,9 @@ static bool load_func_imports(const uint32_t *nids, const Address *entries, size
     return true;
 }
 
-static bool load_imports(const ModuleInfo &module, Address segment_address, const MemState &mem)
+static bool load_imports(const ModuleInfo &module, Ptr<void> segment_address, const MemState &mem)
 {
-    const uint8_t *const base = mem_ptr<const uint8_t>(segment_address, &mem);
+    const uint8_t *const base = Ptr<const uint8_t>(segment_address).get(&mem);
     const ModuleImports *const imports_begin = reinterpret_cast<const ModuleImports *>(base + module.stub_top);
     const ModuleImports *const imports_end = reinterpret_cast<const ModuleImports *>(base + module.stub_end);
     
@@ -104,7 +103,7 @@ static bool load_imports(const ModuleInfo &module, Address segment_address, cons
         assert(imports->num_tls_vars == 0);
         
         const uint32_t *const nids = mem_ptr<const uint32_t>(imports->func_nid_table, &mem);
-        const uint32_t *const entries = mem_ptr<const uint32_t>(imports->func_entry_table, &mem);
+        const Ptr<uint32_t> *const entries = Ptr<Ptr<uint32_t>>(imports->func_entry_table).get(&mem);
         if (!load_func_imports(nids, entries, imports->num_functions, mem))
         {
             return false;
@@ -124,7 +123,7 @@ bool load(Module *module, MemState *mem, const char *path)
     }
     
     const unsigned int module_info_segment_index = static_cast<unsigned int>(elf.get_entry() >> 30);
-    const Address module_info_offset = elf.get_entry() & 0x3fffffff;
+    const uint32_t module_info_offset = elf.get_entry() & 0x3fffffff;
     const ELFIO::segment *const module_info_segment = elf.segments[module_info_segment_index];
     const ModuleInfo *const module_info = reinterpret_cast<const ModuleInfo *>(module_info_segment->get_data() + module_info_offset);
     
@@ -135,14 +134,14 @@ bool load(Module *module, MemState *mem, const char *path)
         const uint32_t type = src.get_type();
         if (type == PT_LOAD)
         {
-            const Address address = alloc(mem, src.get_memory_size(), "segment");
-            if (address == 0)
+            const Ptr<void> address(alloc(mem, src.get_memory_size(), "segment"));
+            if (!address)
             {
                 std::cerr << "Failed to allocate memory for segment." << std::endl;
                 return false;
             }
             
-            std::copy_n(src.get_data(), src.get_file_size(), mem_ptr<uint8_t>(address, mem));
+            memcpy(address.get(mem), src.get_data(), src.get_file_size());
             
             segments[segment_index] = address;
         }
@@ -155,8 +154,8 @@ bool load(Module *module, MemState *mem, const char *path)
         }
     }
     
-    const Address module_info_segment_address = segments[module_info_segment_index];
-    module->entry_point = module_info_segment_address + module_info->mod_start;
+    const Ptr<void> module_info_segment_address = segments[module_info_segment_index];
+    module->entry_point = Ptr<void>(module_info_segment_address.address() + module_info->mod_start);
     
     if (!load_imports(*module_info, module_info_segment_address, *mem))
     {
