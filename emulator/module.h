@@ -6,7 +6,7 @@ struct MemState;
 
 struct Module
 {
-    Ptr<void> entry_point;
+    Ptr<const void> entry_point;
 };
 
 bool load(Module *module, MemState *mem, const char *path);

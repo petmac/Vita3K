@@ -155,7 +155,7 @@ bool load(Module *module, MemState *mem, const char *path)
     }
     
     const Ptr<void> module_info_segment_address = segments[module_info_segment_index];
-    module->entry_point = Ptr<void>(module_info_segment_address.address() + module_info->mod_start);
+    module->entry_point = Ptr<const void>(module_info_segment_address.address() + module_info->mod_start);
     
     if (!load_imports(*module_info, module_info_segment_address, *mem))
     {

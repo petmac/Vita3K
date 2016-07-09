@@ -43,4 +43,4 @@ private:
     Address addr;
 };
 
-static_assert(sizeof(Ptr<void>) == 4, "Size of Ptr isn't 4 bytes.");
+static_assert(sizeof(Ptr<const void>) == 4, "Size of Ptr isn't 4 bytes.");

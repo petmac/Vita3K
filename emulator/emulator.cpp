@@ -119,7 +119,7 @@ bool init(EmulatorState *state)
     return init(&state->disasm) && init(&state->mem);
 }
 
-bool run_thread(EmulatorState *state, Ptr<void> entry_point)
+bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
 {
     const bool thumb = entry_point.address() & 1;
     uc_engine *uc = nullptr;

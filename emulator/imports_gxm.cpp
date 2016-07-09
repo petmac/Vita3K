@@ -11,7 +11,7 @@ struct SceGxmInitializeParams
     // This is guesswork based on Napier tutorial 3 PDF.
     uint32_t flags = 0;
     uint32_t displayQueueMaxPendingCount = 0;
-    Ptr<void> displayQueueCallback;
+    Ptr<const void> displayQueueCallback;
     uint32_t displayQueueCallbackDataSize = 0;
     uint32_t parameterBufferSize = 0;
 };

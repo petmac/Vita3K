@@ -13,4 +13,4 @@ struct EmulatorState
 };
 
 bool init(EmulatorState *state);
-bool run_thread(EmulatorState *state, Ptr<void> entry_point);
+bool run_thread(EmulatorState *state, Ptr<const void> entry_point);
