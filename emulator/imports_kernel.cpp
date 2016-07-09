@@ -50,7 +50,7 @@ IMP_SIG(sceKernelCreateLwMutex)
     const char *const name = mem_ptr<const char>(r1, mem);
     const LWMutexAttr attr = static_cast<LWMutexAttr>(r2);
     const int32_t count = r3;
-    const Ptr<Ptr<const void>> stack(sp);
+    const Ptr<Ptr<const void>> stack = sp.cast<Ptr<const void>>();
     const void *const options = stack.get(mem)->get(mem);
     assert(workarea != nullptr);
     assert((attr == LW_MUTEX_ATTR_A) || (attr == LW_MUTEX_ATTR_B));

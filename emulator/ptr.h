@@ -18,14 +18,21 @@ public:
     }
     
     template <class U>
-    explicit Ptr(const Ptr<U> &other)
+    Ptr(const Ptr<U> &other)
         : addr(other.address())
     {
+        T *const t = static_cast<U *>(nullptr);
     }
     
     Address address() const
     {
         return addr;
+    }
+    
+    template <class U>
+    Ptr<U> cast() const
+    {
+        return Ptr<U>(addr);
     }
     
     T *get(const MemState *mem) const

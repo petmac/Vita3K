@@ -86,7 +86,7 @@ static bool load_func_imports(const uint32_t *nids, const Ptr<uint32_t> *entries
 
 static bool load_imports(const ModuleInfo &module, Ptr<void> segment_address, const MemState &mem)
 {
-    const uint8_t *const base = Ptr<const uint8_t>(segment_address).get(&mem);
+    const uint8_t *const base = segment_address.cast<const uint8_t>().get(&mem);
     const ModuleImports *const imports_begin = reinterpret_cast<const ModuleImports *>(base + module.stub_top);
     const ModuleImports *const imports_end = reinterpret_cast<const ModuleImports *>(base + module.stub_end);
     
