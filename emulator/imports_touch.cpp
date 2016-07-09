@@ -29,7 +29,7 @@ IMP_SIG(sceTouchPeek)
 {
     const int32_t port = r0;
     const MemState *const mem = &emu->mem;
-    SceTouchData *const data = mem_ptr<SceTouchData>(r1, mem);
+    SceTouchData *const data = Ptr<SceTouchData>(r1).get(mem);
     const int32_t count = r2;
     assert(port == 0);
     assert(data != nullptr);

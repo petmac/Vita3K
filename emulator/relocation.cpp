@@ -221,7 +221,7 @@ bool relocate(const void *entries, size_t size, const SegmentAddresses &segments
             const Ptr<void> segment_start = segments.find(long_entry->data_segment)->second;
             const Address p = segment_start.address() + long_entry->offset;
             const Address a = long_entry->addend;
-            if (!relocate(mem_ptr<uint32_t>(p, mem), static_cast<Code>(entry->code), s, a, p))
+            if (!relocate(Ptr<uint32_t>(p).get(mem), static_cast<Code>(entry->code), s, a, p))
             {
                 return false;
             }

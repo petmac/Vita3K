@@ -58,7 +58,7 @@ static void code_hook(uc_engine *uc, uint64_t address, uint32_t size, void *user
     assert(err == UC_ERR_OK);
     
     EmulatorState *const state = static_cast<EmulatorState *>(user_data);
-    const uint8_t *const code = mem_ptr<const uint8_t>(static_cast<Address>(address), &state->mem);
+    const uint8_t *const code = Ptr<const uint8_t>(static_cast<Address>(address)).get(&state->mem);
     const size_t buffer_size = GB(4) - address;
     const bool thumb = mode & UC_MODE_THUMB;
     const std::string disassembly = disassemble(&state->disasm, code, buffer_size, address, thumb);
@@ -76,7 +76,7 @@ static void read_hook(uc_engine *uc, uc_mem_type type, uint64_t address, int siz
     assert(value == 0);
     
     const MemState *mem = static_cast<const MemState *>(user_data);
-    memcpy(&value, mem_ptr<const void>(static_cast<Address>(address), mem), size);
+    memcpy(&value, Ptr<const void>(static_cast<Address>(address)).get(mem), size);
     log_memory_access("Read", static_cast<Address>(address), size, value, mem);
 }
 
@@ -148,7 +148,7 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
     const size_t stack_size = MB(1);
     const Address stack_bottom = alloc(&state->mem, stack_size, "stack");
     const Address stack_top = stack_bottom + stack_size;
-    memset(mem_ptr<void>(stack_bottom, &state->mem), 0xcc, stack_size);
+    memset(Ptr<void>(stack_bottom).get(&state->mem), 0xcc, stack_size);
     
     err = uc_reg_write(uc, UC_ARM_REG_SP, &stack_top);
     assert(err == UC_ERR_OK);
@@ -156,7 +156,7 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
     const size_t bootstrap_size = sizeof(thumb ? bootstrap_thumb : bootstrap_arm);
     const Address bootstrap_address = alloc(&state->mem, bootstrap_size, "bootstrap");
     const void *const bootstrap = thumb ? bootstrap_thumb : bootstrap_arm;
-    memcpy(mem_ptr<void>(bootstrap_address, &state->mem), bootstrap, bootstrap_size);
+    memcpy(Ptr<void>(bootstrap_address).get(&state->mem), bootstrap, bootstrap_size);
     
     err = uc_mem_map_ptr(uc, 0, GB(4), UC_PROT_ALL, &state->mem.memory[0]);
     assert(err == UC_ERR_OK);

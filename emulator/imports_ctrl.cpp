@@ -203,7 +203,7 @@ IMP_SIG(sceCtrlPeekBufferPositive)
 {
     const int32_t port = r0;
     const MemState *const mem = &emu->mem;
-    SceCtrlData *const data = mem_ptr<SceCtrlData>(r1, mem);
+    SceCtrlData *const data = Ptr<SceCtrlData>(r1).get(mem);
     const int32_t count = r2;
     assert(port == 0);
     assert(data != nullptr);

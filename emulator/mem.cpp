@@ -50,7 +50,7 @@ bool init(MemState *state)
     state->allocated_pages.resize(length / state->page_size);
     const Address null_address = alloc(state, 1, "NULL");
     assert(null_address == 0);
-    mprotect(mem_ptr<void>(null_address, state), state->page_size, PROT_NONE);
+    mprotect(state->memory.get(), state->page_size, PROT_NONE);
     
     return true;
 }

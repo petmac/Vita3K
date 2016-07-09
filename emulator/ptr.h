@@ -21,7 +21,7 @@ public:
     Ptr(const Ptr<U> &other)
         : addr(other.address())
     {
-        T *const t = static_cast<U *>(nullptr);
+        static_assert(std::is_convertible<U *, T *>::value, "Ptr is not convertible.");
     }
     
     Address address() const
@@ -37,7 +37,14 @@ public:
     
     T *get(const MemState *mem) const
     {
-        return mem_ptr<T>(addr, mem);
+        if (addr == 0)
+        {
+            return nullptr;
+        }
+        else
+        {
+            return reinterpret_cast<T *>(&mem->memory[addr]);
+        }
     }
     
     explicit operator bool() const
@@ -51,3 +58,9 @@ private:
 };
 
 static_assert(sizeof(Ptr<const void>) == 4, "Size of Ptr isn't 4 bytes.");
+
+template <class T>
+Ptr<T> operator+(const Ptr<T> &base, int32_t offset)
+{
+    return Ptr<T>(base.address() + (offset * sizeof(T)));
+}

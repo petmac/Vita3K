@@ -84,7 +84,7 @@ static bool load_func_imports(const uint32_t *nids, const Ptr<uint32_t> *entries
     return true;
 }
 
-static bool load_imports(const ModuleInfo &module, Ptr<void> segment_address, const MemState &mem)
+static bool load_imports(const ModuleInfo &module, Ptr<const void> segment_address, const MemState &mem)
 {
     const uint8_t *const base = segment_address.cast<const uint8_t>().get(&mem);
     const ModuleImports *const imports_begin = reinterpret_cast<const ModuleImports *>(base + module.stub_top);
@@ -94,7 +94,7 @@ static bool load_imports(const ModuleInfo &module, Ptr<void> segment_address, co
     {
         if (LOG_IMPORTS)
         {
-            const char *const lib_name = mem_ptr<const char>(imports->lib_name, &mem);
+            const char *const lib_name = Ptr<const char>(imports->lib_name).get(&mem);
             std::cout << "Loading imports from " << lib_name << std::endl;
         }
         
@@ -102,7 +102,7 @@ static bool load_imports(const ModuleInfo &module, Ptr<void> segment_address, co
         assert(imports->num_vars == 0);
         assert(imports->num_tls_vars == 0);
         
-        const uint32_t *const nids = mem_ptr<const uint32_t>(imports->func_nid_table, &mem);
+        const uint32_t *const nids = Ptr<const uint32_t>(imports->func_nid_table).get(&mem);
         const Ptr<uint32_t> *const entries = Ptr<Ptr<uint32_t>>(imports->func_entry_table).get(&mem);
         if (!load_func_imports(nids, entries, imports->num_functions, mem))
         {
@@ -154,8 +154,8 @@ bool load(Module *module, MemState *mem, const char *path)
         }
     }
     
-    const Ptr<void> module_info_segment_address = segments[module_info_segment_index];
-    module->entry_point = Ptr<const void>(module_info_segment_address.address() + module_info->mod_start);
+    const Ptr<const uint8_t> module_info_segment_address = segments[module_info_segment_index].cast<const uint8_t>();
+    module->entry_point = module_info_segment_address + module_info->mod_start;
     
     if (!load_imports(*module_info, module_info_segment_address, *mem))
     {

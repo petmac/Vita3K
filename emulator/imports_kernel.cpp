@@ -21,7 +21,7 @@ enum LWMutexAttr : uint32_t
 IMP_SIG(sceKernelAllocMemBlock)
 {
     MemState *const mem = &emu->mem;
-    const char *const name = mem_ptr<const char>(r0, mem);
+    const char *const name = Ptr<const char>(r0).get(mem);
     const uint32_t type = r1;
     const uint32_t size = r2;
     const uint32_t unknown = r3;
@@ -46,8 +46,8 @@ IMP_SIG(sceKernelAllocMemBlock)
 IMP_SIG(sceKernelCreateLwMutex)
 {
     const MemState *const mem = &emu->mem;
-    LWMutexWorkArea *const workarea = mem_ptr<LWMutexWorkArea>(r0, mem);
-    const char *const name = mem_ptr<const char>(r1, mem);
+    LWMutexWorkArea *const workarea = Ptr<LWMutexWorkArea>(r0).get(mem);
+    const char *const name = Ptr<const char>(r1).get(mem);
     const LWMutexAttr attr = static_cast<LWMutexAttr>(r2);
     const int32_t count = r3;
     const Ptr<Ptr<const void>> stack = sp.cast<Ptr<const void>>();
@@ -83,7 +83,7 @@ IMP_SIG(sceKernelGetMemBlockBase)
 {
     const SceUID uid = r0;
     const MemState *const mem = &emu->mem;
-    Ptr<void> *const address = mem_ptr<Ptr<void>>(r1, mem);
+    Ptr<void> *const address = Ptr<Ptr<void>>(r1).get(mem);
     assert(uid >= 0);
     assert(address != nullptr);
     
@@ -146,9 +146,9 @@ IMP_SIG(sceKernelGetThreadId)
 IMP_SIG(sceKernelLockLwMutex)
 {
     const MemState *const mem = &emu->mem;
-    LWMutexWorkArea *const workarea = mem_ptr<LWMutexWorkArea>(r0, mem);
+    LWMutexWorkArea *const workarea = Ptr<LWMutexWorkArea>(r0).get(mem);
     const int32_t count = r1;
-    uint32_t *const timeout = mem_ptr<uint32_t>(r2, mem);
+    uint32_t *const timeout = Ptr<uint32_t>(r2).get(mem);
     assert(workarea != nullptr);
     assert(count == 1);
     assert(timeout == nullptr);
@@ -160,7 +160,7 @@ IMP_SIG(sceKernelLockLwMutex)
 IMP_SIG(sceKernelUnlockLwMutex)
 {
     const MemState *const mem = &emu->mem;
-    LWMutexWorkArea *const workarea = mem_ptr<LWMutexWorkArea>(r0, mem);
+    LWMutexWorkArea *const workarea = Ptr<LWMutexWorkArea>(r0).get(mem);
     const int32_t count = r1;
     assert(workarea != nullptr);
     assert(count == 1);
