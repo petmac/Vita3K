@@ -414,6 +414,15 @@ struct SceGxmSyncObject
 {
 };
 
+struct SceGxmValidRegion
+{
+    // https://psp2sdk.github.io/structSceGxmValidRegion.html
+    uint32_t xMin;
+    uint32_t yMin;
+    uint32_t xMax;
+    uint32_t yMax;
+};
+
 struct SceGxmVertexAttribute
 {
     // https://psp2sdk.github.io/structSceGxmVertexAttribute.html
@@ -436,6 +445,36 @@ struct SceGxmVertexStream
     uint16_t stride;
     uint16_t indexSource;
 };
+
+IMP_SIG(sceGxmBeginScene)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    struct Stack
+    {
+        Ptr<SceGxmSyncObject> vertexSyncObject;
+        Ptr<SceGxmSyncObject> fragmentSyncObject;
+        Ptr<const SceGxmColorSurface> colorSurface;
+        Ptr<const SceGxmDepthStencilSurface> depthStencil;
+    };
+    
+    const MemState *const mem = &emu->mem;
+    const Stack *const stack = sp.cast<const Stack>().get(mem);
+    GxmContext *const context = Ptr<GxmContext>(r0).get(mem);
+    const uint32_t flags = r1;
+    const SceGxmRenderTarget *const renderTarget = Ptr<const SceGxmRenderTarget>(r2).get(mem);
+    const SceGxmValidRegion *const validRegion = Ptr<const SceGxmValidRegion>(r3).get(mem);
+    assert(stack != nullptr);
+    assert(context != nullptr);
+    assert(flags == 0);
+    assert(renderTarget != nullptr);
+    assert(validRegion == nullptr);
+    assert(!stack->vertexSyncObject);
+    assert(stack->fragmentSyncObject);
+    assert(stack->colorSurface);
+    assert(stack->depthStencil);
+    
+    return SCE_OK;
+}
 
 IMP_SIG(sceGxmColorSurfaceInit)
 {
