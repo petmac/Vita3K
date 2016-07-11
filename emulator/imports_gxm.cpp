@@ -658,6 +658,17 @@ IMP_SIG(sceGxmProgramParameterGetResourceIndex)
     return 0;
 }
 
+IMP_SIG(sceGxmSetFragmentProgram)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    GxmContext *const context = Ptr<GxmContext>(r0).get(&emu->mem);
+    const SceGxmFragmentProgram *const fragmentProgram = Ptr<const SceGxmFragmentProgram>(r1).get(&emu->mem);
+    assert(context != nullptr);
+    assert(fragmentProgram != nullptr);
+    
+    return 0;
+}
+
 IMP_SIG(sceGxmSetVertexProgram)
 {
     // https://psp2sdk.github.io/gxm_8h.html
