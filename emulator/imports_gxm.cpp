@@ -658,6 +658,20 @@ IMP_SIG(sceGxmProgramParameterGetResourceIndex)
     return 0;
 }
 
+IMP_SIG(sceGxmReserveFragmentDefaultUniformBuffer)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    GxmContext *const context = Ptr<GxmContext>(r0).get(&emu->mem);
+    Ptr<void> *const uniformBuffer = Ptr<Ptr<void>>(r1).get(&emu->mem);
+    assert(context != nullptr);
+    assert(uniformBuffer != nullptr);
+    
+    // TODO Allocate enough space in ring buffer for uniform parameters?
+    *uniformBuffer = Ptr<void>();
+    
+    return SCE_OK;
+}
+
 IMP_SIG(sceGxmSetFragmentProgram)
 {
     // https://psp2sdk.github.io/gxm_8h.html
