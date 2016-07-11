@@ -411,7 +411,7 @@ struct SceGxmShaderPatcherParams
 };
 
 struct SceGxmSyncObject
-{    
+{
 };
 
 struct SceGxmVertexAttribute
