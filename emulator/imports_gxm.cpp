@@ -13,6 +13,7 @@ enum GxmMemoryAttrib
 
 enum SceGxmAttributeFormat
 {
+    // https://psp2sdk.github.io/gxm_8h.html
     SCE_GXM_ATTRIBUTE_FORMAT_U8,
     SCE_GXM_ATTRIBUTE_FORMAT_S8,
     SCE_GXM_ATTRIBUTE_FORMAT_U16,
@@ -23,6 +24,56 @@ enum SceGxmAttributeFormat
     SCE_GXM_ATTRIBUTE_FORMAT_S16N,
     SCE_GXM_ATTRIBUTE_FORMAT_F16,
     SCE_GXM_ATTRIBUTE_FORMAT_F32
+};
+
+enum SceGxmColorMask
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    SCE_GXM_COLOR_MASK_NONE = 0,
+    SCE_GXM_COLOR_MASK_A = (1 << 0),
+    SCE_GXM_COLOR_MASK_R = (1 << 1),
+    SCE_GXM_COLOR_MASK_G = (1 << 2),
+    SCE_GXM_COLOR_MASK_B = (1 << 3),
+    SCE_GXM_COLOR_MASK_ALL = (SCE_GXM_COLOR_MASK_A | SCE_GXM_COLOR_MASK_R | SCE_GXM_COLOR_MASK_G | SCE_GXM_COLOR_MASK_B)
+};
+
+enum SceGxmBlendFactor
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    SCE_GXM_BLEND_FACTOR_ZERO,
+    SCE_GXM_BLEND_FACTOR_ONE,
+    SCE_GXM_BLEND_FACTOR_SRC_COLOR,
+    SCE_GXM_BLEND_FACTOR_ONE_MINUS_SRC_COLOR,
+    SCE_GXM_BLEND_FACTOR_SRC_ALPHA,
+    SCE_GXM_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+    SCE_GXM_BLEND_FACTOR_DST_COLOR,
+    SCE_GXM_BLEND_FACTOR_ONE_MINUS_DST_COLOR,
+    SCE_GXM_BLEND_FACTOR_DST_ALPHA,
+    SCE_GXM_BLEND_FACTOR_ONE_MINUS_DST_ALPHA,
+    SCE_GXM_BLEND_FACTOR_SRC_ALPHA_SATURATE,
+    SCE_GXM_BLEND_FACTOR_DST_ALPHA_SATURATE
+};
+
+enum SceGxmBlendFunc
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    SCE_GXM_BLEND_FUNC_NONE,
+    SCE_GXM_BLEND_FUNC_ADD,
+    SCE_GXM_BLEND_FUNC_SUBTRACT,
+    SCE_GXM_BLEND_FUNC_REVERSE_SUBTRACT
+};
+
+struct SceGxmBlendInfo
+{
+    // https://psp2sdk.github.io/structSceGxmBlendInfo.html
+    // TODO I don't think this is right.
+    SceGxmColorMask colorMask;
+    SceGxmBlendFunc colorFunc : 4;
+    SceGxmBlendFunc alphaFunc : 4;
+    SceGxmBlendFactor colorSrc : 4;
+    SceGxmBlendFactor colorDst : 4;
+    SceGxmBlendFactor alphaSrc : 4;
+    SceGxmBlendFactor alphaDst : 4;
 };
 
 enum SceGxmColorBaseFormat
@@ -246,6 +297,11 @@ enum SceGxmDepthStencilSurfaceType
 // https://psp2sdk.github.io/gxm_8h.html
 typedef void SceGxmDisplayQueueCallback(Ptr<const void> callbackData);
 
+struct SceGxmFragmentProgram
+{
+    // TODO This is an opaque type.
+};
+
 struct SceGxmInitializeParams
 {
     // This is guesswork based on Napier tutorial 3 PDF.
@@ -254,6 +310,28 @@ struct SceGxmInitializeParams
     Ptr<SceGxmDisplayQueueCallback> displayQueueCallback;
     uint32_t displayQueueCallbackDataSize = 0;
     uint32_t parameterBufferSize = 0;
+};
+
+enum SceGxmMultisampleMode
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    SCE_GXM_MULTISAMPLE_NONE,
+    SCE_GXM_MULTISAMPLE_2X,
+    SCE_GXM_MULTISAMPLE_4X
+};
+
+enum SceGxmOutputRegisterFormat
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    SCE_GXM_OUTPUT_REGISTER_FORMAT_DECLARED,
+    SCE_GXM_OUTPUT_REGISTER_FORMAT_UCHAR4,
+    SCE_GXM_OUTPUT_REGISTER_FORMAT_CHAR4,
+    SCE_GXM_OUTPUT_REGISTER_FORMAT_USHORT2,
+    SCE_GXM_OUTPUT_REGISTER_FORMAT_SHORT2,
+    SCE_GXM_OUTPUT_REGISTER_FORMAT_HALF4,
+    SCE_GXM_OUTPUT_REGISTER_FORMAT_HALF2,
+    SCE_GXM_OUTPUT_REGISTER_FORMAT_FLOAT2,
+    SCE_GXM_OUTPUT_REGISTER_FORMAT_FLOAT
 };
 
 enum SceGxmOutputRegisterSize
@@ -552,6 +630,42 @@ IMP_SIG(sceGxmShaderPatcherCreate)
     *shaderPatcher = Ptr<SceGxmShaderPatcher>(alloc(&emu->mem, sizeof(SceGxmShaderPatcher), __FUNCTION__));
     assert(*shaderPatcher);
     if (!*shaderPatcher)
+    {
+        return OUT_OF_MEMORY;
+    }
+    
+    return SCE_OK;
+}
+
+IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    // sceGxmShaderPatcherCreateFragmentProgram (SceGxmShaderPatcher *shaderPatcher, SceGxmShaderPatcherId programId, SceGxmOutputRegisterFormat outputFormat, SceGxmMultisampleMode multisampleMode, const SceGxmBlendInfo *blendInfo, const SceGxmProgram *vertexProgram, SceGxmFragmentProgram **fragmentProgram)
+    struct Stack
+    {
+        Ptr<const SceGxmBlendInfo> blendInfo;
+        Ptr<const SceGxmVertexProgram> vertexProgram;
+        Ptr<Ptr<SceGxmFragmentProgram>> fragmentProgram;
+    };
+    
+    MemState *const mem = &emu->mem;
+    SceGxmShaderPatcher *const shaderPatcher = Ptr<SceGxmShaderPatcher>(r0).get(mem);
+    const SceGxmRegisteredProgram *const programId = SceGxmShaderPatcherId(r1).get(mem);
+    const SceGxmOutputRegisterFormat outputFormat = static_cast<SceGxmOutputRegisterFormat>(r2);
+    const SceGxmMultisampleMode multiesampleMode = static_cast<SceGxmMultisampleMode>(r3);
+    const Stack *const stack = sp.cast<const Stack>().get(mem);
+    const SceGxmBlendInfo *const blendInfo = stack->blendInfo.get(mem);
+    Ptr<SceGxmFragmentProgram> *const fragmentProgram = stack->fragmentProgram.get(mem);
+    assert(shaderPatcher != nullptr);
+    assert(programId != 0);
+    assert(outputFormat == SCE_GXM_OUTPUT_REGISTER_FORMAT_UCHAR4);
+    assert(multiesampleMode == SCE_GXM_MULTISAMPLE_NONE);
+    assert((blendInfo == nullptr) || (blendInfo != nullptr));
+    assert(fragmentProgram != nullptr);
+    
+    *fragmentProgram = Ptr<SceGxmFragmentProgram>(alloc(mem, sizeof(SceGxmFragmentProgram), __FUNCTION__));
+    assert(*fragmentProgram);
+    if (!*fragmentProgram)
     {
         return OUT_OF_MEMORY;
     }
