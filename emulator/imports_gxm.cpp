@@ -305,6 +305,12 @@ struct SceGxmFragmentProgram
     // TODO This is an opaque type.
 };
 
+enum SceGxmIndexFormat
+{
+    SCE_GXM_INDEX_FORMAT_U16 = 0x00000000,
+    SCE_GXM_INDEX_FORMAT_U32 = 0x01000000
+};
+
 struct SceGxmInitializeParams
 {
     // This is guesswork based on Napier tutorial 3 PDF.
@@ -342,6 +348,17 @@ enum SceGxmOutputRegisterSize
     // https://psp2sdk.github.io/gxm_8h.html
     SCE_GXM_OUTPUT_REGISTER_SIZE_32BIT,
     SCE_GXM_OUTPUT_REGISTER_SIZE_64BIT
+};
+
+enum SceGxmPrimitiveType
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    SCE_GXM_PRIMITIVE_TRIANGLES = 0x00000000,
+    SCE_GXM_PRIMITIVE_LINES = 0x04000000,
+    SCE_GXM_PRIMITIVE_POINTS = 0x08000000,
+    SCE_GXM_PRIMITIVE_TRIANGLE_STRIP = 0x0c000000,
+    SCE_GXM_PRIMITIVE_TRIANGLE_FAN = 0x10000000,
+    SCE_GXM_PRIMITIVE_TRIANGLE_EDGES = 0x14000000
 };
 
 struct SceGxmProgram
@@ -581,6 +598,24 @@ IMP_SIG(sceGxmDepthStencilSurfaceInit)
     memset(surface, 0, sizeof(*surface));
     surface->depthData = stack->depthData;
     surface->stencilData = stack->stencilData;
+    
+    return SCE_OK;
+}
+
+IMP_SIG(sceGxmDraw)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    const MemState *const mem = &emu->mem;
+    SceGxmContext *const context = Ptr<SceGxmContext>(r0).get(mem);
+    const SceGxmPrimitiveType primType = static_cast<SceGxmPrimitiveType>(r1);
+    const SceGxmIndexFormat indexType = static_cast<SceGxmIndexFormat>(r2);
+    const void *const indexData = Ptr<const void>(r3).get(mem);
+    const uint32_t indexCount = *sp.cast<uint32_t>().get(mem);
+    assert(context != nullptr);
+    assert(primType == SCE_GXM_PRIMITIVE_TRIANGLES);
+    assert(indexType == SCE_GXM_INDEX_FORMAT_U16);
+    assert(indexData != nullptr);
+    assert(indexCount > 0);
     
     return SCE_OK;
 }
