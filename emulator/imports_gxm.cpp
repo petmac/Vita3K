@@ -728,6 +728,20 @@ IMP_SIG(sceGxmSetVertexProgram)
     return 0;
 }
 
+IMP_SIG(sceGxmSetVertexStream)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    const MemState *const mem = &emu->mem;
+    SceGxmContext *const context = Ptr<SceGxmContext>(r0).get(mem);
+    const uint32_t streamIndex = r1;
+    const void *const streamData = Ptr<const void>(r2).get(mem);
+    assert(context != nullptr);
+    assert(streamIndex == 0);
+    assert(streamData != nullptr);
+    
+    return SCE_OK;
+}
+
 IMP_SIG(sceGxmShaderPatcherCreate)
 {
     // https://psp2sdk.github.io/gxm_8h.html
