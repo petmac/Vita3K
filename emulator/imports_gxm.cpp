@@ -1,9 +1,5 @@
 #include "import.h"
 
-struct GxmContext
-{
-};
-
 enum GxmMemoryAttrib
 {
     // https://github.com/xerpi/vitahelloworld/blob/master/draw.c
@@ -267,6 +263,13 @@ struct SceGxmContextParams
     uint32_t fragmentUsseRingBufferOffset;
 };
 
+struct SceGxmContext
+{
+    // This is an opaque type.
+    SceGxmContextParams params;
+    size_t fragment_ring_buffer_used;
+};
+
 enum SceGxmDepthStencilFormat
 {
     // https://psp2sdk.github.io/gxm_8h.html
@@ -459,7 +462,7 @@ IMP_SIG(sceGxmBeginScene)
     
     const MemState *const mem = &emu->mem;
     const Stack *const stack = sp.cast<const Stack>().get(mem);
-    GxmContext *const context = Ptr<GxmContext>(r0).get(mem);
+    SceGxmContext *const context = Ptr<SceGxmContext>(r0).get(mem);
     const uint32_t flags = r1;
     const SceGxmRenderTarget *const renderTarget = Ptr<const SceGxmRenderTarget>(r2).get(mem);
     const SceGxmValidRegion *const validRegion = Ptr<const SceGxmValidRegion>(r3).get(mem);
@@ -472,6 +475,9 @@ IMP_SIG(sceGxmBeginScene)
     assert(stack->fragmentSyncObject);
     assert(stack->colorSurface);
     assert(stack->depthStencil);
+    
+    // TODO This may not be right.
+    context->fragment_ring_buffer_used = 0;
     
     return SCE_OK;
 }
@@ -515,15 +521,18 @@ IMP_SIG(sceGxmCreateContext)
 {
     // https://psp2sdk.github.io/gxm_8h.html
     const SceGxmContextParams *const params = Ptr<const SceGxmContextParams>(r0).get(&emu->mem);
-    Ptr<GxmContext> *const context = Ptr<Ptr<GxmContext>>(r1).get(&emu->mem);
+    Ptr<SceGxmContext> *const context = Ptr<Ptr<SceGxmContext>>(r1).get(&emu->mem);
     assert(params != nullptr);
     assert(context != nullptr);
     
-    *context = Ptr<GxmContext>(alloc(&emu->mem, sizeof(GxmContext), __FUNCTION__));
+    *context = Ptr<SceGxmContext>(alloc(&emu->mem, sizeof(SceGxmContext), __FUNCTION__));
     if (!*context)
     {
         return OUT_OF_MEMORY;
     }
+    
+    SceGxmContext *const ctx = context->get(&emu->mem);
+    ctx->params = *params;
     
     return SCE_OK;
 }
@@ -661,13 +670,21 @@ IMP_SIG(sceGxmProgramParameterGetResourceIndex)
 IMP_SIG(sceGxmReserveFragmentDefaultUniformBuffer)
 {
     // https://psp2sdk.github.io/gxm_8h.html
-    GxmContext *const context = Ptr<GxmContext>(r0).get(&emu->mem);
+    SceGxmContext *const context = Ptr<SceGxmContext>(r0).get(&emu->mem);
     Ptr<void> *const uniformBuffer = Ptr<Ptr<void>>(r1).get(&emu->mem);
     assert(context != nullptr);
     assert(uniformBuffer != nullptr);
     
-    // TODO Allocate enough space in ring buffer for uniform parameters?
-    *uniformBuffer = Ptr<void>();
+    const size_t size = 64; // TODO I guess this must be in the fragment program.
+    const size_t next_used = context->fragment_ring_buffer_used + size;
+    assert(next_used <= context->params.fragmentRingBufferMemSize);
+    if (next_used > context->params.fragmentRingBufferMemSize)
+    {
+        return OUT_OF_MEMORY;
+    }
+    
+    *uniformBuffer = context->params.fragmentRingBufferMem.cast<uint8_t>() + static_cast<int32_t>(context->fragment_ring_buffer_used);
+    context->fragment_ring_buffer_used = next_used;
     
     return SCE_OK;
 }
@@ -675,7 +692,7 @@ IMP_SIG(sceGxmReserveFragmentDefaultUniformBuffer)
 IMP_SIG(sceGxmSetFragmentProgram)
 {
     // https://psp2sdk.github.io/gxm_8h.html
-    GxmContext *const context = Ptr<GxmContext>(r0).get(&emu->mem);
+    SceGxmContext *const context = Ptr<SceGxmContext>(r0).get(&emu->mem);
     const SceGxmFragmentProgram *const fragmentProgram = Ptr<const SceGxmFragmentProgram>(r1).get(&emu->mem);
     assert(context != nullptr);
     assert(fragmentProgram != nullptr);
@@ -683,10 +700,27 @@ IMP_SIG(sceGxmSetFragmentProgram)
     return 0;
 }
 
+IMP_SIG(sceGxmSetUniformDataF)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    const Ptr<void> uniformBuffer(r0);
+    const Ptr<const SceGxmProgramParameter> parameter(r1);
+    const uint32_t componentOffset = r2;
+    const uint32_t componentCount = r3;
+    const Ptr<const float> sourceData = *sp.cast<Ptr<const float>>().get(&emu->mem);
+    assert(uniformBuffer);
+    assert(parameter);
+    (void)componentOffset;
+    assert(componentCount > 0);
+    assert(sourceData);
+    
+    return SCE_OK;
+}
+
 IMP_SIG(sceGxmSetVertexProgram)
 {
     // https://psp2sdk.github.io/gxm_8h.html
-    GxmContext *const context = Ptr<GxmContext>(r0).get(&emu->mem);
+    SceGxmContext *const context = Ptr<SceGxmContext>(r0).get(&emu->mem);
     const SceGxmVertexProgram *const vertexProgram = Ptr<const SceGxmVertexProgram>(r1).get(&emu->mem);
     assert(context != nullptr);
     assert(vertexProgram != nullptr);
