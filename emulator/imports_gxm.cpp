@@ -684,6 +684,7 @@ struct SceGxmContext
     // This is an opaque type.
     SceGxmContextParams params;
     size_t fragment_ring_buffer_used;
+    size_t vertex_ring_buffer_used;
 };
 
 enum SceGxmDepthStencilFormat
@@ -911,6 +912,7 @@ IMP_SIG(sceGxmBeginScene)
     
     // TODO This may not be right.
     context->fragment_ring_buffer_used = 0;
+    context->vertex_ring_buffer_used = 0;
     
     return SCE_OK;
 }
@@ -1136,6 +1138,28 @@ IMP_SIG(sceGxmReserveFragmentDefaultUniformBuffer)
     
     *uniformBuffer = context->params.fragmentRingBufferMem.cast<uint8_t>() + static_cast<int32_t>(context->fragment_ring_buffer_used);
     context->fragment_ring_buffer_used = next_used;
+    
+    return SCE_OK;
+}
+
+IMP_SIG(sceGxmReserveVertexDefaultUniformBuffer)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    SceGxmContext *const context = Ptr<SceGxmContext>(r0).get(&emu->mem);
+    Ptr<void> *const uniformBuffer = Ptr<Ptr<void>>(r1).get(&emu->mem);
+    assert(context != nullptr);
+    assert(uniformBuffer != nullptr);
+    
+    const size_t size = 64; // TODO I guess this must be in the vertex program.
+    const size_t next_used = context->vertex_ring_buffer_used + size;
+    assert(next_used <= context->params.vertexRingBufferMemSize);
+    if (next_used > context->params.vertexRingBufferMemSize)
+    {
+        return OUT_OF_MEMORY;
+    }
+    
+    *uniformBuffer = context->params.vertexRingBufferMem.cast<uint8_t>() + static_cast<int32_t>(context->vertex_ring_buffer_used);
+    context->vertex_ring_buffer_used = next_used;
     
     return SCE_OK;
 }
