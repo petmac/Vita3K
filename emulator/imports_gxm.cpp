@@ -1028,6 +1028,22 @@ IMP_SIG(sceGxmDepthStencilSurfaceInit)
     return SCE_OK;
 }
 
+IMP_SIG(sceGxmDisplayQueueAddEntry)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    const MemState *const mem = &emu->mem;
+    SceGxmSyncObject *const oldBuffer = Ptr<SceGxmSyncObject>(r0).get(mem);
+    SceGxmSyncObject *const newBuffer = Ptr<SceGxmSyncObject>(r1).get(mem);
+    const void *const callbackData = Ptr<const void>(r2).get(mem);
+    assert(oldBuffer != nullptr);
+    assert(newBuffer != nullptr);
+    assert(callbackData != nullptr);
+    
+    // TODO Call callback.
+    
+    return SCE_OK;
+}
+
 IMP_SIG(sceGxmDraw)
 {
     // https://psp2sdk.github.io/gxm_8h.html
