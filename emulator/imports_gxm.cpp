@@ -1173,7 +1173,20 @@ IMP_SIG(sceGxmSetFragmentProgram)
     assert(context != nullptr);
     assert(fragmentProgram != nullptr);
     
-    return 0;
+    return SCE_OK;
+}
+
+IMP_SIG(sceGxmSetFragmentTexture)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    SceGxmContext *const context = Ptr<SceGxmContext>(r0).get(&emu->mem);
+    const uint32_t textureIndex = r1;
+    const SceGxmTexture *const texture = Ptr<const SceGxmTexture>(r2).get(&emu->mem);
+    assert(context != nullptr);
+    assert(textureIndex == 0);
+    assert(texture != nullptr);
+    
+    return SCE_OK;
 }
 
 IMP_SIG(sceGxmSetUniformDataF)
