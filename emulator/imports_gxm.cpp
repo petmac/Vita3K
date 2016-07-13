@@ -747,6 +747,13 @@ enum SceGxmMultisampleMode
     SCE_GXM_MULTISAMPLE_4X
 };
 
+struct SceGxmNotification
+{
+    // https://psp2sdk.github.io/structSceGxmNotification.html
+    Ptr<volatile uint32_t> address;
+    uint32_t value;
+};
+
 enum SceGxmOutputRegisterFormat
 {
     // https://psp2sdk.github.io/gxm_8h.html
@@ -1035,6 +1042,20 @@ IMP_SIG(sceGxmDraw)
     assert(indexType == SCE_GXM_INDEX_FORMAT_U16);
     assert(indexData != nullptr);
     assert(indexCount > 0);
+    
+    return SCE_OK;
+}
+
+IMP_SIG(sceGxmEndScene)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    const MemState *const mem = &emu->mem;
+    SceGxmContext *const context = Ptr<SceGxmContext>(r0).get(mem);
+    const SceGxmNotification *const vertexNotification = Ptr<const SceGxmNotification>(r1).get(mem);
+    const SceGxmNotification *const fragmentNotification = Ptr<const SceGxmNotification>(r2).get(mem);
+    assert(context != nullptr);
+    assert(vertexNotification == nullptr);
+    assert(fragmentNotification == nullptr);
     
     return SCE_OK;
 }
