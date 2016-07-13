@@ -1031,7 +1031,7 @@ IMP_SIG(sceGxmDraw)
     const void *const indexData = Ptr<const void>(r3).get(mem);
     const uint32_t indexCount = *sp.cast<uint32_t>().get(mem);
     assert(context != nullptr);
-    assert(primType == SCE_GXM_PRIMITIVE_TRIANGLES);
+    assert((primType == SCE_GXM_PRIMITIVE_TRIANGLES) || (primType == SCE_GXM_PRIMITIVE_TRIANGLE_STRIP));
     assert(indexType == SCE_GXM_INDEX_FORMAT_U16);
     assert(indexData != nullptr);
     assert(indexCount > 0);
