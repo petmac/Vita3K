@@ -217,10 +217,14 @@ enum SceGxmColorFormat
     SCE_GXM_COLOR_FORMAT_A8 = SCE_GXM_COLOR_FORMAT_U8_A
 };
 
-struct SceGxmTexture
+union SceGxmTexture
 {
     // https://psp2sdk.github.io/structSceGxmTexture.html
     uint32_t controlWords[4];
+    struct
+    {
+        Ptr<void> data;
+    } emu;
 };
 
 enum SceGxmTextureBaseFormat
@@ -1314,6 +1318,16 @@ IMP_SIG(sceGxmTerminate)
     return SCE_OK;
 }
 
+IMP_SIG(sceGxmTextureGetData)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    const MemState *const mem = &emu->mem;
+    SceGxmTexture *const texture = Ptr<SceGxmTexture>(r0).get(mem);
+    assert(texture != nullptr);
+    
+    return texture->emu.data.address();
+}
+
 IMP_SIG(sceGxmTextureInitLinear)
 {
     // https://psp2sdk.github.io/gxm_8h.html
@@ -1323,7 +1337,7 @@ IMP_SIG(sceGxmTextureInitLinear)
         uint32_t mipCount;
     };
     
-    const MemState *const mem = &emu->mem;
+    MemState *const mem = &emu->mem;
     const Stack *const stack = sp.cast<const Stack>().get(mem);
     SceGxmTexture *const texture = Ptr<SceGxmTexture>(r0).get(mem);
     const void *const data = Ptr<const void>(r1).get(mem);
@@ -1335,6 +1349,16 @@ IMP_SIG(sceGxmTextureInitLinear)
     assert(width > 0);
     assert(stack->height > 0);
     assert(stack->mipCount == 0);
+    
+    const size_t data_size = width * stack->height * 4; // TODO Handle alignment.
+    texture->emu.data = Ptr<void>(alloc(mem, data_size, __FUNCTION__));
+    assert(texture->emu.data);
+    if (!texture->emu.data)
+    {
+        return OUT_OF_MEMORY;
+    }
+    
+    memcpy(texture->emu.data.get(mem), data, data_size);
     
     return SCE_OK;
 }
