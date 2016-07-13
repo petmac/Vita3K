@@ -217,17 +217,6 @@ enum SceGxmColorFormat
     SCE_GXM_COLOR_FORMAT_A8 = SCE_GXM_COLOR_FORMAT_U8_A
 };
 
-union SceGxmTexture
-{
-    // https://psp2sdk.github.io/structSceGxmTexture.html
-    uint32_t controlWords[4];
-    struct
-    {
-        uint32_t width;
-        Ptr<void> data;
-    } emu;
-};
-
 enum SceGxmTextureBaseFormat
 {
     SCE_GXM_TEXTURE_BASE_FORMAT_U8 = 0x00000000,
@@ -635,6 +624,20 @@ enum SceGxmTextureFormat
     SCE_GXM_TEXTURE_FORMAT_PVRTII2BPP = SCE_GXM_TEXTURE_FORMAT_PVRTII2BPP_ABGR,
     SCE_GXM_TEXTURE_FORMAT_PVRTII4BPP = SCE_GXM_TEXTURE_FORMAT_PVRTII4BPP_ABGR
 };
+
+union SceGxmTexture
+{
+    // https://psp2sdk.github.io/structSceGxmTexture.html
+    uint32_t controlWords[4];
+    struct
+    {
+        SceGxmTextureFormat format;
+        uint32_t width;
+        Ptr<void> data;
+    } emu;
+};
+
+static_assert(sizeof(SceGxmTexture) == 16, "Incorrect size.");
 
 struct SceGxmColorSurface
 {
@@ -1329,6 +1332,16 @@ IMP_SIG(sceGxmTextureGetData)
     return texture->emu.data.address();
 }
 
+IMP_SIG(sceGxmTextureGetFormat)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    const MemState *const mem = &emu->mem;
+    const SceGxmTexture *const texture = Ptr<const SceGxmTexture>(r0).get(mem);
+    assert(texture != nullptr);
+    
+    return texture->emu.format;
+}
+
 IMP_SIG(sceGxmTextureGetWidth)
 {
     // https://psp2sdk.github.io/gxm_8h.html
@@ -1369,6 +1382,7 @@ IMP_SIG(sceGxmTextureInitLinear)
         return OUT_OF_MEMORY;
     }
     
+    texture->emu.format = texFormat;
     texture->emu.width = width;
     memcpy(texture->emu.data.get(mem), data, data_size);
     
