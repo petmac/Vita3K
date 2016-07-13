@@ -1173,7 +1173,7 @@ IMP_SIG(sceGxmSetFragmentProgram)
     assert(context != nullptr);
     assert(fragmentProgram != nullptr);
     
-    return SCE_OK;
+    return 0; // void
 }
 
 IMP_SIG(sceGxmSetFragmentTexture)
