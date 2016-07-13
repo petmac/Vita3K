@@ -1111,6 +1111,18 @@ IMP_SIG(sceGxmMapVertexUsseMemory)
     return SCE_OK;
 }
 
+IMP_SIG(sceGxmPadHeartbeat)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    const MemState *const mem = &emu->mem;
+    const SceGxmColorSurface *const displaySurface = Ptr<const SceGxmColorSurface>(r0).get(mem);
+    SceGxmSyncObject *const displaySyncObject = Ptr<SceGxmSyncObject>(r1).get(mem);
+    assert(displaySurface != nullptr);
+    assert(displaySyncObject != nullptr);
+    
+    return SCE_OK;
+}
+
 IMP_SIG(sceGxmProgramCheck)
 {
     // https://psp2sdk.github.io/gxm_8h.html
