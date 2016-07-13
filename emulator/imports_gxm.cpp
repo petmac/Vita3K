@@ -633,6 +633,7 @@ union SceGxmTexture
     {
         SceGxmTextureFormat format;
         uint32_t width;
+        uint32_t height;
         Ptr<void> data;
     } emu;
 };
@@ -1366,6 +1367,16 @@ IMP_SIG(sceGxmTextureGetFormat)
     return texture->emu.format;
 }
 
+IMP_SIG(sceGxmTextureGetHeight)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    const MemState *const mem = &emu->mem;
+    const SceGxmTexture *const texture = Ptr<const SceGxmTexture>(r0).get(mem);
+    assert(texture != nullptr);
+    
+    return texture->emu.height;
+}
+
 IMP_SIG(sceGxmTextureGetWidth)
 {
     // https://psp2sdk.github.io/gxm_8h.html
@@ -1408,6 +1419,7 @@ IMP_SIG(sceGxmTextureInitLinear)
     
     texture->emu.format = texFormat;
     texture->emu.width = width;
+    texture->emu.height = stack->height;
     memcpy(texture->emu.data.get(mem), data, data_size);
     
     return SCE_OK;
