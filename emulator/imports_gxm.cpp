@@ -223,6 +223,7 @@ union SceGxmTexture
     uint32_t controlWords[4];
     struct
     {
+        uint32_t width;
         Ptr<void> data;
     } emu;
 };
@@ -1328,6 +1329,16 @@ IMP_SIG(sceGxmTextureGetData)
     return texture->emu.data.address();
 }
 
+IMP_SIG(sceGxmTextureGetWidth)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    const MemState *const mem = &emu->mem;
+    const SceGxmTexture *const texture = Ptr<const SceGxmTexture>(r0).get(mem);
+    assert(texture != nullptr);
+    
+    return texture->emu.width;
+}
+
 IMP_SIG(sceGxmTextureInitLinear)
 {
     // https://psp2sdk.github.io/gxm_8h.html
@@ -1358,6 +1369,7 @@ IMP_SIG(sceGxmTextureInitLinear)
         return OUT_OF_MEMORY;
     }
     
+    texture->emu.width = width;
     memcpy(texture->emu.data.get(mem), data, data_size);
     
     return SCE_OK;
