@@ -1442,6 +1442,17 @@ IMP_SIG(sceGxmSyncObjectCreate)
     return SCE_OK;
 }
 
+IMP_SIG(sceGxmSyncObjectDestroy)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    SceGxmSyncObject *const syncObject = Ptr<SceGxmSyncObject>(r0).get(&emu->mem);
+    assert(syncObject != nullptr);
+    
+    // TODO Free sync object.
+    
+    return SCE_OK;
+}
+
 IMP_SIG(sceGxmTerminate)
 {
     return SCE_OK;
@@ -1527,7 +1538,8 @@ IMP_SIG(sceGxmTextureInitLinear)
 
 IMP_SIG(sceGxmUnmapMemory)
 {
-    const void *const address = Ptr<const void>(r0).get(&emu->mem);
+    // https://psp2sdk.github.io/gxm_8h.html
+    void *const address = Ptr<void>(r0).get(&emu->mem);
     assert(address != nullptr);
     
     return SCE_OK;
