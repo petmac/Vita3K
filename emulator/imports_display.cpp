@@ -1,8 +1,8 @@
 #include "import.h"
 
-#include <SDL2/SDL_events.h>
+#include "events.h"
+
 #include <SDL2/SDL_video.h>
-#include <unicorn/unicorn.h>
 
 enum PixelFormat : uint32_t
 {
@@ -51,16 +51,7 @@ IMP_SIG(sceDisplaySetFrameBuf)
 
 IMP_SIG(sceDisplayWaitVblankStart)
 {
-    SDL_Event event;
-    while (SDL_PollEvent(&event))
-    {
-        if (event.type == SDL_QUIT)
-        {
-            // TODO Stop all threads, not just this one.
-            uc_emu_stop(uc);
-            break;
-        }
-    }
+    handle_events(uc);
     
     return SCE_OK;
 }

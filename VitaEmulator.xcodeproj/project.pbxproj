@@ -17,6 +17,7 @@
 		C1855A991D016320004539B7 /* libunicorn.1.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = C1855A971D016245004539B7 /* libunicorn.1.dylib */; };
 		C1855A9D1D01ED3F004539B7 /* emulator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1855A9B1D01ED3F004539B7 /* emulator.cpp */; settings = {ASSET_TAGS = (); }; };
 		C188F8851D1D0E9400D16550 /* imports_touch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C188F8841D1D0E9400D16550 /* imports_touch.cpp */; settings = {ASSET_TAGS = (); }; };
+		C1890AE91D36FD2B00AA1485 /* events.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1890AE71D36FD2B00AA1485 /* events.cpp */; settings = {ASSET_TAGS = (); }; };
 		C1AA7C6D1D2258C000FAF58D /* relocation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1AA7C6B1D2258C000FAF58D /* relocation.cpp */; settings = {ASSET_TAGS = (); }; };
 		C1AD18EF1D07869800064A1F /* libcapstone.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1AD18EE1D07869800064A1F /* libcapstone.a */; };
 		C1AD18F41D07ED2100064A1F /* disasm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1AD18F21D07ED2100064A1F /* disasm.cpp */; settings = {ASSET_TAGS = (); }; };
@@ -83,6 +84,8 @@
 		C1855A9B1D01ED3F004539B7 /* emulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = emulator.cpp; sourceTree = "<group>"; };
 		C1855A9C1D01ED3F004539B7 /* emulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = emulator.h; sourceTree = "<group>"; };
 		C188F8841D1D0E9400D16550 /* imports_touch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imports_touch.cpp; sourceTree = "<group>"; };
+		C1890AE71D36FD2B00AA1485 /* events.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = events.cpp; sourceTree = "<group>"; };
+		C1890AE81D36FD2B00AA1485 /* events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = events.h; sourceTree = "<group>"; };
 		C193EE101D2CE1BB00543CE7 /* ctrl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ctrl.h; sourceTree = "<group>"; };
 		C1AA7C6B1D2258C000FAF58D /* relocation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = relocation.cpp; sourceTree = "<group>"; };
 		C1AA7C6C1D2258C000FAF58D /* relocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = relocation.h; sourceTree = "<group>"; };
@@ -177,6 +180,8 @@
 				C1AD18F31D07ED2100064A1F /* disasm.h */,
 				C1855A9B1D01ED3F004539B7 /* emulator.cpp */,
 				C1855A9C1D01ED3F004539B7 /* emulator.h */,
+				C1890AE71D36FD2B00AA1485 /* events.cpp */,
+				C1890AE81D36FD2B00AA1485 /* events.h */,
 				C173D8B01D11CEA8001F9EF7 /* gen_nids.py */,
 				C1EA5B7B1D17CB48000CE42E /* import.h */,
 				C17B2A481D1C46F600E115C4 /* imports_ctrl.cpp */,
@@ -311,6 +316,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1890AE91D36FD2B00AA1485 /* events.cpp in Sources */,
 				C1AD18F41D07ED2100064A1F /* disasm.cpp in Sources */,
 				C175824C1D1AFD4100E1AA12 /* imports_gxm.cpp in Sources */,
 				C17B2A471D1C416E00E115C4 /* imports_display.cpp in Sources */,
