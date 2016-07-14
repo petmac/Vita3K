@@ -1044,6 +1044,12 @@ IMP_SIG(sceGxmDisplayQueueAddEntry)
     return SCE_OK;
 }
 
+IMP_SIG(sceGxmDisplayQueueFinish)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    return SCE_OK;
+}
+
 IMP_SIG(sceGxmDraw)
 {
     // https://psp2sdk.github.io/gxm_8h.html
