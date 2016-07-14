@@ -224,11 +224,6 @@ IMP_SIG(sceCtrlPeekBufferPositive)
         apply_controller(&data->buttons, axes.data(), controller.second.get());
     }
     
-    if (data->buttons != 0)
-    {
-        data->buttons |= SCE_CTRL_ANY;
-    }
-    
     data->lx = float_to_byte(axes[0]);
     data->ly = float_to_byte(axes[1]);
     data->rx = float_to_byte(axes[2]);
