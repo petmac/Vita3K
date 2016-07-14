@@ -1076,6 +1076,16 @@ IMP_SIG(sceGxmEndScene)
     return SCE_OK;
 }
 
+IMP_SIG(sceGxmFinish)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    const MemState *const mem = &emu->mem;
+    SceGxmContext *const context = Ptr<SceGxmContext>(r0).get(mem);
+    assert(context != nullptr);
+    
+    return 0; // void
+}
+
 IMP_SIG(sceGxmInitialize)
 {
     const SceGxmInitializeParams *const params = Ptr<const SceGxmInitializeParams>(r0).get(&emu->mem);
