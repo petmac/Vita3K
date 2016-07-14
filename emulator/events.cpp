@@ -3,7 +3,7 @@
 #include <SDL2/SDL_events.h>
 #include <unicorn/unicorn.h>
 
-void handle_events(uc_struct *uc)
+bool handle_events(uc_struct *uc)
 {
     SDL_Event event;
     while (SDL_PollEvent(&event))
@@ -12,7 +12,9 @@ void handle_events(uc_struct *uc)
         {
             // TODO Stop all threads, not just this one.
             uc_emu_stop(uc);
-            break;
+            return false;
         }
     }
+    
+    return true;
 }
