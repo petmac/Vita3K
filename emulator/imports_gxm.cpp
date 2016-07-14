@@ -1411,6 +1411,17 @@ IMP_SIG(sceGxmShaderPatcherReleaseFragmentProgram)
     return SCE_OK;
 }
 
+IMP_SIG(sceGxmShaderPatcherReleaseVertexProgram)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    SceGxmShaderPatcher *const shaderPatcher = Ptr<SceGxmShaderPatcher>(r0).get(&emu->mem);
+    SceGxmVertexProgram *const vertexProgram = Ptr<SceGxmVertexProgram>(r1).get(&emu->mem);
+    assert(shaderPatcher != nullptr);
+    assert(vertexProgram != nullptr);
+    
+    return SCE_OK;
+}
+
 IMP_SIG(sceGxmSyncObjectCreate)
 {
     Ptr<SceGxmSyncObject> *const syncObject = Ptr<Ptr<SceGxmSyncObject>>(r0).get(&emu->mem);
