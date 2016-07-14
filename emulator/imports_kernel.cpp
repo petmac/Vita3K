@@ -106,6 +106,22 @@ IMP_SIG(sceKernelExitProcess)
     return SCE_OK;
 }
 
+IMP_SIG(sceKernelFreeMemBlock)
+{
+    // https://psp2sdk.github.io/sysmem_8h.html
+    const SceUID uid = r0;
+    assert(uid != SCE_UID_INVALID_UID);
+    
+    KernelState *const state = &emu->kernel;
+    const Blocks::const_iterator block = state->blocks.find(uid);
+    assert(block != state->blocks.end());
+    
+    // TODO Free block.
+    state->blocks.erase(block);
+    
+    return SCE_OK;
+}
+
 IMP_SIG(sceKernelGetMemBlockBase)
 {
     const SceUID uid = r0;
