@@ -2,16 +2,20 @@
 
 import json
 
-with open("../vita-headers/db.json") as file:
-    data = json.load(file)
-    with open("nids.h", "w") as header:
+def load_functions_from_file(functions, name):
+    with open("../vita-headers/" + name + ".json") as file:
+        data = json.load(file)
         libraries = data.values()
-        functions = {}
         for library in libraries:
             for module in library["modules"].values():
                 functions.update(module["functions"])
 
-        for name in sorted(functions):
-            nid = functions[name]
-            line = "NID(" + name + ", " + hex(nid) + ")\n"
-            header.write(line)
+functions = {}
+load_functions_from_file(functions, "db")
+load_functions_from_file(functions, "extra")
+
+with open("nids.h", "w") as header:
+    for name in sorted(functions):
+        nid = functions[name]
+        line = "NID(" + name + ", " + hex(nid) + ")\n"
+        header.write(line)

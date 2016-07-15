@@ -3107,5 +3107,13 @@ UNIMPLEMENTED(srand)
 UNIMPLEMENTED(strcpy)
 UNIMPLEMENTED(strlen)
 UNIMPLEMENTED(unlink)
+UNIMPLEMENTED(uvl_alloc_code_mem)
+UNIMPLEMENTED(uvl_debug_log)
+UNIMPLEMENTED(uvl_exit)
+UNIMPLEMENTED(uvl_flush_icache)
+UNIMPLEMENTED(uvl_load)
+UNIMPLEMENTED(uvl_lock_mem)
+UNIMPLEMENTED(uvl_log_write)
+UNIMPLEMENTED(uvl_unlock_mem)
 
 #undef UNIMPLEMENTED
