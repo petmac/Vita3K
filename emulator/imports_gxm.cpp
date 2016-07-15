@@ -1028,6 +1028,16 @@ IMP_SIG(sceGxmDepthStencilSurfaceInit)
     return SCE_OK;
 }
 
+IMP_SIG(sceGxmDestroyRenderTarget)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    const MemState *const mem = &emu->mem;
+    SceGxmRenderTarget *const renderTarget = Ptr<SceGxmRenderTarget>(r0).get(mem);
+    assert(renderTarget != nullptr);
+    
+    return SCE_OK;
+}
+
 IMP_SIG(sceGxmDisplayQueueAddEntry)
 {
     // https://psp2sdk.github.io/gxm_8h.html
