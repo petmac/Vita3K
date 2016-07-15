@@ -1556,6 +1556,15 @@ IMP_SIG(sceGxmTextureInitLinear)
     return SCE_OK;
 }
 
+IMP_SIG(sceGxmUnmapFragmentUsseMemory)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    void *const base = Ptr<void>(r0).get(&emu->mem);
+    assert(base != nullptr);
+    
+    return SCE_OK;
+}
+
 IMP_SIG(sceGxmUnmapMemory)
 {
     // https://psp2sdk.github.io/gxm_8h.html
