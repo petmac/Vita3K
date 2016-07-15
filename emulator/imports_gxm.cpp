@@ -1573,3 +1573,12 @@ IMP_SIG(sceGxmUnmapMemory)
     
     return SCE_OK;
 }
+
+IMP_SIG(sceGxmUnmapVertexUsseMemory)
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    void *const base = Ptr<void>(r0).get(&emu->mem);
+    assert(base != nullptr);
+    
+    return SCE_OK;
+}
