@@ -21,6 +21,7 @@
 		C1AA7C6D1D2258C000FAF58D /* relocation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1AA7C6B1D2258C000FAF58D /* relocation.cpp */; settings = {ASSET_TAGS = (); }; };
 		C1AD18EF1D07869800064A1F /* libcapstone.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1AD18EE1D07869800064A1F /* libcapstone.a */; };
 		C1AD18F41D07ED2100064A1F /* disasm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1AD18F21D07ED2100064A1F /* disasm.cpp */; settings = {ASSET_TAGS = (); }; };
+		C1B13F7E1D38C2AD00571DBA /* imports_uvl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1B13F7D1D38C2AD00571DBA /* imports_uvl.cpp */; settings = {ASSET_TAGS = (); }; };
 		C1B4A0451D02FFFC00F53D2C /* mem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1B4A0431D02FFFC00F53D2C /* mem.cpp */; settings = {ASSET_TAGS = (); }; };
 		C1DD5EEC1D1E6B0800FCE19A /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1DD5EEB1D1E6B0800FCE19A /* main.cpp */; settings = {ASSET_TAGS = (); }; };
 		C1DD5EEE1D1E6C4500FCE19A /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1DD5EED1D1E6C4500FCE19A /* OpenGL.framework */; };
@@ -92,6 +93,7 @@
 		C1AD18EE1D07869800064A1F /* libcapstone.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcapstone.a; path = capstone/libcapstone.a; sourceTree = "<group>"; };
 		C1AD18F21D07ED2100064A1F /* disasm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = disasm.cpp; sourceTree = "<group>"; };
 		C1AD18F31D07ED2100064A1F /* disasm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = disasm.h; sourceTree = "<group>"; };
+		C1B13F7D1D38C2AD00571DBA /* imports_uvl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imports_uvl.cpp; sourceTree = "<group>"; };
 		C1B4A0431D02FFFC00F53D2C /* mem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mem.cpp; sourceTree = "<group>"; };
 		C1B4A0441D02FFFC00F53D2C /* mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mem.h; sourceTree = "<group>"; };
 		C1DD5EEB1D1E6B0800FCE19A /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -189,6 +191,7 @@
 				C175824B1D1AFD4100E1AA12 /* imports_gxm.cpp */,
 				C1EA5B7E1D17CE74000CE42E /* imports_kernel.cpp */,
 				C188F8841D1D0E9400D16550 /* imports_touch.cpp */,
+				C1B13F7D1D38C2AD00571DBA /* imports_uvl.cpp */,
 				C173D8B21D1306EA001F9EF7 /* imports.cpp */,
 				C173D8B31D1306EA001F9EF7 /* imports.h */,
 				C1E11F221D2C1E6700D49E5B /* kernel.h */,
@@ -320,6 +323,7 @@
 				C1AD18F41D07ED2100064A1F /* disasm.cpp in Sources */,
 				C175824C1D1AFD4100E1AA12 /* imports_gxm.cpp in Sources */,
 				C17B2A471D1C416E00E115C4 /* imports_display.cpp in Sources */,
+				C1B13F7E1D38C2AD00571DBA /* imports_uvl.cpp in Sources */,
 				C1EA5B7F1D17CE74000CE42E /* imports_kernel.cpp in Sources */,
 				C173D8B41D1306EA001F9EF7 /* imports.cpp in Sources */,
 				C1EA5B841D19202F000CE42E /* call.cpp in Sources */,
