@@ -52,6 +52,17 @@ static const uint32_t bootstrap_thumb[] =
     0x0A10EEE8
 };
 
+static Ptr<void> load_bootstrap(const void *bootstrap, size_t size, MemState *mem)
+{
+    const Ptr<void> buffer(alloc(mem, size, __FUNCTION__));
+    if (buffer)
+    {
+        memcpy(buffer.get(mem), bootstrap, size);
+    }
+    
+    return buffer;
+}
+
 static void code_hook(uc_engine *uc, uint64_t address, uint32_t size, void *user_data)
 {
     size_t mode;
@@ -118,8 +129,15 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
 bool init(EmulatorState *state)
 {
     state->window = WindowPtr(SDL_CreateWindow("Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 960, 544, 0), SDL_DestroyWindow);
+    if (!state->window || !init(&state->disasm) || !init(&state->mem))
+    {
+        return false;
+    }
     
-    return state->window && init(&state->disasm) && init(&state->mem);
+    state->bootstrap_arm = load_bootstrap(bootstrap_arm, sizeof(bootstrap_arm), &state->mem);
+    state->bootstrap_thumb = load_bootstrap(bootstrap_thumb, sizeof(bootstrap_thumb), &state->mem);
+    
+    return state->bootstrap_arm && state->bootstrap_thumb;
 }
 
 bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
@@ -156,15 +174,12 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
     err = uc_reg_write(uc, UC_ARM_REG_SP, &stack_top);
     assert(err == UC_ERR_OK);
     
-    const size_t bootstrap_size = sizeof(thumb ? bootstrap_thumb : bootstrap_arm);
-    const Address bootstrap_address = alloc(&state->mem, bootstrap_size, "bootstrap");
-    const void *const bootstrap = thumb ? bootstrap_thumb : bootstrap_arm;
-    memcpy(Ptr<void>(bootstrap_address).get(&state->mem), bootstrap, bootstrap_size);
-    
     err = uc_mem_map_ptr(uc, 0, GB(4), UC_PROT_ALL, &state->mem.memory[0]);
     assert(err == UC_ERR_OK);
     
-    err = uc_emu_start(uc, bootstrap_address, bootstrap_address + bootstrap_size, 0, 0);
+    const Ptr<const void> bootstrap_address = thumb ? state->bootstrap_thumb : state->bootstrap_arm;
+    const size_t bootstrap_size = thumb ? sizeof(bootstrap_thumb) : sizeof(bootstrap_arm);
+    err = uc_emu_start(uc, bootstrap_address.address(), bootstrap_address.address() + bootstrap_size, 0, 0);
     assert(err == UC_ERR_OK);
     
     err = uc_emu_start(uc, (entry_point.address() >> 1) << 1, 0, 0, 0);
@@ -179,7 +194,7 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
         return false;
     }
     
-    // TODO Free bootstrap and stack.
+    // TODO Free stack.
     // TODO Free hooks?
     
     std::cout << "Emulation succeeded." << std::endl;

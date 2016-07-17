@@ -15,6 +15,8 @@ struct EmulatorState
     DisasmState disasm;
     KernelState kernel;
     MemState mem;
+    Ptr<void> bootstrap_arm;
+    Ptr<void> bootstrap_thumb;
 };
 
 bool init(EmulatorState *state);
