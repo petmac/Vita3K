@@ -715,9 +715,6 @@ enum SceGxmDepthStencilSurfaceType
     SCE_GXM_DEPTH_STENCIL_SURFACE_TILED = 0x00011000
 };
 
-// https://psp2sdk.github.io/gxm_8h.html
-typedef void SceGxmDisplayQueueCallback(Ptr<const void> callbackData);
-
 struct SceGxmFragmentProgram
 {
     // TODO This is an opaque type.
@@ -727,16 +724,6 @@ enum SceGxmIndexFormat
 {
     SCE_GXM_INDEX_FORMAT_U16 = 0x00000000,
     SCE_GXM_INDEX_FORMAT_U32 = 0x01000000
-};
-
-struct SceGxmInitializeParams
-{
-    // This is guesswork based on Napier tutorial 3 PDF.
-    uint32_t flags = 0;
-    uint32_t displayQueueMaxPendingCount = 0;
-    Ptr<SceGxmDisplayQueueCallback> displayQueueCallback;
-    uint32_t displayQueueCallbackDataSize = 0;
-    uint32_t parameterBufferSize = 0;
 };
 
 enum SceGxmMultisampleMode
@@ -1117,9 +1104,10 @@ IMP_SIG(sceGxmFinish)
 IMP_SIG(sceGxmInitialize)
 {
     const SceGxmInitializeParams *const params = Ptr<const SceGxmInitializeParams>(r0).get(&emu->mem);
-    (void)params;
+    assert(params != nullptr);
     
-    // TODO Implement.
+    emu->gxm.params = *params;
+    
     return SCE_OK;
 }
 

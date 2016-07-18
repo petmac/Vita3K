@@ -104,6 +104,7 @@
 		C1EA5B7E1D17CE74000CE42E /* imports_kernel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imports_kernel.cpp; sourceTree = "<group>"; };
 		C1EA5B811D185320000CE42E /* call.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = call.h; sourceTree = "<group>"; };
 		C1EA5B831D19202F000CE42E /* call.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = call.cpp; sourceTree = "<group>"; };
+		C1FFFE461D3CB0070033B73B /* gxm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gxm.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -185,6 +186,7 @@
 				C1890AE71D36FD2B00AA1485 /* events.cpp */,
 				C1890AE81D36FD2B00AA1485 /* events.h */,
 				C173D8B01D11CEA8001F9EF7 /* gen_nids.py */,
+				C1FFFE461D3CB0070033B73B /* gxm.h */,
 				C1EA5B7B1D17CB48000CE42E /* import.h */,
 				C17B2A481D1C46F600E115C4 /* imports_ctrl.cpp */,
 				C17B2A461D1C416E00E115C4 /* imports_display.cpp */,
