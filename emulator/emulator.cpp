@@ -25,8 +25,9 @@ static const bool LOG_IMPORT_CALLS = false;
 // MCR p15, #0, r1, c1, c0, #2
 // MOV r1, #0
 // MCR p15, #0, r1, c7, c5, #4
-// MOV r0,#0x40000000
-// FMXR FPEXC, r0 ; FPEXC = r0
+// MOV r0, #0x40000000
+// FMXR FPEXC, r0
+// SVC #1
 
 // ARM GDB/LLDB
 static const uint32_t bootstrap_arm[] =
@@ -37,7 +38,8 @@ static const uint32_t bootstrap_arm[] =
     0xE3A01000,
     0xEE071F95,
     0xE3A00101,
-    0xEEE80A10
+    0xEEE80A10,
+    0xEF000001
 };
 
 // Thumb-2 GDB/LLDB
@@ -49,7 +51,8 @@ static const uint32_t bootstrap_thumb[] =
     0x0100F04F,
     0x1F95EE07,
     0x4080F04F,
-    0x0A10EEE8
+    0x0A10EEE8,
+    0x0000DF01
 };
 
 static Ptr<void> load_bootstrap(const void *bootstrap, size_t size, MemState *mem)
@@ -98,14 +101,8 @@ static void write_hook(uc_engine *uc, uc_mem_type type, uint64_t address, int si
     log_memory_access("Write", static_cast<Address>(address), size, value, mem);
 }
 
-static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
+static void call_nid(uc_engine *uc, Address pc, EmulatorState *state)
 {
-    assert(intno == 2);
-    
-    EmulatorState *const state = static_cast<EmulatorState *>(user_data);
-    
-    uint32_t pc = 0;
-    uc_reg_read(uc, UC_ARM_REG_PC, &pc);
     uint32_t nid;
     uc_mem_read(uc, pc + 4, &nid, sizeof(nid));
     
@@ -123,6 +120,60 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
         const Args args = read_args(uc);
         const uint32_t result = (*fn)(args.r0, args.r1, args.r2, args.r3, args.sp, uc, state);
         write_result(uc, result);
+    }
+}
+
+static void handle_svc(uc_engine *uc, Address pc, EmulatorState *state, uint32_t imm)
+{
+    switch (imm)
+    {
+        case 0:
+            call_nid(uc, pc, state);
+            break;
+            
+        case 1:
+            uc_emu_stop(uc);
+            break;
+            
+        default:
+            assert(!"Unhandled SVC immediate value.");
+            uc_emu_stop(uc);
+            break;
+    }
+}
+
+static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
+{
+    assert(intno == 2);
+    
+    EmulatorState *const state = static_cast<EmulatorState *>(user_data);
+    
+    uint32_t cpsr = 0;
+    uc_err err = uc_reg_read(uc, UC_ARM_REG_CPSR, &cpsr);
+    assert(err == UC_ERR_OK);
+    
+    uint32_t pc = 0;
+    err = uc_reg_read(uc, UC_ARM_REG_PC, &pc);
+    assert(err == UC_ERR_OK);
+    
+    const bool thumb = (cpsr >> 5) & 1;
+    if (thumb)
+    {
+        const Address svc_address = pc - 2;
+        uint16_t svc_instruction = 0;
+        err = uc_mem_read(uc, svc_address, &svc_instruction, sizeof(svc_instruction));
+        assert(err == UC_ERR_OK);
+        const uint8_t imm = svc_instruction & 0xff;
+        handle_svc(uc, pc, state, imm);
+    }
+    else
+    {
+        const Address svc_address = pc - 4;
+        uint32_t svc_instruction = 0;
+        err = uc_mem_read(uc, svc_address, &svc_instruction, sizeof(svc_instruction));
+        assert(err == UC_ERR_OK);
+        const uint32_t imm = svc_instruction & 0xffffff;
+        handle_svc(uc, pc, state, imm);
     }
 }
 
@@ -178,8 +229,7 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
     assert(err == UC_ERR_OK);
     
     const Ptr<const void> bootstrap_address = thumb ? state->bootstrap_thumb : state->bootstrap_arm;
-    const size_t bootstrap_size = thumb ? sizeof(bootstrap_thumb) : sizeof(bootstrap_arm);
-    err = uc_emu_start(uc, bootstrap_address.address(), bootstrap_address.address() + bootstrap_size, 0, 0);
+    err = uc_emu_start(uc, bootstrap_address.address(), 0, 0, 0);
     assert(err == UC_ERR_OK);
     
     err = uc_emu_start(uc, (entry_point.address() >> 1) << 1, 0, 0, 0);
