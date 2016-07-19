@@ -55,6 +55,11 @@ static const uint32_t bootstrap_thumb[] =
     0x0000DF01
 };
 
+struct InterruptParams
+{
+    EmulatorState *emulator = nullptr;
+};
+
 static Ptr<void> load_bootstrap(const void *bootstrap, size_t size, MemState *mem)
 {
     const Ptr<void> buffer(alloc(mem, size, __FUNCTION__));
@@ -101,7 +106,7 @@ static void write_hook(uc_engine *uc, uc_mem_type type, uint64_t address, int si
     log_memory_access("Write", static_cast<Address>(address), size, value, mem);
 }
 
-static void call_nid(uc_engine *uc, Address pc, EmulatorState *state)
+static void call_nid(uc_engine *uc, Address pc, InterruptParams *params)
 {
     uint32_t nid;
     uc_mem_read(uc, pc + 4, &nid, sizeof(nid));
@@ -118,17 +123,17 @@ static void call_nid(uc_engine *uc, Address pc, EmulatorState *state)
     if (fn != nullptr)
     {
         const Args args = read_args(uc);
-        const uint32_t result = (*fn)(args.r0, args.r1, args.r2, args.r3, args.sp, uc, state);
+        const uint32_t result = (*fn)(args.r0, args.r1, args.r2, args.r3, args.sp, uc, params->emulator);
         write_result(uc, result);
     }
 }
 
-static void handle_svc(uc_engine *uc, Address pc, EmulatorState *state, uint32_t imm)
+static void handle_svc(uc_engine *uc, Address pc, InterruptParams *params, uint32_t imm)
 {
     switch (imm)
     {
         case 0:
-            call_nid(uc, pc, state);
+            call_nid(uc, pc, params);
             break;
             
         case 1:
@@ -146,7 +151,7 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
 {
     assert(intno == 2);
     
-    EmulatorState *const state = static_cast<EmulatorState *>(user_data);
+    InterruptParams *const params = static_cast<InterruptParams *>(user_data);
     
     uint32_t cpsr = 0;
     uc_err err = uc_reg_read(uc, UC_ARM_REG_CPSR, &cpsr);
@@ -164,7 +169,7 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
         err = uc_mem_read(uc, svc_address, &svc_instruction, sizeof(svc_instruction));
         assert(err == UC_ERR_OK);
         const uint8_t imm = svc_instruction & 0xff;
-        handle_svc(uc, pc, state, imm);
+        handle_svc(uc, pc, params, imm);
     }
     else
     {
@@ -173,7 +178,7 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
         err = uc_mem_read(uc, svc_address, &svc_instruction, sizeof(svc_instruction));
         assert(err == UC_ERR_OK);
         const uint32_t imm = svc_instruction & 0xffffff;
-        handle_svc(uc, pc, state, imm);
+        handle_svc(uc, pc, params, imm);
     }
 }
 
@@ -193,6 +198,9 @@ bool init(EmulatorState *state)
 
 bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
 {
+    InterruptParams interrupt_params;
+    interrupt_params.emulator = state;
+    
     const bool thumb = entry_point.address() & 1;
     uc_engine *uc = nullptr;
     uc_err err = uc_open(UC_ARCH_ARM, thumb ? UC_MODE_THUMB : UC_MODE_ARM, &uc);
@@ -214,7 +222,7 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
         assert(err == UC_ERR_OK);
     }
     
-    err = uc_hook_add(uc, &hh, UC_HOOK_INTR, reinterpret_cast<void *>(&intr_hook), state, 1, 0);
+    err = uc_hook_add(uc, &hh, UC_HOOK_INTR, reinterpret_cast<void *>(&intr_hook), &interrupt_params, 1, 0);
     assert(err == UC_ERR_OK);
     
     const size_t stack_size = MB(1);
