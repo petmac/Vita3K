@@ -161,9 +161,9 @@ IMP_SIG(sceKernelGetProcessTimeWide)
 IMP_SIG(sceKernelGetTLSAddr)
 {
     const SceUID slot = r0;
-    const SceUID thread = 0; // TODO Use the real thread ID.
+    const SceUID thread_id = 0; // TODO Use the real thread ID.
     KernelState *const state = &emu->kernel;
-    SlotToAddress *const slot_to_address = &state->tls[thread];
+    SlotToAddress *const slot_to_address = &state->tls[thread_id];
     
     const SlotToAddress::const_iterator existing = slot_to_address->find(slot);
     if (existing != slot_to_address->end())

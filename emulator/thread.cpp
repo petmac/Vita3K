@@ -17,6 +17,7 @@ static const bool LOG_IMPORT_CALLS = false;
 struct InterruptParams
 {
     EmulatorState *emulator = nullptr;
+    ThreadState *thread = nullptr;
 };
 
 static void code_hook(uc_engine *uc, uint64_t address, uint32_t size, void *user_data)
@@ -71,7 +72,7 @@ static void call_nid(uc_engine *uc, Address pc, InterruptParams *params)
     if (fn != nullptr)
     {
         const Args args = read_args(uc);
-        const uint32_t result = (*fn)(args.r0, args.r1, args.r2, args.r3, args.sp, uc, params->emulator);
+        const uint32_t result = (*fn)(args.r0, args.r1, args.r2, args.r3, args.sp, uc, params->thread, params->emulator);
         write_result(uc, result);
     }
 }
@@ -132,8 +133,10 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
 
 bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
 {
+    ThreadState thread;
     InterruptParams interrupt_params;
     interrupt_params.emulator = state;
+    interrupt_params.thread = &thread;
     
     const bool thumb = entry_point.address() & 1;
     uc_engine *uc = nullptr;
