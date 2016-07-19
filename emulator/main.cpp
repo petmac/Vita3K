@@ -1,5 +1,6 @@
 #include "emulator.h"
 #include "module.h"
+#include "thread.h"
 
 #include <SDL2/SDL.h>
 
