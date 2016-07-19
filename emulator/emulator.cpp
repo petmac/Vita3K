@@ -249,11 +249,17 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
         uc_reg_read(uc, UC_ARM_REG_PC, &pc);
         std::cerr << "PC = " << std::hex << pc << std::dec << std::endl;
         
+        uc_close(uc);
+        uc = nullptr;
+        
         return false;
     }
     
     // TODO Free stack.
     // TODO Free hooks?
+    
+    uc_close(uc);
+    uc = nullptr;
     
     std::cout << "Emulation succeeded." << std::endl;
     return true;
