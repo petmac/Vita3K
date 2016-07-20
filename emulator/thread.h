@@ -1,23 +1,10 @@
 #pragma once
 
-#include "ptr.h"
+#include "trampoline.h"
 
-#include <functional>
 #include <queue>
-#include <string>
 
 struct EmulatorState;
-struct uc_struct;
-
-typedef std::function<void()> TrampolineFn;
-
-struct Trampoline
-{
-    std::string name;
-    Ptr<const void> entry_point;
-    TrampolineFn prefix;
-    TrampolineFn postfix;
-};
 
 typedef std::queue<Trampoline> TrampolineQueue;
 

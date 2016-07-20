@@ -23,6 +23,7 @@
 		C1AD18F41D07ED2100064A1F /* disasm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1AD18F21D07ED2100064A1F /* disasm.cpp */; settings = {ASSET_TAGS = (); }; };
 		C1B13F7E1D38C2AD00571DBA /* imports_uvl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1B13F7D1D38C2AD00571DBA /* imports_uvl.cpp */; settings = {ASSET_TAGS = (); }; };
 		C1B4A0451D02FFFC00F53D2C /* mem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1B4A0431D02FFFC00F53D2C /* mem.cpp */; settings = {ASSET_TAGS = (); }; };
+		C1C845991D3FE26D005D8135 /* trampoline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1C845971D3FE26D005D8135 /* trampoline.cpp */; settings = {ASSET_TAGS = (); }; };
 		C1DD5EEC1D1E6B0800FCE19A /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1DD5EEB1D1E6B0800FCE19A /* main.cpp */; settings = {ASSET_TAGS = (); }; };
 		C1DD5EEE1D1E6C4500FCE19A /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1DD5EED1D1E6C4500FCE19A /* OpenGL.framework */; };
 		C1EA5B7D1D17CBF2000CE42E /* unimplemented.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1EA5B7C1D17CBF2000CE42E /* unimplemented.cpp */; settings = {ASSET_TAGS = (); }; };
@@ -97,6 +98,8 @@
 		C1B13F7D1D38C2AD00571DBA /* imports_uvl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imports_uvl.cpp; sourceTree = "<group>"; };
 		C1B4A0431D02FFFC00F53D2C /* mem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mem.cpp; sourceTree = "<group>"; };
 		C1B4A0441D02FFFC00F53D2C /* mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mem.h; sourceTree = "<group>"; };
+		C1C845971D3FE26D005D8135 /* trampoline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = trampoline.cpp; sourceTree = "<group>"; };
+		C1C845981D3FE26D005D8135 /* trampoline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = trampoline.h; sourceTree = "<group>"; };
 		C1DD5EEB1D1E6B0800FCE19A /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		C1DD5EED1D1E6C4500FCE19A /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		C1E11F221D2C1E6700D49E5B /* kernel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = kernel.h; sourceTree = "<group>"; };
@@ -211,6 +214,8 @@
 				C1AA7C6C1D2258C000FAF58D /* relocation.h */,
 				C1FFFE471D3E07A10033B73B /* thread.cpp */,
 				C1FFFE481D3E07A10033B73B /* thread.h */,
+				C1C845971D3FE26D005D8135 /* trampoline.cpp */,
+				C1C845981D3FE26D005D8135 /* trampoline.h */,
 				C1EA5B7C1D17CBF2000CE42E /* unimplemented.cpp */,
 			);
 			path = emulator;
@@ -328,6 +333,7 @@
 			files = (
 				C1890AE91D36FD2B00AA1485 /* events.cpp in Sources */,
 				C1AD18F41D07ED2100064A1F /* disasm.cpp in Sources */,
+				C1C845991D3FE26D005D8135 /* trampoline.cpp in Sources */,
 				C175824C1D1AFD4100E1AA12 /* imports_gxm.cpp in Sources */,
 				C17B2A471D1C416E00E115C4 /* imports_display.cpp in Sources */,
 				C1FFFE491D3E07A10033B73B /* thread.cpp in Sources */,

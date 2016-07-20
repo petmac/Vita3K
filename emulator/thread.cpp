@@ -187,34 +187,13 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
         const Trampoline trampoline = thread.trampolines.front();
         thread.trampolines.pop();
         
-        std::cout << "Starting trampoline \"" << trampoline.name << "\"" << std::endl;
-        
-        if (trampoline.prefix)
+        if (!run_trampoline(thread.uc, trampoline))
         {
-            trampoline.prefix();
-        }
-        
-        err = uc_emu_start(thread.uc, (trampoline.entry_point.address() >> 1) << 1, 0, 0, 0);
-        if (err != UC_ERR_OK)
-        {
-            std::cerr << "Emulation failed:" << std::endl;
-            std::cerr << uc_strerror(err) << std::endl;
-            uint64_t pc = 0;
-            uc_reg_read(thread.uc, UC_ARM_REG_PC, &pc);
-            std::cerr << "PC = " << std::hex << pc << std::dec << std::endl;
-            
             uc_close(thread.uc);
             thread.uc = nullptr;
             
             return false;
         }
-        
-        if (trampoline.postfix)
-        {
-            trampoline.postfix();
-        }
-        
-        std::cout << "Finished trampoline \"" << trampoline.name << "\"" << std::endl;
     }
     
     // TODO Free stack.
