@@ -20,16 +20,21 @@ struct InterruptParams
     ThreadState *thread = nullptr;
 };
 
-static void code_hook(uc_engine *uc, uint64_t address, uint32_t size, void *user_data)
+static bool is_thumb_mode(uc_engine *uc)
 {
-    size_t mode;
+    size_t mode = 0;
     const uc_err err = uc_query(uc, UC_QUERY_MODE, &mode);
     assert(err == UC_ERR_OK);
     
+    return mode & UC_MODE_THUMB;
+}
+
+static void code_hook(uc_engine *uc, uint64_t address, uint32_t size, void *user_data)
+{
     EmulatorState *const state = static_cast<EmulatorState *>(user_data);
     const uint8_t *const code = Ptr<const uint8_t>(static_cast<Address>(address)).get(&state->mem);
     const size_t buffer_size = GB(4) - address;
-    const bool thumb = mode & UC_MODE_THUMB;
+    const bool thumb = is_thumb_mode(uc);
     const std::string disassembly = disassemble(&state->disasm, code, buffer_size, address, thumb);
     std::cout << std::hex << std::setw(8) << address << std::dec << " " << disassembly << std::endl;
 }
@@ -102,16 +107,11 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
     
     InterruptParams *const params = static_cast<InterruptParams *>(user_data);
     
-    uint32_t cpsr = 0;
-    uc_err err = uc_reg_read(uc, UC_ARM_REG_CPSR, &cpsr);
-    assert(err == UC_ERR_OK);
-    
     uint32_t pc = 0;
-    err = uc_reg_read(uc, UC_ARM_REG_PC, &pc);
+    uc_err err = uc_reg_read(uc, UC_ARM_REG_PC, &pc);
     assert(err == UC_ERR_OK);
     
-    const bool thumb = (cpsr >> 5) & 1;
-    if (thumb)
+    if (is_thumb_mode(uc))
     {
         const Address svc_address = pc - 2;
         uint16_t svc_instruction = 0;
