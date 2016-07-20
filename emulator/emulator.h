@@ -4,6 +4,7 @@
 #include "disasm.h"
 #include "gxm.h"
 #include "kernel.h"
+#include "trampoline.h"
 
 struct SDL_Window;
 
@@ -16,8 +17,8 @@ struct EmulatorState
     DisasmState disasm;
     KernelState kernel;
     MemState mem;
-    Ptr<void> bootstrap_arm;
-    Ptr<void> bootstrap_thumb;
+    Trampoline bootstrap_arm;
+    Trampoline bootstrap_thumb;
     GxmState gxm;
 };
 

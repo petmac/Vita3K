@@ -43,7 +43,7 @@ static const uint32_t bootstrap_thumb[] =
     0x0000DF01
 };
 
-static Ptr<void> load_bootstrap(const void *bootstrap, size_t size, MemState *mem)
+static Trampoline load_bootstrap(const void *bootstrap, size_t size, MemState *mem)
 {
     const Ptr<void> buffer(alloc(mem, size, __FUNCTION__));
     if (buffer)
@@ -51,7 +51,11 @@ static Ptr<void> load_bootstrap(const void *bootstrap, size_t size, MemState *me
         memcpy(buffer.get(mem), bootstrap, size);
     }
     
-    return buffer;
+    Trampoline trampoline;
+    trampoline.name = "Bootstrap";
+    trampoline.entry_point = buffer;
+    
+    return trampoline;
 }
 
 bool init(EmulatorState *state)
@@ -65,5 +69,5 @@ bool init(EmulatorState *state)
     state->bootstrap_arm = load_bootstrap(bootstrap_arm, sizeof(bootstrap_arm), &state->mem);
     state->bootstrap_thumb = load_bootstrap(bootstrap_thumb, sizeof(bootstrap_thumb), &state->mem);
     
-    return state->bootstrap_arm && state->bootstrap_thumb;
+    return state->bootstrap_arm.entry_point && state->bootstrap_thumb.entry_point;
 }

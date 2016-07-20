@@ -172,10 +172,7 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
     err = uc_mem_map_ptr(thread.uc, 0, GB(4), UC_PROT_ALL, &state->mem.memory[0]);
     assert(err == UC_ERR_OK);
     
-    Trampoline bootstrap_trampoline;
-    bootstrap_trampoline.name = "Bootstrap";
-    bootstrap_trampoline.entry_point = thumb ? state->bootstrap_thumb : state->bootstrap_arm;
-    thread.trampolines.push(bootstrap_trampoline);
+    thread.trampolines.push(thumb ? state->bootstrap_thumb : state->bootstrap_arm);
     
     Trampoline main_trampoline;
     main_trampoline.name = "Main";
