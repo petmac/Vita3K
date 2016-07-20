@@ -51,7 +51,7 @@ IMP_SIG(sceDisplaySetFrameBuf)
 
 IMP_SIG(sceDisplayWaitVblankStart)
 {
-    handle_events(uc);
+    handle_events(thread->uc);
     
     return SCE_OK;
 }

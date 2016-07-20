@@ -82,7 +82,7 @@ IMP_SIG(sceKernelDelayThread)
     uint32_t elapsed;
     do
     {
-        if (handle_events(uc))
+        if (handle_events(thread->uc))
         {
             const uint32_t t2 = SDL_GetTicks();
             elapsed = t2 - t1;
@@ -101,7 +101,7 @@ IMP_SIG(sceKernelExitProcess)
 {
     // TODO Handle exit code?
     // TODO Stop all threads, not just this one.
-    uc_emu_stop(uc);
+    uc_emu_stop(thread->uc);
     
     return SCE_OK;
 }
@@ -152,7 +152,7 @@ IMP_SIG(sceKernelGetProcessTimeWide)
     r0 = static_cast<uint32_t>(clocks);
     r1 = static_cast<uint32_t>(clocks >> 32);
     
-    const uc_err err = uc_reg_write(uc, UC_ARM_REG_R1, &r1);
+    const uc_err err = uc_reg_write(thread->uc, UC_ARM_REG_R1, &r1);
     assert(err == UC_ERR_OK);
     
     return r0;

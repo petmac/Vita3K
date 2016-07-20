@@ -55,10 +55,10 @@ static void write_hook(uc_engine *uc, uc_mem_type type, uint64_t address, int si
     log_memory_access("Write", static_cast<Address>(address), size, value, mem);
 }
 
-static void call_nid(uc_engine *uc, Address pc, InterruptParams *params)
+static void call_nid(Address pc, InterruptParams *params)
 {
     uint32_t nid;
-    uc_mem_read(uc, pc + 4, &nid, sizeof(nid));
+    uc_mem_read(params->thread->uc, pc + 4, &nid, sizeof(nid));
     
     if (LOG_IMPORT_CALLS)
     {
@@ -71,27 +71,27 @@ static void call_nid(uc_engine *uc, Address pc, InterruptParams *params)
     assert(fn != nullptr);
     if (fn != nullptr)
     {
-        const Args args = read_args(uc);
-        const uint32_t result = (*fn)(args.r0, args.r1, args.r2, args.r3, args.sp, uc, params->thread, params->emulator);
-        write_result(uc, result);
+        const Args args = read_args(params->thread->uc);
+        const uint32_t result = (*fn)(args.r0, args.r1, args.r2, args.r3, args.sp, params->thread, params->emulator);
+        write_result(params->thread->uc, result);
     }
 }
 
-static void handle_svc(uc_engine *uc, Address pc, InterruptParams *params, uint32_t imm)
+static void handle_svc(Address pc, InterruptParams *params, uint32_t imm)
 {
     switch (imm)
     {
         case 0:
-            call_nid(uc, pc, params);
+            call_nid(pc, params);
             break;
             
         case 1:
-            uc_emu_stop(uc);
+            uc_emu_stop(params->thread->uc);
             break;
             
         default:
             assert(!"Unhandled SVC immediate value.");
-            uc_emu_stop(uc);
+            uc_emu_stop(params->thread->uc);
             break;
     }
 }
@@ -118,7 +118,7 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
         err = uc_mem_read(uc, svc_address, &svc_instruction, sizeof(svc_instruction));
         assert(err == UC_ERR_OK);
         const uint8_t imm = svc_instruction & 0xff;
-        handle_svc(uc, pc, params, imm);
+        handle_svc(pc, params, imm);
     }
     else
     {
@@ -127,7 +127,7 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
         err = uc_mem_read(uc, svc_address, &svc_instruction, sizeof(svc_instruction));
         assert(err == UC_ERR_OK);
         const uint32_t imm = svc_instruction & 0xffffff;
-        handle_svc(uc, pc, params, imm);
+        handle_svc(pc, params, imm);
     }
 }
 
@@ -139,27 +139,26 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
     interrupt_params.thread = &thread;
     
     const bool thumb = entry_point.address() & 1;
-    uc_engine *uc = nullptr;
-    uc_err err = uc_open(UC_ARCH_ARM, thumb ? UC_MODE_THUMB : UC_MODE_ARM, &uc);
+    uc_err err = uc_open(UC_ARCH_ARM, thumb ? UC_MODE_THUMB : UC_MODE_ARM, &thread.uc);
     assert(err == UC_ERR_OK);
     
     uc_hook hh = 0;
     if (LOG_CODE)
     {
-        err = uc_hook_add(uc, &hh, UC_HOOK_CODE, reinterpret_cast<void *>(&code_hook), state, 1, 0);
+        err = uc_hook_add(thread.uc, &hh, UC_HOOK_CODE, reinterpret_cast<void *>(&code_hook), state, 1, 0);
         assert(err == UC_ERR_OK);
     }
     
     if (LOG_MEM_ACCESS)
     {
-        err = uc_hook_add(uc, &hh, UC_HOOK_MEM_READ, reinterpret_cast<void *>(&read_hook), &state->mem, 1, 0);
+        err = uc_hook_add(thread.uc, &hh, UC_HOOK_MEM_READ, reinterpret_cast<void *>(&read_hook), &state->mem, 1, 0);
         assert(err == UC_ERR_OK);
         
-        err = uc_hook_add(uc, &hh, UC_HOOK_MEM_WRITE, reinterpret_cast<void *>(&write_hook), &state->mem, 1, 0);
+        err = uc_hook_add(thread.uc, &hh, UC_HOOK_MEM_WRITE, reinterpret_cast<void *>(&write_hook), &state->mem, 1, 0);
         assert(err == UC_ERR_OK);
     }
     
-    err = uc_hook_add(uc, &hh, UC_HOOK_INTR, reinterpret_cast<void *>(&intr_hook), &interrupt_params, 1, 0);
+    err = uc_hook_add(thread.uc, &hh, UC_HOOK_INTR, reinterpret_cast<void *>(&intr_hook), &interrupt_params, 1, 0);
     assert(err == UC_ERR_OK);
     
     const size_t stack_size = MB(1);
@@ -167,37 +166,71 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
     const Address stack_top = stack_bottom + stack_size;
     memset(Ptr<void>(stack_bottom).get(&state->mem), 0xcc, stack_size);
     
-    err = uc_reg_write(uc, UC_ARM_REG_SP, &stack_top);
+    err = uc_reg_write(thread.uc, UC_ARM_REG_SP, &stack_top);
     assert(err == UC_ERR_OK);
     
-    err = uc_mem_map_ptr(uc, 0, GB(4), UC_PROT_ALL, &state->mem.memory[0]);
+    err = uc_mem_map_ptr(thread.uc, 0, GB(4), UC_PROT_ALL, &state->mem.memory[0]);
     assert(err == UC_ERR_OK);
     
-    const Ptr<const void> bootstrap_address = thumb ? state->bootstrap_thumb : state->bootstrap_arm;
-    err = uc_emu_start(uc, bootstrap_address.address(), 0, 0, 0);
-    assert(err == UC_ERR_OK);
+    Trampoline bootstrap_trampoline;
+    bootstrap_trampoline.name = "Bootstrap";
+    bootstrap_trampoline.entry_point = thumb ? state->bootstrap_thumb : state->bootstrap_arm;
+    thread.trampolines.push(bootstrap_trampoline);
     
-    err = uc_emu_start(uc, (entry_point.address() >> 1) << 1, 0, 0, 0);
-    if (err != UC_ERR_OK)
+    Trampoline main_trampoline;
+    main_trampoline.name = "Main";
+    main_trampoline.entry_point = entry_point;
+    thread.trampolines.push(main_trampoline);
+    
+    while (!thread.trampolines.empty())
     {
-        std::cerr << "Emulation failed:" << std::endl;
-        std::cerr << uc_strerror(err) << std::endl;
-        uint64_t pc = 0;
-        uc_reg_read(uc, UC_ARM_REG_PC, &pc);
-        std::cerr << "PC = " << std::hex << pc << std::dec << std::endl;
+        const Trampoline trampoline = thread.trampolines.front();
+        thread.trampolines.pop();
         
-        uc_close(uc);
-        uc = nullptr;
+        std::cout << "Starting trampoline \"" << trampoline.name << "\"" << std::endl;
         
-        return false;
+        if (trampoline.prefix)
+        {
+            trampoline.prefix();
+        }
+        
+        err = uc_emu_start(thread.uc, (trampoline.entry_point.address() >> 1) << 1, 0, 0, 0);
+        if (err != UC_ERR_OK)
+        {
+            std::cerr << "Emulation failed:" << std::endl;
+            std::cerr << uc_strerror(err) << std::endl;
+            uint64_t pc = 0;
+            uc_reg_read(thread.uc, UC_ARM_REG_PC, &pc);
+            std::cerr << "PC = " << std::hex << pc << std::dec << std::endl;
+            
+            uc_close(thread.uc);
+            thread.uc = nullptr;
+            
+            return false;
+        }
+        
+        if (trampoline.postfix)
+        {
+            trampoline.postfix();
+        }
+        
+        std::cout << "Finished trampoline \"" << trampoline.name << "\"" << std::endl;
     }
     
     // TODO Free stack.
     // TODO Free hooks?
     
-    uc_close(uc);
-    uc = nullptr;
+    uc_close(thread.uc);
+    thread.uc = nullptr;
     
     std::cout << "Emulation succeeded." << std::endl;
     return true;
+}
+
+void add_trampoline(ThreadState *thread, const Trampoline &trampoline)
+{
+    const uc_err err = uc_emu_stop(thread->uc);
+    assert(err == UC_ERR_OK);
+    
+    thread->trampolines.push(trampoline);
 }
