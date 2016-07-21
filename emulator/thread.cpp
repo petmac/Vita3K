@@ -190,6 +190,8 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
         const bool cpu_is_thumb = is_thumb_mode(thread.uc);
         if (trampoline_is_thumb != cpu_is_thumb)
         {
+            // TODO Support switching from Thumb to ARM.
+            assert(trampoline_is_thumb);
             const Trampoline *const interchange_trampoline = &state->arm_to_thumb;
             if (!run_trampoline(thread.uc, *interchange_trampoline))
             {
