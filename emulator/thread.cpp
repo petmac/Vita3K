@@ -14,7 +14,7 @@ static const bool LOG_CODE = false;
 static const bool LOG_MEM_ACCESS = false;
 static const bool LOG_IMPORT_CALLS = false;
 
-struct InterruptParams
+struct HookParams
 {
     EmulatorState *emulator = nullptr;
     ThreadState *thread = nullptr;
@@ -31,12 +31,15 @@ static bool is_thumb_mode(uc_engine *uc)
 
 static void code_hook(uc_engine *uc, uint64_t address, uint32_t size, void *user_data)
 {
-    EmulatorState *const state = static_cast<EmulatorState *>(user_data);
-    const uint8_t *const code = Ptr<const uint8_t>(static_cast<Address>(address)).get(&state->mem);
-    const size_t buffer_size = GB(4) - address;
-    const bool thumb = is_thumb_mode(uc);
-    const std::string disassembly = disassemble(&state->disasm, code, buffer_size, address, thumb);
-    std::cout << std::hex << std::setw(8) << address << std::dec << " " << disassembly << std::endl;
+    const HookParams *const params = static_cast<const HookParams *>(user_data);
+    if (params->thread->log_code)
+    {
+        const uint8_t *const code = Ptr<const uint8_t>(static_cast<Address>(address)).get(&params->emulator->mem);
+        const size_t buffer_size = GB(4) - address;
+        const bool thumb = is_thumb_mode(uc);
+        const std::string disassembly = disassemble(&params->emulator->disasm, code, buffer_size, address, thumb);
+        std::cout << std::hex << std::setw(8) << address << std::dec << " " << disassembly << std::endl;
+    }
 }
 
 static void log_memory_access(const char *type, Address address, int size, int64_t value, const MemState *mem)
@@ -60,10 +63,10 @@ static void write_hook(uc_engine *uc, uc_mem_type type, uint64_t address, int si
     log_memory_access("Write", static_cast<Address>(address), size, value, mem);
 }
 
-static void call_nid(Address pc, InterruptParams *params)
+static void call_nid(Address pc, const HookParams &params)
 {
     uint32_t nid;
-    uc_mem_read(params->thread->uc, pc + 4, &nid, sizeof(nid));
+    uc_mem_read(params.thread->uc, pc + 4, &nid, sizeof(nid));
     
     if (LOG_IMPORT_CALLS)
     {
@@ -76,13 +79,13 @@ static void call_nid(Address pc, InterruptParams *params)
     assert(fn != nullptr);
     if (fn != nullptr)
     {
-        const Args args = read_args(params->thread->uc);
-        const uint32_t result = (*fn)(args.r0, args.r1, args.r2, args.r3, args.sp, params->thread, params->emulator);
-        write_result(params->thread->uc, result);
+        const Args args = read_args(params.thread->uc);
+        const uint32_t result = (*fn)(args.r0, args.r1, args.r2, args.r3, args.sp, params.thread, params.emulator);
+        write_result(params.thread->uc, result);
     }
 }
 
-static void handle_svc(Address pc, InterruptParams *params, uint32_t imm)
+static void handle_svc(Address pc, const HookParams &params, uint32_t imm)
 {
     switch (imm)
     {
@@ -91,12 +94,12 @@ static void handle_svc(Address pc, InterruptParams *params, uint32_t imm)
             break;
             
         case 1:
-            uc_emu_stop(params->thread->uc);
+            uc_emu_stop(params.thread->uc);
             break;
             
         default:
             assert(!"Unhandled SVC immediate value.");
-            uc_emu_stop(params->thread->uc);
+            uc_emu_stop(params.thread->uc);
             break;
     }
 }
@@ -105,7 +108,7 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
 {
     assert(intno == 2);
     
-    InterruptParams *const params = static_cast<InterruptParams *>(user_data);
+    const HookParams *const params = static_cast<const HookParams *>(user_data);
     
     uint32_t pc = 0;
     uc_err err = uc_reg_read(uc, UC_ARM_REG_PC, &pc);
@@ -118,7 +121,7 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
         err = uc_mem_read(uc, svc_address, &svc_instruction, sizeof(svc_instruction));
         assert(err == UC_ERR_OK);
         const uint8_t imm = svc_instruction & 0xff;
-        handle_svc(pc, params, imm);
+        handle_svc(pc, *params, imm);
     }
     else
     {
@@ -127,16 +130,16 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
         err = uc_mem_read(uc, svc_address, &svc_instruction, sizeof(svc_instruction));
         assert(err == UC_ERR_OK);
         const uint32_t imm = svc_instruction & 0xffffff;
-        handle_svc(pc, params, imm);
+        handle_svc(pc, *params, imm);
     }
 }
 
 bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
 {
     ThreadState thread;
-    InterruptParams interrupt_params;
-    interrupt_params.emulator = state;
-    interrupt_params.thread = &thread;
+    HookParams hook_params;
+    hook_params.emulator = state;
+    hook_params.thread = &thread;
     
     uc_err err = uc_open(UC_ARCH_ARM, UC_MODE_ARM, &thread.uc);
     assert(err == UC_ERR_OK);
@@ -144,7 +147,7 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
     uc_hook hh = 0;
     if (LOG_CODE)
     {
-        err = uc_hook_add(thread.uc, &hh, UC_HOOK_CODE, reinterpret_cast<void *>(&code_hook), state, 1, 0);
+        err = uc_hook_add(thread.uc, &hh, UC_HOOK_CODE, reinterpret_cast<void *>(&code_hook), &hook_params, 1, 0);
         assert(err == UC_ERR_OK);
     }
     
@@ -157,7 +160,7 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
         assert(err == UC_ERR_OK);
     }
     
-    err = uc_hook_add(thread.uc, &hh, UC_HOOK_INTR, reinterpret_cast<void *>(&intr_hook), &interrupt_params, 1, 0);
+    err = uc_hook_add(thread.uc, &hh, UC_HOOK_INTR, reinterpret_cast<void *>(&intr_hook), &hook_params, 1, 0);
     assert(err == UC_ERR_OK);
     
     const size_t stack_size = MB(1);

@@ -12,6 +12,7 @@ struct ThreadState
 {
     uc_struct *uc = nullptr;
     TrampolineQueue trampolines;
+    bool log_code = false;
 };
 
 bool run_thread(EmulatorState *state, Ptr<const void> entry_point);
