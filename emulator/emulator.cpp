@@ -43,7 +43,7 @@ static const uint8_t arm_to_thumb[] =
     0x01, 0xDF, // svc #1
 };
 
-static Trampoline load_bootstrap(const void *bootstrap, size_t size, MemState *mem)
+static Trampoline load_bootstrap(const char *name, const void *bootstrap, size_t size, MemState *mem)
 {
     const Ptr<void> buffer(alloc(mem, size, __FUNCTION__));
     if (buffer)
@@ -52,7 +52,7 @@ static Trampoline load_bootstrap(const void *bootstrap, size_t size, MemState *m
     }
     
     Trampoline trampoline;
-    trampoline.name = "Bootstrap";
+    trampoline.name = name;
     trampoline.entry_point = buffer;
     
     return trampoline;
@@ -66,8 +66,8 @@ bool init(EmulatorState *state)
         return false;
     }
     
-    state->bootstrap = load_bootstrap(bootstrap, sizeof(bootstrap), &state->mem);
-    state->arm_to_thumb = load_bootstrap(arm_to_thumb, sizeof(arm_to_thumb), &state->mem);
+    state->bootstrap = load_bootstrap("Enable FP and FVP", bootstrap, sizeof(bootstrap), &state->mem);
+    state->arm_to_thumb = load_bootstrap("ARM to Thumb", arm_to_thumb, sizeof(arm_to_thumb), &state->mem);
     
     return state->bootstrap.entry_point && state->arm_to_thumb.entry_point;
 }
