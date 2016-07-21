@@ -138,8 +138,7 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
     interrupt_params.emulator = state;
     interrupt_params.thread = &thread;
     
-    const bool thumb = entry_point.address() & 1;
-    uc_err err = uc_open(UC_ARCH_ARM, thumb ? UC_MODE_THUMB : UC_MODE_ARM, &thread.uc);
+    uc_err err = uc_open(UC_ARCH_ARM, UC_MODE_ARM, &thread.uc);
     assert(err == UC_ERR_OK);
     
     uc_hook hh = 0;
@@ -172,7 +171,7 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
     err = uc_mem_map_ptr(thread.uc, 0, GB(4), UC_PROT_ALL, &state->mem.memory[0]);
     assert(err == UC_ERR_OK);
     
-    thread.trampolines.push(thumb ? state->bootstrap_thumb : state->bootstrap_arm);
+    thread.trampolines.push(state->bootstrap);
     
     Trampoline main_trampoline;
     main_trampoline.name = "Main";
@@ -183,6 +182,20 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
     {
         const Trampoline trampoline = thread.trampolines.front();
         thread.trampolines.pop();
+        
+        const bool trampoline_is_thumb = trampoline.entry_point.address() & 1;
+        const bool cpu_is_thumb = is_thumb_mode(thread.uc);
+        if (trampoline_is_thumb != cpu_is_thumb)
+        {
+            const Trampoline *const interchange_trampoline = &state->arm_to_thumb;
+            if (!run_trampoline(thread.uc, *interchange_trampoline))
+            {
+                uc_close(thread.uc);
+                thread.uc = nullptr;
+                
+                return false;
+            }
+        }
         
         if (!run_trampoline(thread.uc, trampoline))
         {

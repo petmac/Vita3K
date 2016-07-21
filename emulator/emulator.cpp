@@ -18,7 +18,7 @@
 // SVC #1
 
 // ARM GDB/LLDB
-static const uint32_t bootstrap_arm[] =
+static const uint32_t bootstrap[] =
 {
     0xEE111F50,
     0xE381160F,
@@ -30,17 +30,17 @@ static const uint32_t bootstrap_arm[] =
     0xEF000001
 };
 
-// Thumb-2 GDB/LLDB
-static const uint32_t bootstrap_thumb[] =
+static const uint8_t arm_to_thumb[] =
 {
-    0x1F50EE11,
-    0x0170F441,
-    0x1F50EE01,
-    0x0100F04F,
-    0x1F95EE07,
-    0x4080F04F,
-    0x0A10EEE8,
-    0x0000DF01
+    // ARM HEX
+    0x04, 0x00, 0x2D, 0xE5, // push {r0}
+    0x0F, 0x00, 0xA0, 0xE1, // mov r0, pc
+    0x05, 0x00, 0x80, 0xE2, // add r0, #5
+    0x10, 0xFF, 0x2F, 0xE1, // bx r0
+    
+    // Thumb HEX
+    0x01, 0xBC, // pop {r0}
+    0x01, 0xDF, // svc #1
 };
 
 static Trampoline load_bootstrap(const void *bootstrap, size_t size, MemState *mem)
@@ -66,8 +66,8 @@ bool init(EmulatorState *state)
         return false;
     }
     
-    state->bootstrap_arm = load_bootstrap(bootstrap_arm, sizeof(bootstrap_arm), &state->mem);
-    state->bootstrap_thumb = load_bootstrap(bootstrap_thumb, sizeof(bootstrap_thumb), &state->mem);
+    state->bootstrap = load_bootstrap(bootstrap, sizeof(bootstrap), &state->mem);
+    state->arm_to_thumb = load_bootstrap(arm_to_thumb, sizeof(arm_to_thumb), &state->mem);
     
-    return state->bootstrap_arm.entry_point && state->bootstrap_thumb.entry_point;
+    return state->bootstrap.entry_point && state->arm_to_thumb.entry_point;
 }

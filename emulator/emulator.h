@@ -17,8 +17,8 @@ struct EmulatorState
     DisasmState disasm;
     KernelState kernel;
     MemState mem;
-    Trampoline bootstrap_arm;
-    Trampoline bootstrap_thumb;
+    Trampoline bootstrap;
+    Trampoline arm_to_thumb;
     GxmState gxm;
 };
 
