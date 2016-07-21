@@ -9,7 +9,7 @@ static void unimplemented(const char *name)
     assert(false);
 }
 
-#define UNIMPLEMENTED(name) IMP_SIG(name) { unimplemented(#name); return 0; }
+#define UNIMPLEMENTED(name) IMP_SIG(name) { unimplemented(#name); return ImportResult(); }
 
 UNIMPLEMENTED(SceKernelStackChkGuard)
 UNIMPLEMENTED(__aeabi_unwind_cpp_pr0)

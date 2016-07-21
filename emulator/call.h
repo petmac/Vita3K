@@ -14,4 +14,3 @@ struct Args
 };
 
 Args read_args(uc_struct *uc);
-void write_result(uc_struct *uc, uint32_t result);

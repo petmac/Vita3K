@@ -1050,7 +1050,7 @@ IMP_SIG(sceGxmDisplayQueueAddEntry)
     
     // TODO Call callback.
     
-    return SCE_OK;
+    return ImportResult();
 }
 
 IMP_SIG(sceGxmDisplayQueueFinish)
@@ -1098,7 +1098,7 @@ IMP_SIG(sceGxmFinish)
     SceGxmContext *const context = Ptr<SceGxmContext>(r0).get(mem);
     assert(context != nullptr);
     
-    return 0; // void
+    return ImportResult();
 }
 
 IMP_SIG(sceGxmInitialize)
@@ -1248,7 +1248,7 @@ IMP_SIG(sceGxmSetFragmentProgram)
     assert(context != nullptr);
     assert(fragmentProgram != nullptr);
     
-    return 0; // void
+    return ImportResult();
 }
 
 IMP_SIG(sceGxmSetFragmentTexture)
@@ -1289,7 +1289,7 @@ IMP_SIG(sceGxmSetVertexProgram)
     assert(context != nullptr);
     assert(vertexProgram != nullptr);
     
-    return 0;
+    return SCE_OK;
 }
 
 IMP_SIG(sceGxmSetVertexStream)

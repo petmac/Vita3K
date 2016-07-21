@@ -17,9 +17,3 @@ Args read_args(uc_struct *uc)
     
     return args;
 }
-
-void write_result(uc_struct *uc, uint32_t result)
-{
-    const uc_err err = uc_reg_write(uc, UC_ARM_REG_R0, &result);
-    assert(err == UC_ERR_OK);
-}

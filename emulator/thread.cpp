@@ -2,6 +2,7 @@
 
 #include "call.h"
 #include "emulator.h"
+#include "import_result.h"
 #include "imports.h"
 
 #include <unicorn/unicorn.h>
@@ -80,8 +81,9 @@ static void call_nid(Address pc, const HookParams &params)
     if (fn != nullptr)
     {
         const Args args = read_args(params.thread->uc);
-        const uint32_t result = (*fn)(args.r0, args.r1, args.r2, args.r3, args.sp, params.thread, params.emulator);
-        write_result(params.thread->uc, result);
+        // TODO Make result const?
+        ImportResult result = (*fn)(args.r0, args.r1, args.r2, args.r3, args.sp, params.thread, params.emulator);
+        result.apply(params.thread->uc);
     }
 }
 

@@ -152,10 +152,7 @@ IMP_SIG(sceKernelGetProcessTimeWide)
     r0 = static_cast<uint32_t>(clocks);
     r1 = static_cast<uint32_t>(clocks >> 32);
     
-    const uc_err err = uc_reg_write(thread->uc, UC_ARM_REG_R1, &r1);
-    assert(err == UC_ERR_OK);
-    
-    return r0;
+    return ImportResult(r0, r1);
 }
 
 IMP_SIG(sceKernelGetTLSAddr)
