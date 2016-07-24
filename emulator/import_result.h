@@ -1,8 +1,6 @@
 #pragma once
 
-#include <stdint.h>
-#include <list>
-#include <vector>
+#include <functional>
 
 struct uc_struct;
 
@@ -14,13 +12,9 @@ public:
     ImportResult(uint32_t r0);
     ImportResult(uint32_t r0, uint32_t r1);
     
-    void apply(uc_struct *uc); // TODO Make this const?
+    void apply(uc_struct *uc) const;
     
 private:
     
-    void add(int reg, uint32_t val);
-    
-    std::vector<int> regs;
-    std::list<uint32_t> vals_32;
-    std::vector<void *> vals;
+    std::function<void(uc_struct *)> function;
 };
