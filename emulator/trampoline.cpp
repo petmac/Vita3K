@@ -4,9 +4,14 @@
 
 #include <iostream>
 
+static const bool LOG_TRAMPOLINES = false;
+
 bool run_trampoline(uc_struct *uc, const Trampoline &trampoline)
 {
-    std::cout << "Starting trampoline \"" << trampoline.name << "\"" << std::endl;
+    if (LOG_TRAMPOLINES)
+    {
+        std::cout << "Starting trampoline \"" << trampoline.name << "\"" << std::endl;
+    }
     
     if (trampoline.prefix)
     {
@@ -30,7 +35,10 @@ bool run_trampoline(uc_struct *uc, const Trampoline &trampoline)
         trampoline.postfix();
     }
     
-    std::cout << "Finished trampoline \"" << trampoline.name << "\"" << std::endl;
+    if (LOG_TRAMPOLINES)
+    {
+        std::cout << "Finished trampoline \"" << trampoline.name << "\"" << std::endl;
+    }
     
     return true;
 }
