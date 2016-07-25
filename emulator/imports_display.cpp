@@ -34,7 +34,7 @@ IMP_SIG(sceDisplaySetFrameBuf)
     assert(fb != nullptr);
     assert(fb->size == sizeof(SceDisplayFrameBuf));
     assert(fb->base);
-    assert(fb->pitch == fb->width);
+    assert(fb->pitch >= fb->width);
     assert(fb->pixelformat == SCE_DISPLAY_PIXELFORMAT_A8B8G8R8);
     assert(fb->width == 960);
     assert(fb->height == 544);

@@ -1,5 +1,7 @@
 #include "import.h"
 
+#include <unicorn/unicorn.h>
+
 enum GxmMemoryAttrib
 {
     // https://github.com/xerpi/vitahelloworld/blob/master/draw.c
@@ -1043,12 +1045,35 @@ IMP_SIG(sceGxmDisplayQueueAddEntry)
     const MemState *const mem = &emu->mem;
     SceGxmSyncObject *const oldBuffer = Ptr<SceGxmSyncObject>(r0).get(mem);
     SceGxmSyncObject *const newBuffer = Ptr<SceGxmSyncObject>(r1).get(mem);
-    const void *const callbackData = Ptr<const void>(r2).get(mem);
+    const Ptr<const void> callbackData = Ptr<const void>(r2);
     assert(oldBuffer != nullptr);
     assert(newBuffer != nullptr);
-    assert(callbackData != nullptr);
+    assert(callbackData);
     
-    // TODO Call callback.
+    Address lr = 0;
+    const uc_err err = uc_reg_read(thread->uc, UC_ARM_REG_LR, &lr);
+    assert(err == UC_ERR_OK);
+    
+    Trampoline call_callback;
+    call_callback.name = "Call callback";
+    call_callback.entry_point = emu->gxm.params.displayQueueCallback.cast<const void>();
+    call_callback.prefix = [callbackData, thread]()
+    {
+        const ImportResult callback_params(callbackData.address());
+        callback_params.apply(thread->uc);
+    };
+    
+    Trampoline resume;
+    resume.name = "Resume after callback";
+    resume.entry_point = Ptr<const void>(lr);
+    resume.prefix = [thread]()
+    {
+        const ImportResult return_ok(SCE_OK);
+        return_ok.apply(thread->uc);
+    };
+    
+    add_trampoline(thread, call_callback);
+    add_trampoline(thread, resume);
     
     return ImportResult();
 }
