@@ -224,8 +224,5 @@ bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
 
 void add_trampoline(ThreadState *thread, const Trampoline &trampoline)
 {
-    const uc_err err = uc_emu_stop(thread->uc);
-    assert(err == UC_ERR_OK);
-    
     thread->trampolines.push(trampoline);
 }

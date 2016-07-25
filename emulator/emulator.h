@@ -19,6 +19,7 @@ struct EmulatorState
     MemState mem;
     Trampoline bootstrap;
     Trampoline arm_to_thumb;
+    Trampoline stop;
     GxmState gxm;
 };
 

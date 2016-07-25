@@ -1051,16 +1051,25 @@ IMP_SIG(sceGxmDisplayQueueAddEntry)
     assert(callbackData);
     
     Address lr = 0;
-    const uc_err err = uc_reg_read(thread->uc, UC_ARM_REG_LR, &lr);
+    uc_err err = uc_reg_read(thread->uc, UC_ARM_REG_LR, &lr);
+    assert(err == UC_ERR_OK);
+    
+    const Address callback_data_address = callbackData.address();
+    const Address callback_lr = emu->stop.entry_point.address();
+    
+    err = uc_emu_stop(thread->uc);
     assert(err == UC_ERR_OK);
     
     Trampoline call_callback;
     call_callback.name = "Call callback";
     call_callback.entry_point = emu->gxm.params.displayQueueCallback.cast<const void>();
-    call_callback.prefix = [callbackData, thread]()
+    call_callback.prefix = [callback_data_address, callback_lr, thread]()
     {
-        const ImportResult callback_params(callbackData.address());
-        callback_params.apply(thread->uc);
+        int regs[] = { UC_ARM_REG_R0, UC_ARM_REG_LR };
+        const void *vals[] = { &callback_data_address, &callback_lr };
+        
+        const uc_err err = uc_reg_write_batch(thread->uc, regs, const_cast<void *const *>(vals), 2);
+        assert(err == UC_ERR_OK);
     };
     
     Trampoline resume;
@@ -1068,6 +1077,7 @@ IMP_SIG(sceGxmDisplayQueueAddEntry)
     resume.entry_point = Ptr<const void>(lr);
     resume.prefix = [thread]()
     {
+        // TODO It's a little odd to use ImportResult for this.
         const ImportResult return_ok(SCE_OK);
         return_ok.apply(thread->uc);
     };
