@@ -415,6 +415,7 @@
 					"${PROJECT_DIR}/capstone/include",
 					"${PROJECT_DIR}/elfio",
 					"${PROJECT_DIR}/unicorn/include",
+					/usr/local/opt/glew/include,
 					/usr/local/opt/sdl2/include,
 					"${inherited}",
 				);
@@ -460,6 +461,7 @@
 					"${PROJECT_DIR}/capstone/include",
 					"${PROJECT_DIR}/elfio",
 					"${PROJECT_DIR}/unicorn/include",
+					/usr/local/opt/glew/include,
 					/usr/local/opt/sdl2/include,
 					"${inherited}",
 				);
@@ -479,10 +481,12 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/unicorn",
 					"$(PROJECT_DIR)/capstone",
+					/usr/local/opt/glew/lib,
 					/usr/local/opt/sdl2/lib,
 					"$(inherited)",
 				);
 				OTHER_LDFLAGS = (
+					"-lglew",
 					"-lSDL2",
 					"${inherited}",
 				);
@@ -501,10 +505,12 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/unicorn",
 					"$(PROJECT_DIR)/capstone",
+					/usr/local/opt/glew/lib,
 					/usr/local/opt/sdl2/lib,
 					"$(inherited)",
 				);
 				OTHER_LDFLAGS = (
+					"-lglew",
 					"-lSDL2",
 					"${inherited}",
 				);
