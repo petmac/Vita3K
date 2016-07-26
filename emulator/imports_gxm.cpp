@@ -1,6 +1,6 @@
 #include "import.h"
 
-#include <SDL2/SDL_opengl.h>
+#include <GL/glew.h>
 #include <SDL2/SDL_video.h>
 #include <unicorn/unicorn.h>
 
@@ -986,6 +986,11 @@ IMP_SIG(sceGxmCreateContext)
     assert(SDL_GL_GetCurrentContext() == nullptr);
     ctx->gl = SDL_GL_CreateContext(emu->window.get());
     assert(ctx->gl != nullptr);
+    
+    if (glewInit() != GLEW_OK)
+    {
+        return TODO_GLEW_INIT_FAILED;
+    }
     
     // TODO This is just for debugging.
     glClearColor(0.0625f, 0.125f, 0.25f, 0);
