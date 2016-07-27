@@ -1,7 +1,6 @@
 #include "import.h"
 
 #include <SDL2/SDL_events.h>
-#include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_video.h>
 #include <unicorn/unicorn.h>
 
@@ -27,6 +26,8 @@ enum SetBuf : uint32_t
 
 IMP_SIG(sceDisplaySetFrameBuf)
 {
+    typedef std::unique_ptr<SDL_Surface, void (*)(SDL_Surface *)> SurfacePtr;
+    
     const MemState *const mem = &emu->mem;
     const SceDisplayFrameBuf *const fb = Ptr<const SceDisplayFrameBuf>(r0).get(mem);
     const SetBuf set = static_cast<SetBuf>(r1);
@@ -39,16 +40,11 @@ IMP_SIG(sceDisplaySetFrameBuf)
     assert(fb->height == 544);
     assert(set == SCE_DISPLAY_SETBUF_NEXTFRAME);
     
-    const void *const pixels = fb->base.get(mem);
-    glDrawPixels(fb->width, fb->height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-    
-    SDL_Window *const window = SDL_GL_GetCurrentWindow();
-    assert(window != nullptr);
-    
-    if (window != nullptr)
-    {
-        SDL_GL_SwapWindow(window);
-    }
+    void *const pixels = fb->base.cast<void>().get(mem);
+    const SurfacePtr framebuffer_surface(SDL_CreateRGBSurfaceFrom(pixels, fb->width, fb->height, 32, fb->pitch * 4, 0xff << 0, 0xff << 8, 0xff << 16, 0), SDL_FreeSurface);
+    SDL_Surface *const window_surface = SDL_GetWindowSurface(emu->window.get());
+    SDL_UpperBlit(framebuffer_surface.get(), nullptr, window_surface, nullptr);
+    SDL_UpdateWindowSurface(emu->window.get());
     
     return SCE_OK;
 }

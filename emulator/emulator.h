@@ -4,8 +4,13 @@
 #include "disasm.h"
 #include "kernel.h"
 
+struct SDL_Window;
+
+typedef std::shared_ptr<SDL_Window> WindowPtr;
+
 struct EmulatorState
 {
+    WindowPtr window;
     CtrlState ctrl;
     DisasmState disasm;
     KernelState kernel;

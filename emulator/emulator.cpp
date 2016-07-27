@@ -3,6 +3,7 @@
 #include "call.h"
 #include "imports.h"
 
+#include <SDL2/SDL_video.h>
 #include <unicorn/unicorn.h>
 
 #include <assert.h>
@@ -116,7 +117,9 @@ static void intr_hook(uc_engine *uc, uint32_t intno, void *user_data)
 
 bool init(EmulatorState *state)
 {
-    return init(&state->disasm) && init(&state->mem);
+    state->window = WindowPtr(SDL_CreateWindow("Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 960, 544, 0), SDL_DestroyWindow);
+    
+    return state->window && init(&state->disasm) && init(&state->mem);
 }
 
 bool run_thread(EmulatorState *state, Ptr<const void> entry_point)
