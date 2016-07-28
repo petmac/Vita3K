@@ -65,7 +65,7 @@ static Trampoline load_bootstrap(const char *name, const void *bootstrap, size_t
 
 bool init(EmulatorState *state)
 {
-    state->window = WindowPtr(SDL_CreateWindow("Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 960, 544, 0), SDL_DestroyWindow);
+    state->window = WindowPtr(SDL_CreateWindow("Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 960, 544, SDL_WINDOW_OPENGL), SDL_DestroyWindow);
     if (!state->window || !init(&state->disasm) || !init(&state->mem))
     {
         return false;

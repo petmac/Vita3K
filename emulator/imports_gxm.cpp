@@ -1,5 +1,6 @@
 #include "import.h"
 
+#include <SDL2/SDL_video.h>
 #include <unicorn/unicorn.h>
 
 enum GxmMemoryAttrib
@@ -686,6 +687,7 @@ struct SceGxmContext
 {
     // This is an opaque type.
     SceGxmContextParams params;
+    SDL_GLContext gl;
     size_t fragment_ring_buffer_used;
     size_t vertex_ring_buffer_used;
 };
@@ -966,6 +968,10 @@ IMP_SIG(sceGxmCreateContext)
     SceGxmContext *const ctx = context->get(&emu->mem);
     ctx->params = *params;
     
+    assert(SDL_GL_GetCurrentContext() == nullptr);
+    ctx->gl = SDL_GL_CreateContext(emu->window.get());
+    assert(ctx->gl != nullptr);
+    
     return SCE_OK;
 }
 
@@ -1023,6 +1029,10 @@ IMP_SIG(sceGxmDestroyContext)
     const MemState *const mem = &emu->mem;
     SceGxmContext *const context = Ptr<SceGxmContext>(r0).get(mem);
     assert(context != nullptr);
+    
+    assert(context->gl != nullptr);
+    SDL_GL_DeleteContext(context->gl);
+    context->gl = nullptr;
     
     // TODO Free the context.
     
