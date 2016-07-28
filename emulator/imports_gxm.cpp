@@ -629,17 +629,14 @@ enum SceGxmTextureFormat
     SCE_GXM_TEXTURE_FORMAT_PVRTII4BPP = SCE_GXM_TEXTURE_FORMAT_PVRTII4BPP_ABGR
 };
 
-union SceGxmTexture
+struct SceGxmTexture
 {
     // https://psp2sdk.github.io/structSceGxmTexture.html
-    uint32_t controlWords[4];
-    struct
-    {
-        SceGxmTextureFormat format;
-        uint32_t width;
-        uint32_t height;
-        Ptr<void> data;
-    } emu;
+    //uint32_t controlWords[4];
+    SceGxmTextureFormat format;
+    uint32_t width;
+    uint32_t height;
+    Ptr<void> data;
 };
 
 static_assert(sizeof(SceGxmTexture) == 16, "Incorrect size.");
@@ -977,7 +974,7 @@ IMP_SIG(sceGxmCreateContext)
     assert(params != nullptr);
     assert(context != nullptr);
     
-    *context = Ptr<SceGxmContext>(alloc(&emu->mem, sizeof(SceGxmContext), __FUNCTION__));
+    *context = alloc<SceGxmContext>(&emu->mem, __FUNCTION__);
     if (!*context)
     {
         return OUT_OF_MEMORY;
@@ -1004,7 +1001,7 @@ IMP_SIG(sceGxmCreateRenderTarget)
     assert(params != nullptr);
     assert(renderTarget != nullptr);
     
-    *renderTarget = Ptr<SceGxmRenderTarget>(alloc(&emu->mem, sizeof(SceGxmRenderTarget), __FUNCTION__));
+    *renderTarget = alloc<SceGxmRenderTarget>(&emu->mem, __FUNCTION__);
     if (!*renderTarget)
     {
         return OUT_OF_MEMORY;
@@ -1390,7 +1387,7 @@ IMP_SIG(sceGxmShaderPatcherCreate)
     assert(params != nullptr);
     assert(shaderPatcher != nullptr);
     
-    *shaderPatcher = Ptr<SceGxmShaderPatcher>(alloc(&emu->mem, sizeof(SceGxmShaderPatcher), __FUNCTION__));
+    *shaderPatcher = alloc<SceGxmShaderPatcher>(&emu->mem, __FUNCTION__);
     assert(*shaderPatcher);
     if (!*shaderPatcher)
     {
@@ -1426,7 +1423,7 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     assert((blendInfo == nullptr) || (blendInfo != nullptr));
     assert(fragmentProgram != nullptr);
     
-    *fragmentProgram = Ptr<SceGxmFragmentProgram>(alloc(mem, sizeof(SceGxmFragmentProgram), __FUNCTION__));
+    *fragmentProgram = alloc<SceGxmFragmentProgram>(mem, __FUNCTION__);
     assert(*fragmentProgram);
     if (!*fragmentProgram)
     {
@@ -1462,7 +1459,7 @@ IMP_SIG(sceGxmShaderPatcherCreateVertexProgram)
     assert(stack->streamCount > 0);
     assert(vertexProgram != nullptr);
     
-    *vertexProgram = Ptr<SceGxmVertexProgram>(alloc(mem, sizeof(SceGxmVertexProgram), __FUNCTION__));
+    *vertexProgram = alloc<SceGxmVertexProgram>(mem, __FUNCTION__);
     assert(*vertexProgram);
     if (!*vertexProgram)
     {
@@ -1491,7 +1488,7 @@ IMP_SIG(sceGxmShaderPatcherRegisterProgram)
     assert(programHeader != nullptr);
     assert(programId != nullptr);
     
-    *programId = SceGxmShaderPatcherId(alloc(&emu->mem, sizeof(SceGxmRegisteredProgram), __FUNCTION__));
+    *programId = alloc<SceGxmRegisteredProgram>(&emu->mem, __FUNCTION__);
     assert(*programId);
     if (!*programId)
     {
@@ -1539,7 +1536,7 @@ IMP_SIG(sceGxmSyncObjectCreate)
     Ptr<SceGxmSyncObject> *const syncObject = Ptr<Ptr<SceGxmSyncObject>>(r0).get(&emu->mem);
     assert(syncObject != nullptr);
     
-    *syncObject = Ptr<SceGxmSyncObject>(alloc(&emu->mem, sizeof(SceGxmSyncObject), __FUNCTION__));
+    *syncObject = alloc<SceGxmSyncObject>(&emu->mem, __FUNCTION__);
     if (!*syncObject)
     {
         return OUT_OF_MEMORY;
@@ -1571,7 +1568,7 @@ IMP_SIG(sceGxmTextureGetData)
     SceGxmTexture *const texture = Ptr<SceGxmTexture>(r0).get(mem);
     assert(texture != nullptr);
     
-    return texture->emu.data.address();
+    return texture->data.address();
 }
 
 IMP_SIG(sceGxmTextureGetFormat)
@@ -1581,7 +1578,7 @@ IMP_SIG(sceGxmTextureGetFormat)
     const SceGxmTexture *const texture = Ptr<const SceGxmTexture>(r0).get(mem);
     assert(texture != nullptr);
     
-    return texture->emu.format;
+    return texture->format;
 }
 
 IMP_SIG(sceGxmTextureGetHeight)
@@ -1591,7 +1588,7 @@ IMP_SIG(sceGxmTextureGetHeight)
     const SceGxmTexture *const texture = Ptr<const SceGxmTexture>(r0).get(mem);
     assert(texture != nullptr);
     
-    return texture->emu.height;
+    return texture->height;
 }
 
 IMP_SIG(sceGxmTextureGetWidth)
@@ -1601,7 +1598,7 @@ IMP_SIG(sceGxmTextureGetWidth)
     const SceGxmTexture *const texture = Ptr<const SceGxmTexture>(r0).get(mem);
     assert(texture != nullptr);
     
-    return texture->emu.width;
+    return texture->width;
 }
 
 IMP_SIG(sceGxmTextureInitLinear)
@@ -1627,17 +1624,17 @@ IMP_SIG(sceGxmTextureInitLinear)
     assert(stack->mipCount == 0);
     
     const size_t data_size = width * stack->height * 4; // TODO Handle alignment.
-    texture->emu.data = Ptr<void>(alloc(mem, data_size, __FUNCTION__));
-    assert(texture->emu.data);
-    if (!texture->emu.data)
+    texture->data = Ptr<void>(alloc(mem, data_size, __FUNCTION__));
+    assert(texture->data);
+    if (!texture->data)
     {
         return OUT_OF_MEMORY;
     }
     
-    texture->emu.format = texFormat;
-    texture->emu.width = width;
-    texture->emu.height = stack->height;
-    memcpy(texture->emu.data.get(mem), data, data_size);
+    texture->format = texFormat;
+    texture->width = width;
+    texture->height = stack->height;
+    memcpy(texture->data.get(mem), data, data_size);
     
     return SCE_OK;
 }

@@ -171,7 +171,7 @@ IMP_SIG(sceKernelGetTLSAddr)
     // TODO Use a finer-grained allocator.
     // TODO This is a memory leak.
     MemState *const mem = &emu->mem;
-    const Ptr<Ptr<void>> address(alloc(mem, sizeof(Ptr<void>), "TLS"));
+    const Ptr<Ptr<void>> address(alloc<Ptr<void>>(mem, "TLS"));
     slot_to_address->insert(SlotToAddress::value_type(slot, address));
     
     return address.address();

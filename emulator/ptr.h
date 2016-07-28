@@ -64,3 +64,19 @@ Ptr<T> operator+(const Ptr<T> &base, int32_t offset)
 {
     return Ptr<T>(base.address() + (offset * sizeof(T)));
 }
+
+template <class T>
+Ptr<T> alloc(MemState *mem, const char *name)
+{
+    const Address address = alloc(mem, sizeof(T), name);
+    const Ptr<T> ptr(address);
+    if (!ptr)
+    {
+        return ptr;
+    }
+    
+    T *const memory = ptr.get(mem);
+    new (memory) T;
+    
+    return ptr;
+}
