@@ -1,5 +1,6 @@
 #include "import.h"
 
+#include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_video.h>
 #include <unicorn/unicorn.h>
 
@@ -643,6 +644,14 @@ union SceGxmTexture
 
 static_assert(sizeof(SceGxmTexture) == 16, "Incorrect size.");
 
+enum ColorSurfaceEmitWord : uint32_t
+{
+    CSEM_WIDTH,
+    CSEM_HEIGHT,
+    CSEM_STRIDE_IN_PIXELS,
+    CSEM_DATA,
+};
+
 struct SceGxmColorSurface
 {
     // https://psp2sdk.github.io/structSceGxmColorSurface.html
@@ -690,6 +699,7 @@ struct SceGxmContext
     SDL_GLContext gl;
     size_t fragment_ring_buffer_used;
     size_t vertex_ring_buffer_used;
+    SceGxmColorSurface color_surface;
 };
 
 enum SceGxmDepthStencilFormat
@@ -912,6 +922,10 @@ IMP_SIG(sceGxmBeginScene)
     // TODO This may not be right.
     context->fragment_ring_buffer_used = 0;
     context->vertex_ring_buffer_used = 0;
+    context->color_surface = *stack->colorSurface.get(mem);
+    
+    // TODO This is just for debugging.
+    glClear(GL_COLOR_BUFFER_BIT);
     
     return SCE_OK;
 }
@@ -946,6 +960,10 @@ IMP_SIG(sceGxmColorSurfaceInit)
     
     // TODO Initialise.
     memset(surface, 0, sizeof(*surface));
+    surface->pbeEmitWords[CSEM_WIDTH] = stack->width;
+    surface->pbeEmitWords[CSEM_HEIGHT] = stack->height;
+    surface->pbeEmitWords[CSEM_STRIDE_IN_PIXELS] = stack->strideInPixels;
+    surface->pbeEmitWords[CSEM_DATA] = stack->data.address();
     surface->outputRegisterSize = stack->outputRegisterSize;
     
     return SCE_OK;
@@ -971,6 +989,9 @@ IMP_SIG(sceGxmCreateContext)
     assert(SDL_GL_GetCurrentContext() == nullptr);
     ctx->gl = SDL_GL_CreateContext(emu->window.get());
     assert(ctx->gl != nullptr);
+    
+    // TODO This is just for debugging.
+    glClearColor(0.0625f, 0.125f, 0.25f, 0);
     
     return SCE_OK;
 }
@@ -1045,6 +1066,8 @@ IMP_SIG(sceGxmDestroyRenderTarget)
     const MemState *const mem = &emu->mem;
     SceGxmRenderTarget *const renderTarget = Ptr<SceGxmRenderTarget>(r0).get(mem);
     assert(renderTarget != nullptr);
+    
+    // TODO Free the render target.
     
     return SCE_OK;
 }
@@ -1132,6 +1155,14 @@ IMP_SIG(sceGxmEndScene)
     assert(context != nullptr);
     assert(vertexNotification == nullptr);
     assert(fragmentNotification == nullptr);
+    
+    const GLsizei width = context->color_surface.pbeEmitWords[CSEM_WIDTH];
+    const GLsizei height = context->color_surface.pbeEmitWords[CSEM_HEIGHT];
+    const GLsizei stride_in_pixels = context->color_surface.pbeEmitWords[CSEM_STRIDE_IN_PIXELS];
+    const Address data = context->color_surface.pbeEmitWords[CSEM_DATA];
+    void *const pixels = Ptr<void>(data).get(mem);
+    glPixelStorei(GL_PACK_ROW_LENGTH, stride_in_pixels);
+    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
     
     return SCE_OK;
 }
