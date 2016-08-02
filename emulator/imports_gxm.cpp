@@ -1434,14 +1434,14 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     SceGxmShaderPatcher *const shaderPatcher = Ptr<SceGxmShaderPatcher>(r0).get(mem);
     const SceGxmRegisteredProgram *const programId = SceGxmShaderPatcherId(r1).get(mem);
     const SceGxmOutputRegisterFormat outputFormat = static_cast<SceGxmOutputRegisterFormat>(r2);
-    const SceGxmMultisampleMode multiesampleMode = static_cast<SceGxmMultisampleMode>(r3);
+    const SceGxmMultisampleMode multisampleMode = static_cast<SceGxmMultisampleMode>(r3);
     const Stack *const stack = sp.cast<const Stack>().get(mem);
     const SceGxmBlendInfo *const blendInfo = stack->blendInfo.get(mem);
     Ptr<SceGxmFragmentProgram> *const fragmentProgram = stack->fragmentProgram.get(mem);
     assert(shaderPatcher != nullptr);
     assert(programId != 0);
     assert(outputFormat == SCE_GXM_OUTPUT_REGISTER_FORMAT_UCHAR4);
-    assert(multiesampleMode == SCE_GXM_MULTISAMPLE_NONE);
+    assert(multisampleMode == SCE_GXM_MULTISAMPLE_NONE);
     assert((blendInfo == nullptr) || (blendInfo != nullptr));
     assert(fragmentProgram != nullptr);
     
