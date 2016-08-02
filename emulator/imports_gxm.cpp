@@ -1456,7 +1456,7 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     struct Stack
     {
         Ptr<const SceGxmBlendInfo> blendInfo;
-        Ptr<const SceGxmVertexProgram> vertexProgram;
+        Ptr<const SceGxmProgram> vertexProgram;
         Ptr<Ptr<SceGxmFragmentProgram>> fragmentProgram;
     };
     
@@ -1467,12 +1467,14 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     const SceGxmMultisampleMode multisampleMode = static_cast<SceGxmMultisampleMode>(r3);
     const Stack *const stack = sp.cast<const Stack>().get(mem);
     const SceGxmBlendInfo *const blendInfo = stack->blendInfo.get(mem);
+    const SceGxmProgram *const vertexProgram = stack->vertexProgram.get(mem);
     Ptr<SceGxmFragmentProgram> *const fragmentProgram = stack->fragmentProgram.get(mem);
     assert(shaderPatcher != nullptr);
     assert(programId != 0);
     assert(outputFormat == SCE_GXM_OUTPUT_REGISTER_FORMAT_UCHAR4);
     assert(multisampleMode == SCE_GXM_MULTISAMPLE_NONE);
     assert((blendInfo == nullptr) || (blendInfo != nullptr));
+    assert(vertexProgram != nullptr);
     assert(fragmentProgram != nullptr);
     
     *fragmentProgram = alloc<SceGxmFragmentProgram>(mem, __FUNCTION__);
