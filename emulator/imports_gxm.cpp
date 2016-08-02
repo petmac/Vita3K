@@ -1587,11 +1587,13 @@ IMP_SIG(sceGxmShaderPatcherRegisterProgram)
         return TODO_FILE_NOT_FOUND;
     }
     
-    const std::istream_iterator<char> begin(is);
-    const std::istream_iterator<char> end;
+    is.seekg(0, std::ios::end);
+    const size_t size = is.tellg();
+    is.seekg(0);
     
     SceGxmRegisteredProgram *const rp = programId->get(&emu->mem);
-    rp->source.assign(begin, end);
+    rp->source.resize(size, ' ');
+    is.read(&rp->source[0], size); 
     
     return SCE_OK;
 }
