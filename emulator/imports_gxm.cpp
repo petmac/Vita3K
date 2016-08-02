@@ -927,6 +927,44 @@ static uint64_t fnv1a(const void *data, size_t size)
     return result;
 }
 
+static GLuint create_and_compile_shader(GLenum type, const GLchar *source)
+{
+    GLuint shader = glCreateShader(type);
+    if (shader == 0)
+    {
+        return 0;
+    }
+    
+    const GLint length = static_cast<GLint>(strlen(source));
+    glShaderSource(shader, 1, &source, &length);
+    glCompileShader(shader);
+    
+    GLint log_length = 0;
+    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_length);
+    
+    if (log_length > 0)
+    {
+        std::vector<GLchar> log;
+        log.resize(log_length);
+        glGetShaderInfoLog(shader, log_length, nullptr, &log.front());
+        
+        std::cerr << &log.front() << std::endl;
+    }
+    
+    GLint is_compiled = GL_FALSE;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &is_compiled);
+    assert(is_compiled != GL_FALSE);
+    if (is_compiled == GL_FALSE)
+    {
+        glDeleteShader(shader);
+        shader = 0;
+        
+        return 0;
+    }
+    
+    return shader;
+}
+
 IMP_SIG(sceGxmBeginScene)
 {
     // https://psp2sdk.github.io/gxm_8h.html
@@ -1485,35 +1523,10 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     }
     
     SceGxmFragmentProgram *const fp = fragmentProgram->get(mem);
-    fp->shader = glCreateShader(GL_FRAGMENT_SHADER);
+    fp->shader = create_and_compile_shader(GL_FRAGMENT_SHADER, programId->source.c_str());
     assert(fp->shader != 0);
-    
-    const GLchar *const source = programId->source.c_str();
-    const GLint length = static_cast<GLint>(programId->source.length());
-    glShaderSource(fp->shader, 1, &source, &length);
-    
-    glCompileShader(fp->shader);
-    
-    GLint log_length = 0;
-    glGetShaderiv(fp->shader, GL_INFO_LOG_LENGTH, &log_length);
-    
-    if (log_length > 0)
+    if (!fp->shader)
     {
-        std::vector<GLchar> log;
-        log.resize(log_length);
-        glGetShaderInfoLog(fp->shader, log_length, nullptr, &log.front());
-        
-        std::cerr << &log.front() << std::endl;
-    }
-    
-    GLint is_compiled = GL_FALSE;
-    glGetShaderiv(fp->shader, GL_COMPILE_STATUS, &is_compiled);
-    assert(is_compiled != GL_FALSE);
-    if (is_compiled == GL_FALSE)
-    {
-        glDeleteShader(fp->shader);
-        fp->shader = 0;
-        
         // TODO Free fragmentProgram.
         
         return TODO_COMPILE_FAILED;
@@ -1558,35 +1571,10 @@ IMP_SIG(sceGxmShaderPatcherCreateVertexProgram)
     SceGxmVertexProgram *const vp = vertexProgram->get(mem);
     vp->attributes.assign(&attributes[0], &attributes[attributeCount]);
     vp->streams.assign(&streams[0], &streams[stack->streamCount]);
-    vp->shader = glCreateShader(GL_VERTEX_SHADER);
+    vp->shader = create_and_compile_shader(GL_VERTEX_SHADER, programId->source.c_str());
     assert(vp->shader != 0);
-    
-    const GLchar *const source = programId->source.c_str();
-    const GLint length = static_cast<GLint>(programId->source.length());
-    glShaderSource(vp->shader, 1, &source, &length);
-    
-    glCompileShader(vp->shader);
-    
-    GLint log_length = 0;
-    glGetShaderiv(vp->shader, GL_INFO_LOG_LENGTH, &log_length);
-    
-    if (log_length > 0)
+    if (!vp->shader)
     {
-        std::vector<GLchar> log;
-        log.resize(log_length);
-        glGetShaderInfoLog(vp->shader, log_length, nullptr, &log.front());
-        
-        std::cerr << &log.front() << std::endl;
-    }
-    
-    GLint is_compiled = GL_FALSE;
-    glGetShaderiv(vp->shader, GL_COMPILE_STATUS, &is_compiled);
-    assert(is_compiled != GL_FALSE);
-    if (is_compiled == GL_FALSE)
-    {
-        glDeleteShader(vp->shader);
-        vp->shader = 0;
-        
         // TODO Free vertexProgram.
         
         return TODO_COMPILE_FAILED;
