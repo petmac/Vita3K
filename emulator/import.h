@@ -15,6 +15,7 @@ enum ResultCode : int32_t
     UNKNOWN_UID = -1,
     OUT_OF_MEMORY = -2,
     TODO_GLEW_INIT_FAILED = -3,
+    TODO_FILE_NOT_FOUND = -4,
 };
 
 #define IMP_SIG(name) ImportResult import_##name(uint32_t r0, uint32_t r1, uint32_t r2, uint32_t r3, Ptr<void> sp, ThreadState *thread, EmulatorState *emu)

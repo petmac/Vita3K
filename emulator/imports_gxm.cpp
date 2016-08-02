@@ -4,6 +4,10 @@
 #include <SDL2/SDL_video.h>
 #include <unicorn/unicorn.h>
 
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
 enum GxmMemoryAttrib
 {
     // https://github.com/xerpi/vitahelloworld/blob/master/draw.c
@@ -810,7 +814,7 @@ struct SceGxmProgramParameter
 struct SceGxmRegisteredProgram
 {
     // TODO This is an opaque type.
-    uint64_t hash;
+    std::string source;
 };
 
 struct SceGxmRenderTarget
@@ -1541,8 +1545,22 @@ IMP_SIG(sceGxmShaderPatcherRegisterProgram)
         return OUT_OF_MEMORY;
     }
     
+    const uint64_t hash = fnv1a(programHeader, programHeader->size);
+    std::ostringstream path;
+    path << "shaders/" << hash << ".txt";
+    
+    std::ifstream is(path.str());
+    if (is.fail())
+    {
+        std::cerr << "Couldn't open '" << path.str() << "' for reading." << std::endl;
+        return TODO_FILE_NOT_FOUND;
+    }
+    
+    const std::istream_iterator<char> begin(is);
+    const std::istream_iterator<char> end;
+    
     SceGxmRegisteredProgram *const rp = programId->get(&emu->mem);
-    rp->hash = fnv1a(programHeader, programHeader->size);
+    rp->source.assign(begin, end);
     
     return SCE_OK;
 }
