@@ -1596,7 +1596,7 @@ IMP_SIG(sceGxmShaderPatcherRegisterProgram)
     
     SceGxmRegisteredProgram *const rp = programId->get(&emu->mem);
     rp->source.resize(size, ' ');
-    is.read(&rp->source[0], size); 
+    is.read(&rp->source[0], size);
     
     return SCE_OK;
 }
