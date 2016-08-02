@@ -907,6 +907,7 @@ struct SceGxmVertexProgram
     // TODO I think this is an opaque type.
     std::vector<SceGxmVertexAttribute> attributes;
     std::vector<SceGxmVertexStream> streams;
+    GLuint shader = 0;
 };
 
 // https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1a_hash
@@ -1515,6 +1516,36 @@ IMP_SIG(sceGxmShaderPatcherCreateVertexProgram)
     SceGxmVertexProgram *const vp = vertexProgram->get(mem);
     vp->attributes.assign(&attributes[0], &attributes[attributeCount]);
     vp->streams.assign(&streams[0], &streams[stack->streamCount]);
+    vp->shader = glCreateShader(GL_VERTEX_SHADER);
+    assert(vp->shader != 0);
+    
+    const GLchar *const source = programId->source.c_str();
+    const GLint length = static_cast<GLint>(programId->source.length());
+    glShaderSource(vp->shader, 1, &source, &length);
+    
+    glCompileShader(vp->shader);
+    
+    GLint log_length = 0;
+    glGetShaderiv(vp->shader, GL_INFO_LOG_LENGTH, &log_length);
+    
+    std::vector<GLchar> log;
+    log.resize(log_length);
+    glGetShaderInfoLog(vp->shader, log_length, nullptr, &log.front());
+    
+    std::cerr << &log.front() << std::endl;
+    
+    GLint is_compiled = GL_FALSE;
+    glGetShaderiv(vp->shader, GL_COMPILE_STATUS, &is_compiled);
+    assert(is_compiled != GL_FALSE);
+    if (is_compiled == GL_FALSE)
+    {
+        glDeleteShader(vp->shader);
+        vp->shader = 0;
+        
+        // TODO Free vertexProgram.
+        
+        return TODO_COMPILE_FAILED;
+    }
     
     return SCE_OK;
 }
