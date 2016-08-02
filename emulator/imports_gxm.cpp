@@ -1528,11 +1528,14 @@ IMP_SIG(sceGxmShaderPatcherCreateVertexProgram)
     GLint log_length = 0;
     glGetShaderiv(vp->shader, GL_INFO_LOG_LENGTH, &log_length);
     
-    std::vector<GLchar> log;
-    log.resize(log_length);
-    glGetShaderInfoLog(vp->shader, log_length, nullptr, &log.front());
-    
-    std::cerr << &log.front() << std::endl;
+    if (log_length > 0)
+    {
+        std::vector<GLchar> log;
+        log.resize(log_length);
+        glGetShaderInfoLog(vp->shader, log_length, nullptr, &log.front());
+        
+        std::cerr << &log.front() << std::endl;
+    }
     
     GLint is_compiled = GL_FALSE;
     glGetShaderiv(vp->shader, GL_COMPILE_STATUS, &is_compiled);
