@@ -1423,7 +1423,6 @@ IMP_SIG(sceGxmShaderPatcherCreate)
 IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
 {
     // https://psp2sdk.github.io/gxm_8h.html
-    // sceGxmShaderPatcherCreateFragmentProgram (SceGxmShaderPatcher *shaderPatcher, SceGxmShaderPatcherId programId, SceGxmOutputRegisterFormat outputFormat, SceGxmMultisampleMode multisampleMode, const SceGxmBlendInfo *blendInfo, const SceGxmProgram *vertexProgram, SceGxmFragmentProgram **fragmentProgram)
     struct Stack
     {
         Ptr<const SceGxmBlendInfo> blendInfo;
