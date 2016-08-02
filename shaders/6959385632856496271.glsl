@@ -1,10 +1,12 @@
 // https://github.com/xerpi/libvita2d/blob/master/libvita2d/shader/texture_v.cg
-uniform mat4 wvp;
-attribute vec3 aPosition;
-attribute vec2 aTexcoord;
+#version 330 core
 
-varying vec4 vPosition;
-varying vec2 vTexcoord;
+uniform mat4 wvp;
+in vec3 aPosition;
+in vec2 aTexcoord;
+
+out vec4 vPosition;
+out vec2 vTexcoord;
 
 void main()
 {

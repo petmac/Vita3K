@@ -1,8 +1,12 @@
 // https://github.com/xerpi/libvita2d/blob/master/libvita2d/shader/texture_f.cg
+#version 330 core
+
 uniform sampler2D tex;
-varying vec2 vTexcoord;
+in vec2 vTexcoord;
+
+out vec4 fragColor;
 
 void main()
 {
-    gl_FragColor = texture2D(tex, vTexcoord);
+    fragColor = texture(tex, vTexcoord);
 }

@@ -1022,8 +1022,12 @@ IMP_SIG(sceGxmCreateContext)
     ctx->params = *params;
     
     assert(SDL_GL_GetCurrentContext() == nullptr);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     ctx->gl = SDL_GL_CreateContext(emu->window.get());
     assert(ctx->gl != nullptr);
+    
+    std::cout << "GL_VERSION = " << glGetString(GL_VERSION) << std::endl;
+    std::cout << "GL_SHADING_LANGUAGE_VERSION = " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
     
     if (glewInit() != GLEW_OK)
     {

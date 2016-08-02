@@ -1,10 +1,12 @@
 // https://github.com/xerpi/libvita2d/blob/master/libvita2d/shader/color_v.cg
-uniform mat4 wvp;
-attribute vec3 aPosition;
-attribute vec4 aColor;
+#version 330 core
 
-varying vec4 vPosition;
-varying vec4 vColor;
+uniform mat4 wvp;
+in vec3 aPosition;
+in vec4 aColor;
+
+out vec4 vPosition;
+out vec4 vColor;
 
 void main()
 {
