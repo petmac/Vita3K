@@ -810,6 +810,7 @@ struct SceGxmProgramParameter
 struct SceGxmRegisteredProgram
 {
     // TODO This is an opaque type.
+    uint64_t hash;
 };
 
 struct SceGxmRenderTarget
@@ -903,6 +904,22 @@ struct SceGxmVertexProgram
     std::vector<SceGxmVertexAttribute> attributes;
     std::vector<SceGxmVertexStream> streams;
 };
+
+// https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1a_hash
+static uint64_t fnv1a(const void *data, size_t size)
+{
+    const uint8_t *const begin = static_cast<const uint8_t *>(data);
+    const uint8_t *const end = begin + size;
+    uint64_t result = 0xcbf29ce484222325;
+    
+    for (const uint8_t *p = begin; p != end; ++p)
+    {
+        result ^= *p;
+        result *= 0x100000001b3;
+    }
+    
+    return result;
+}
 
 IMP_SIG(sceGxmBeginScene)
 {
@@ -1523,6 +1540,9 @@ IMP_SIG(sceGxmShaderPatcherRegisterProgram)
     {
         return OUT_OF_MEMORY;
     }
+    
+    SceGxmRegisteredProgram *const rp = programId->get(&emu->mem);
+    rp->hash = fnv1a(programHeader, programHeader->size);
     
     return SCE_OK;
 }
