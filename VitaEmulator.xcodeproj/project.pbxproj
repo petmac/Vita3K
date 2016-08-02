@@ -64,7 +64,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B2F8DAC51D50C81B003BA463 /* 13599876527580594779.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 13599876527580594779.txt; sourceTree = "<group>"; };
+		B2F8DAC71D50CD83003BA463 /* 13599876527580594779.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 13599876527580594779.glsl; sourceTree = "<group>"; };
 		C12143791D000FEE00702861 /* VitaEmulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VitaEmulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C12143851D000FEE00702861 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C121438A1D000FEE00702861 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -134,7 +134,7 @@
 		B2F8DAC41D50C81B003BA463 /* shaders */ = {
 			isa = PBXGroup;
 			children = (
-				B2F8DAC51D50C81B003BA463 /* 13599876527580594779.txt */,
+				B2F8DAC71D50CD83003BA463 /* 13599876527580594779.glsl */,
 			);
 			path = shaders;
 			sourceTree = "<group>";

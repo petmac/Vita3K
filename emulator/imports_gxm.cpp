@@ -1581,7 +1581,7 @@ IMP_SIG(sceGxmShaderPatcherRegisterProgram)
     
     const uint64_t hash = fnv1a(programHeader, programHeader->size);
     std::ostringstream path;
-    path << "shaders/" << hash << ".txt";
+    path << "shaders/" << hash << ".glsl";
     
     std::ifstream is(path.str());
     if (is.fail())
