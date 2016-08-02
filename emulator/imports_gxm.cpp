@@ -784,10 +784,22 @@ enum SceGxmPrimitiveType
     SCE_GXM_PRIMITIVE_TRIANGLE_EDGES = 0x14000000
 };
 
+// For debugging/reversing.
+union Unknown
+{
+    uint8_t unknown8[1024];
+    uint16_t unknown16[512];
+    uint32_t unknown32[256];
+};
+
 struct SceGxmProgram
 {
     // TODO This is an opaque struct.
-    uint32_t unknown[256]; // For debugging/reversing.
+    char magic[4];
+    char maybe_version[2];
+    char maybe_padding[2];
+    uint32_t size;
+    Unknown unknown;
 };
 
 struct SceGxmProgramParameter
@@ -1248,6 +1260,12 @@ IMP_SIG(sceGxmProgramCheck)
     // https://psp2sdk.github.io/gxm_8h.html
     const SceGxmProgram *program = Ptr<const SceGxmProgram>(r0).get(&emu->mem);
     assert(program != nullptr);
+    
+    assert(memcmp(program->magic, "GXP", 4) == 0);
+    assert(program->maybe_version[0] == 1);
+    assert(program->maybe_version[1] == 4);
+    assert(program->maybe_padding[0] == 0);
+    assert(program->maybe_padding[1] == 0);
     
     return SCE_OK;
 }
