@@ -64,7 +64,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B2D4749A1D50F50000C71A33 /* 13734954368157190244.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 13734954368157190244.glsl; sourceTree = "<group>"; };
+		B2D4749B1D50F50000C71A33 /* 15572183010274844106.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 15572183010274844106.glsl; sourceTree = "<group>"; };
+		B2D4749C1D50F50000C71A33 /* 6959385632856496271.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 6959385632856496271.glsl; sourceTree = "<group>"; };
+		B2D4749D1D50F50000C71A33 /* 7762965783345142270.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 7762965783345142270.glsl; sourceTree = "<group>"; };
+		B2D4749E1D50F50000C71A33 /* 8854786452444500389.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 8854786452444500389.glsl; sourceTree = "<group>"; };
 		B2F8DAC71D50CD83003BA463 /* 13599876527580594779.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 13599876527580594779.glsl; sourceTree = "<group>"; };
+		B2F8DAC91D50CF68003BA463 /* 10622023203265062212.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = 10622023203265062212.glsl; sourceTree = "<group>"; };
 		C12143791D000FEE00702861 /* VitaEmulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VitaEmulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C12143851D000FEE00702861 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C121438A1D000FEE00702861 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -134,7 +140,13 @@
 		B2F8DAC41D50C81B003BA463 /* shaders */ = {
 			isa = PBXGroup;
 			children = (
+				B2D4749C1D50F50000C71A33 /* 6959385632856496271.glsl */,
+				B2D4749D1D50F50000C71A33 /* 7762965783345142270.glsl */,
+				B2D4749E1D50F50000C71A33 /* 8854786452444500389.glsl */,
+				B2F8DAC91D50CF68003BA463 /* 10622023203265062212.glsl */,
 				B2F8DAC71D50CD83003BA463 /* 13599876527580594779.glsl */,
+				B2D4749A1D50F50000C71A33 /* 13734954368157190244.glsl */,
+				B2D4749B1D50F50000C71A33 /* 15572183010274844106.glsl */,
 			);
 			path = shaders;
 			sourceTree = "<group>";
