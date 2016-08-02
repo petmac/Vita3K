@@ -733,6 +733,7 @@ enum SceGxmDepthStencilSurfaceType
 struct SceGxmFragmentProgram
 {
     // TODO This is an opaque type.
+    GLuint shader = 0;
 };
 
 enum SceGxmIndexFormat
@@ -1475,6 +1476,41 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     if (!*fragmentProgram)
     {
         return OUT_OF_MEMORY;
+    }
+    
+    SceGxmFragmentProgram *const fp = fragmentProgram->get(mem);
+    fp->shader = glCreateShader(GL_FRAGMENT_SHADER);
+    assert(fp->shader != 0);
+    
+    const GLchar *const source = programId->source.c_str();
+    const GLint length = static_cast<GLint>(programId->source.length());
+    glShaderSource(fp->shader, 1, &source, &length);
+    
+    glCompileShader(fp->shader);
+    
+    GLint log_length = 0;
+    glGetShaderiv(fp->shader, GL_INFO_LOG_LENGTH, &log_length);
+    
+    if (log_length > 0)
+    {
+        std::vector<GLchar> log;
+        log.resize(log_length);
+        glGetShaderInfoLog(fp->shader, log_length, nullptr, &log.front());
+        
+        std::cerr << &log.front() << std::endl;
+    }
+    
+    GLint is_compiled = GL_FALSE;
+    glGetShaderiv(fp->shader, GL_COMPILE_STATUS, &is_compiled);
+    assert(is_compiled != GL_FALSE);
+    if (is_compiled == GL_FALSE)
+    {
+        glDeleteShader(fp->shader);
+        fp->shader = 0;
+        
+        // TODO Free fragmentProgram.
+        
+        return TODO_COMPILE_FAILED;
     }
     
     return SCE_OK;
