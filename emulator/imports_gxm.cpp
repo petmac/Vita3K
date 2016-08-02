@@ -890,16 +890,18 @@ struct SceGxmVertexAttribute
 
 static_assert(sizeof(SceGxmVertexAttribute) == 8, "Structure has been incorrectly packed.");
 
-struct SceGxmVertexProgram
-{
-    // TODO I think this is an opaque type.
-};
-
 struct SceGxmVertexStream
 {
     // https://psp2sdk.github.io/structSceGxmVertexStream.html
     uint16_t stride;
     uint16_t indexSource;
+};
+
+struct SceGxmVertexProgram
+{
+    // TODO I think this is an opaque type.
+    std::vector<SceGxmVertexAttribute> attributes;
+    std::vector<SceGxmVertexStream> streams;
 };
 
 IMP_SIG(sceGxmBeginScene)
@@ -1488,6 +1490,10 @@ IMP_SIG(sceGxmShaderPatcherCreateVertexProgram)
     {
         return OUT_OF_MEMORY;
     }
+    
+    SceGxmVertexProgram *const vp = vertexProgram->get(mem);
+    vp->attributes.assign(&attributes[0], &attributes[attributeCount]);
+    vp->streams.assign(&streams[0], &streams[stack->streamCount]);
     
     return SCE_OK;
 }
