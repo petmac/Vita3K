@@ -11,7 +11,7 @@ enum GxmMemoryAttrib
     SCE_GXM_MEMORY_ATTRIB_RW = 3
 };
 
-enum SceGxmAttributeFormat
+enum SceGxmAttributeFormat : uint8_t
 {
     // https://psp2sdk.github.io/gxm_8h.html
     SCE_GXM_ATTRIBUTE_FORMAT_U8,
@@ -881,13 +881,14 @@ struct SceGxmValidRegion
 struct SceGxmVertexAttribute
 {
     // https://psp2sdk.github.io/structSceGxmVertexAttribute.html
-    // TODO This structure might get oddly padded.
     uint16_t streamIndex;
     uint16_t offset;
     SceGxmAttributeFormat format;
     uint8_t componentCount;
     uint16_t regIndex;
 };
+
+static_assert(sizeof(SceGxmVertexAttribute) == 8, "Structure has been incorrectly packed.");
 
 struct SceGxmVertexProgram
 {
