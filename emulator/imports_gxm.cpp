@@ -837,6 +837,8 @@ struct SceGxmRenderTargetParams
 
 struct SceGxmShaderPatcher
 {
+    // TODO This is an opaque struct.
+    std::map<Ptr<const SceGxmProgram>, GLuint> vertex_shaders;
 };
 
 typedef Ptr<SceGxmRegisteredProgram> SceGxmShaderPatcherId;
@@ -1528,15 +1530,15 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     const SceGxmMultisampleMode multisampleMode = static_cast<SceGxmMultisampleMode>(r3);
     const Stack *const stack = sp.cast<const Stack>().get(mem);
     const SceGxmBlendInfo *const blendInfo = stack->blendInfo.get(mem);
-    const SceGxmProgram *const vertexProgram = stack->vertexProgram.get(mem);
     Ptr<SceGxmFragmentProgram> *const fragmentProgram = stack->fragmentProgram.get(mem);
     assert(shaderPatcher != nullptr);
     assert(programId != 0);
     assert(outputFormat == SCE_GXM_OUTPUT_REGISTER_FORMAT_UCHAR4);
     assert(multisampleMode == SCE_GXM_MULTISAMPLE_NONE);
     assert((blendInfo == nullptr) || (blendInfo != nullptr));
-    assert(vertexProgram != nullptr);
+    assert(stack->vertexProgram);
     assert(fragmentProgram != nullptr);
+    assert(shaderPatcher->vertex_shaders.find(stack->vertexProgram) != shaderPatcher->vertex_shaders.end());
     
     *fragmentProgram = alloc<SceGxmFragmentProgram>(mem, __FUNCTION__);
     assert(*fragmentProgram);
@@ -1602,6 +1604,8 @@ IMP_SIG(sceGxmShaderPatcherCreateVertexProgram)
         
         return TODO_COMPILE_FAILED;
     }
+    
+    shaderPatcher->vertex_shaders[programId->program] = vp->shader;
     
     return SCE_OK;
 }
@@ -1678,6 +1682,7 @@ IMP_SIG(sceGxmShaderPatcherUnregisterProgram)
     assert(shaderPatcher != nullptr);
     assert(programId != nullptr);
     
+    shaderPatcher->vertex_shaders.erase(programId->program);
     programId->program.reset();
     
     // TODO Free programId.
