@@ -5,11 +5,10 @@ uniform mat4 wvp;
 in vec3 aPosition;
 in vec4 aColor;
 
-out vec4 vPosition;
 out vec4 vColor;
 
 void main()
 {
-    vPosition = vec4(aPosition, 1) * wvp;
+    gl_Position = vec4(aPosition, 1) * wvp;
     vColor = aColor;
 }
