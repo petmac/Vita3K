@@ -1641,6 +1641,11 @@ IMP_SIG(sceGxmShaderPatcherReleaseFragmentProgram)
     assert(shaderPatcher != nullptr);
     assert(fragmentProgram != nullptr);
     
+    glDeleteShader(fragmentProgram->shader);
+    fragmentProgram->shader = 0;
+    
+    // TODO Free fragmentProgram.
+    
     return SCE_OK;
 }
 
@@ -1651,6 +1656,11 @@ IMP_SIG(sceGxmShaderPatcherReleaseVertexProgram)
     SceGxmVertexProgram *const vertexProgram = Ptr<SceGxmVertexProgram>(r1).get(&emu->mem);
     assert(shaderPatcher != nullptr);
     assert(vertexProgram != nullptr);
+    
+    glDeleteShader(vertexProgram->shader);
+    vertexProgram->shader = 0;
+    
+    // TODO Free vertexProgram.
     
     return SCE_OK;
 }
@@ -1664,6 +1674,7 @@ IMP_SIG(sceGxmShaderPatcherUnregisterProgram)
     assert(programId != nullptr);
     
     programId->program = nullptr;
+    programId->source.clear();
     
     // TODO Free programId.
     
