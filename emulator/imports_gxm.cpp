@@ -733,7 +733,6 @@ enum SceGxmDepthStencilSurfaceType
 struct SceGxmFragmentProgram
 {
     // TODO This is an opaque type.
-    GLuint shader = 0;
     GLuint program = 0;
 };
 
@@ -1550,9 +1549,9 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     }
     
     SceGxmFragmentProgram *const fp = fragmentProgram->get(mem);
-    fp->shader = create_and_compile_shader(GL_FRAGMENT_SHADER, programId->program.get(mem));
-    assert(fp->shader != 0);
-    if (!fp->shader)
+    GLuint fragment_shader = create_and_compile_shader(GL_FRAGMENT_SHADER, programId->program.get(mem));
+    assert(fragment_shader != 0);
+    if (!fragment_shader)
     {
         // TODO Free fragmentProgram.
         
@@ -1562,8 +1561,8 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     fp->program = glCreateProgram();
     if (!fp->program)
     {
-        glDeleteShader(fp->shader);
-        fp->shader = 0;
+        glDeleteShader(fragment_shader);
+        fragment_shader = 0;
         
         // TODO Free fragmentProgram.
         
@@ -1574,7 +1573,11 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     assert(vertex_shader != shaderPatcher->vertex_shaders.end());
     
     glAttachShader(fp->program, vertex_shader->second);
-    glAttachShader(fp->program, fp->shader);
+    glAttachShader(fp->program, fragment_shader);
+    
+    glDeleteShader(fragment_shader);
+    fragment_shader = 0;
+    
     glLinkProgram(fp->program);
     
     GLint log_length = 0;
@@ -1597,15 +1600,12 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
         glDeleteProgram(fp->program);
         fp->program = 0;
         
-        glDeleteShader(fp->shader);
-        fp->shader = 0;
-        
         // TODO Free fragmentProgram.
         
         return TODO_LINK_PROGRAM_FAILED;
     }
     
-    glDetachShader(fp->program, fp->shader);
+    glDetachShader(fp->program, fragment_shader);
     glDetachShader(fp->program, vertex_shader->second);
     
     return SCE_OK;
@@ -1703,9 +1703,6 @@ IMP_SIG(sceGxmShaderPatcherReleaseFragmentProgram)
     
     glDeleteProgram(fragmentProgram->program);
     fragmentProgram->program = 0;
-    
-    glDeleteShader(fragmentProgram->shader);
-    fragmentProgram->shader = 0;
     
     // TODO Free fragmentProgram.
     
