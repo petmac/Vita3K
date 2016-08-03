@@ -815,8 +815,7 @@ struct SceGxmProgramParameter
 struct SceGxmRegisteredProgram
 {
     // TODO This is an opaque type.
-    const SceGxmProgram *program = nullptr;
-    std::string source;
+    Ptr<const SceGxmProgram> program;
 };
 
 struct SceGxmRenderTarget
@@ -964,6 +963,29 @@ static GLuint create_and_compile_shader(GLenum type, const GLchar *source)
     }
     
     return shader;
+}
+
+static GLuint create_and_compile_shader(GLenum type, const SceGxmProgram *program)
+{
+    const uint64_t hash = fnv1a(program, program->size);
+    std::ostringstream path;
+    path << "shaders/" << hash << ".glsl";
+    
+    std::ifstream is(path.str());
+    if (is.fail())
+    {
+        std::cerr << "Couldn't open '" << path.str() << "' for reading." << std::endl;
+        return TODO_FILE_NOT_FOUND;
+    }
+    
+    is.seekg(0, std::ios::end);
+    const size_t size = is.tellg();
+    is.seekg(0);
+    
+    std::string source(size, ' ');
+    is.read(&source[0], size);
+    
+    return create_and_compile_shader(type, source.c_str());
 }
 
 IMP_SIG(sceGxmBeginScene)
@@ -1524,7 +1546,7 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     }
     
     SceGxmFragmentProgram *const fp = fragmentProgram->get(mem);
-    fp->shader = create_and_compile_shader(GL_FRAGMENT_SHADER, programId->source.c_str());
+    fp->shader = create_and_compile_shader(GL_FRAGMENT_SHADER, programId->program.get(mem));
     assert(fp->shader != 0);
     if (!fp->shader)
     {
@@ -1572,7 +1594,7 @@ IMP_SIG(sceGxmShaderPatcherCreateVertexProgram)
     SceGxmVertexProgram *const vp = vertexProgram->get(mem);
     vp->attributes.assign(&attributes[0], &attributes[attributeCount]);
     vp->streams.assign(&streams[0], &streams[stack->streamCount]);
-    vp->shader = create_and_compile_shader(GL_VERTEX_SHADER, programId->source.c_str());
+    vp->shader = create_and_compile_shader(GL_VERTEX_SHADER, programId->program.get(mem));
     assert(vp->shader != 0);
     if (!vp->shader)
     {
@@ -1597,10 +1619,10 @@ IMP_SIG(sceGxmShaderPatcherRegisterProgram)
 {
     // https://psp2sdk.github.io/gxm_8h.html
     SceGxmShaderPatcher *const shaderPatcher = Ptr<SceGxmShaderPatcher>(r0).get(&emu->mem);
-    const SceGxmProgram *const programHeader = Ptr<const SceGxmProgram>(r1).get(&emu->mem);
+    const Ptr<const SceGxmProgram> programHeader(r1);
     SceGxmShaderPatcherId *const programId = Ptr<SceGxmShaderPatcherId>(r2).get(&emu->mem);
     assert(shaderPatcher != nullptr);
-    assert(programHeader != nullptr);
+    assert(programHeader);
     assert(programId != nullptr);
     
     *programId = alloc<SceGxmRegisteredProgram>(&emu->mem, __FUNCTION__);
@@ -1610,25 +1632,8 @@ IMP_SIG(sceGxmShaderPatcherRegisterProgram)
         return OUT_OF_MEMORY;
     }
     
-    const uint64_t hash = fnv1a(programHeader, programHeader->size);
-    std::ostringstream path;
-    path << "shaders/" << hash << ".glsl";
-    
-    std::ifstream is(path.str());
-    if (is.fail())
-    {
-        std::cerr << "Couldn't open '" << path.str() << "' for reading." << std::endl;
-        return TODO_FILE_NOT_FOUND;
-    }
-    
-    is.seekg(0, std::ios::end);
-    const size_t size = is.tellg();
-    is.seekg(0);
-    
     SceGxmRegisteredProgram *const rp = programId->get(&emu->mem);
     rp->program = programHeader;
-    rp->source.resize(size, ' ');
-    is.read(&rp->source[0], size);
     
     return SCE_OK;
 }
@@ -1673,8 +1678,7 @@ IMP_SIG(sceGxmShaderPatcherUnregisterProgram)
     assert(shaderPatcher != nullptr);
     assert(programId != nullptr);
     
-    programId->program = nullptr;
-    programId->source.clear();
+    programId->program.reset();
     
     // TODO Free programId.
     

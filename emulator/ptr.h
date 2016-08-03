@@ -47,6 +47,11 @@ public:
         }
     }
     
+    void reset()
+    {
+        addr = 0;
+    }
+    
     explicit operator bool() const
     {
         return addr != 0;
@@ -63,6 +68,12 @@ template <class T>
 Ptr<T> operator+(const Ptr<T> &base, int32_t offset)
 {
     return Ptr<T>(base.address() + (offset * sizeof(T)));
+}
+
+template <class T, class U>
+bool operator<(const Ptr<T> &a, const Ptr<U> &b)
+{
+    return a.address() < b.address();
 }
 
 template <class T>
