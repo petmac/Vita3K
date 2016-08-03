@@ -815,6 +815,7 @@ struct SceGxmProgramParameter
 struct SceGxmRegisteredProgram
 {
     // TODO This is an opaque type.
+    const SceGxmProgram *program = nullptr;
     std::string source;
 };
 
@@ -1625,6 +1626,7 @@ IMP_SIG(sceGxmShaderPatcherRegisterProgram)
     is.seekg(0);
     
     SceGxmRegisteredProgram *const rp = programId->get(&emu->mem);
+    rp->program = programHeader;
     rp->source.resize(size, ' ');
     is.read(&rp->source[0], size);
     
@@ -1660,6 +1662,10 @@ IMP_SIG(sceGxmShaderPatcherUnregisterProgram)
     SceGxmRegisteredProgram *const programId = SceGxmShaderPatcherId(r1).get(&emu->mem);
     assert(shaderPatcher != nullptr);
     assert(programId != nullptr);
+    
+    programId->program = nullptr;
+    
+    // TODO Free programId.
     
     return SCE_OK;
 }
