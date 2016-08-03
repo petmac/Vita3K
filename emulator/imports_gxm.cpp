@@ -734,6 +734,7 @@ struct SceGxmFragmentProgram
 {
     // TODO This is an opaque type.
     GLuint shader = 0;
+    GLuint program = 0;
 };
 
 enum SceGxmIndexFormat
@@ -835,10 +836,12 @@ struct SceGxmRenderTargetParams
     SceUID driverMemBlock = SCE_UID_INVALID_UID;
 };
 
+typedef std::map<Ptr<const SceGxmProgram>, GLuint> ProgramToVertexShader;
+
 struct SceGxmShaderPatcher
 {
     // TODO This is an opaque struct.
-    std::map<Ptr<const SceGxmProgram>, GLuint> vertex_shaders;
+    ProgramToVertexShader vertex_shaders;
 };
 
 typedef Ptr<SceGxmRegisteredProgram> SceGxmShaderPatcherId;
@@ -1538,7 +1541,6 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     assert((blendInfo == nullptr) || (blendInfo != nullptr));
     assert(stack->vertexProgram);
     assert(fragmentProgram != nullptr);
-    assert(shaderPatcher->vertex_shaders.find(stack->vertexProgram) != shaderPatcher->vertex_shaders.end());
     
     *fragmentProgram = alloc<SceGxmFragmentProgram>(mem, __FUNCTION__);
     assert(*fragmentProgram);
@@ -1556,6 +1558,55 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
         
         return TODO_COMPILE_FAILED;
     }
+    
+    fp->program = glCreateProgram();
+    if (!fp->program)
+    {
+        glDeleteShader(fp->shader);
+        fp->shader = 0;
+        
+        // TODO Free fragmentProgram.
+        
+        return TODO_CREATE_PROGRAM_FAILED;
+    }
+    
+    const ProgramToVertexShader::const_iterator vertex_shader = shaderPatcher->vertex_shaders.find(stack->vertexProgram);
+    assert(vertex_shader != shaderPatcher->vertex_shaders.end());
+    
+    glAttachShader(fp->program, vertex_shader->second);
+    glAttachShader(fp->program, fp->shader);
+    glLinkProgram(fp->program);
+    
+    GLint log_length = 0;
+    glGetProgramiv(fp->program, GL_INFO_LOG_LENGTH, &log_length);
+    
+    if (log_length > 0)
+    {
+        std::vector<GLchar> log;
+        log.resize(log_length);
+        glGetProgramInfoLog(fp->program, log_length, nullptr, &log.front());
+        
+        std::cerr << &log.front() << std::endl;
+    }
+    
+    GLint is_linked = GL_FALSE;
+    glGetProgramiv(fp->program, GL_LINK_STATUS, &is_linked);
+    assert(is_linked != GL_FALSE);
+    if (is_linked == GL_FALSE)
+    {
+        glDeleteProgram(fp->program);
+        fp->program = 0;
+        
+        glDeleteShader(fp->shader);
+        fp->shader = 0;
+        
+        // TODO Free fragmentProgram.
+        
+        return TODO_LINK_PROGRAM_FAILED;
+    }
+    
+    glDetachShader(fp->program, fp->shader);
+    glDetachShader(fp->program, vertex_shader->second);
     
     return SCE_OK;
 }
@@ -1649,6 +1700,9 @@ IMP_SIG(sceGxmShaderPatcherReleaseFragmentProgram)
     SceGxmFragmentProgram *const fragmentProgram = Ptr<SceGxmFragmentProgram>(r1).get(&emu->mem);
     assert(shaderPatcher != nullptr);
     assert(fragmentProgram != nullptr);
+    
+    glDeleteProgram(fragmentProgram->program);
+    fragmentProgram->program = 0;
     
     glDeleteShader(fragmentProgram->shader);
     fragmentProgram->shader = 0;
