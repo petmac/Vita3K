@@ -891,7 +891,7 @@ struct SceGxmVertexAttribute
     uint16_t offset;
     SceGxmAttributeFormat format;
     uint8_t componentCount;
-    uint16_t regIndex;
+    uint16_t regIndex; // Returned from sceGxmProgramParameterGetResourceIndex().
 };
 
 static_assert(sizeof(SceGxmVertexAttribute) == 8, "Structure has been incorrectly packed.");
