@@ -423,7 +423,9 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
+				PATH = "${inherited}:${VITASDK}/bin";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VITASDK = "${HOME}/vitasdk";
 			};
 			name = Debug;
 		};
@@ -433,7 +435,9 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
+				PATH = "${inherited}:${VITASDK}/bin";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VITASDK = "${HOME}/vitasdk";
 			};
 			name = Release;
 		};
