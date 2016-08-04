@@ -15,7 +15,12 @@ int main(int argc, char *argv[]) {
 		output << s;
 	}
 	output << std::endl;
-	printf("%s\n", output.str().c_str());
+    FILE *fp = fopen("ux0:/data/hello.txt", "w");
+    if (fp)
+    {
+        fprintf(fp, "%s\n", output.str().c_str());
+        fclose(fp);
+    }
 	sceKernelExitProcess(0);
     return 0;
 }
