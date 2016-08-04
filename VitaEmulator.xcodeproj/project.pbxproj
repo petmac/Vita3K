@@ -251,6 +251,20 @@
 /* End PBXGroup section */
 
 /* Begin PBXLegacyTarget section */
+		C10B22BB1D53E94F00EEA230 /* NativeTool */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = C10B22BC1D53E94F00EEA230 /* Build configuration list for PBXLegacyTarget "NativeTool" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "${PROJECT_DIR}/native-tool";
+			dependencies = (
+			);
+			name = NativeTool;
+			passBuildSettingsInEnvironment = 1;
+			productName = NativeTool;
+		};
 		C167A8F21D00E78500AD05D5 /* Unicorn */ = {
 			isa = PBXLegacyTarget;
 			buildArgumentsString = "$(ACTION)";
@@ -311,6 +325,9 @@
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Peter Mackay";
 				TargetAttributes = {
+					C10B22BB1D53E94F00EEA230 = {
+						CreatedOnToolsVersion = 7.0;
+					};
 					C12143781D000FEE00702861 = {
 						CreatedOnToolsVersion = 7.0;
 					};
@@ -338,6 +355,7 @@
 				C12143781D000FEE00702861 /* VitaEmulator */,
 				C167A8F21D00E78500AD05D5 /* Unicorn */,
 				C1AD18E81D07809D00064A1F /* Capstone */,
+				C10B22BB1D53E94F00EEA230 /* NativeTool */,
 			);
 		};
 /* End PBXProject section */
@@ -396,6 +414,29 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		C10B22BD1D53E94F00EEA230 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		C10B22BE1D53E94F00EEA230 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		C121438B1D000FEE00702861 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -604,6 +645,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		C10B22BC1D53E94F00EEA230 /* Build configuration list for PBXLegacyTarget "NativeTool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C10B22BD1D53E94F00EEA230 /* Debug */,
+				C10B22BE1D53E94F00EEA230 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		C12143741D000FEE00702861 /* Build configuration list for PBXProject "VitaEmulator" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
