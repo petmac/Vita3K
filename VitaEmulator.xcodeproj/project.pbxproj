@@ -708,6 +708,7 @@
 				C10B22BE1D53E94F00EEA230 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		C12143741D000FEE00702861 /* Build configuration list for PBXProject "VitaEmulator" */ = {
 			isa = XCConfigurationList;
