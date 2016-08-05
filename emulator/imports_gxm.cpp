@@ -789,28 +789,33 @@ enum SceGxmPrimitiveType
     SCE_GXM_PRIMITIVE_TRIANGLE_EDGES = 0x14000000
 };
 
-// For debugging/reversing.
-union Unknown
-{
-    uint8_t unknown8[1024];
-    uint16_t unknown16[512];
-    uint32_t unknown32[256];
-};
-
 struct SceGxmProgram
 {
-    // TODO This is an opaque struct.
     char magic[4];
     char maybe_version[2];
     char maybe_padding[2];
     uint32_t size;
-    Unknown unknown;
+    uint8_t unknown1[8];
+    uint16_t maybe_type;
+    uint16_t unknown2[7];
+    uint32_t parameter_count;
+    uint32_t parameters_offset; // Number of bytes from the start of this field to the first parameter.
 };
 
 struct SceGxmProgramParameter
 {
-    // TODO Reverse engineer SceGxmProgram.
+    int32_t name_offset; // Number of bytes from the start of this structure to the name string.
+    uint8_t category;
+    uint8_t container_index : 4;
+    uint8_t component_count : 4;
+    uint8_t unknown1[2];
+    uint8_t array_size;
+    uint8_t unknown2[3];
+    uint8_t resource_index;
+    uint8_t unknown3[3];
 };
+
+static_assert(sizeof(SceGxmProgramParameter) == 16, "Incorrect structure layout.");
 
 struct SceGxmRegisteredProgram
 {
@@ -1367,14 +1372,26 @@ IMP_SIG(sceGxmProgramCheck)
 
 IMP_SIG(sceGxmProgramFindParameterByName)
 {
-    const SceGxmProgram *const program = Ptr<const SceGxmProgram>(r0).get(&emu->mem);
-    const char *const name = Ptr<const char>(r1).get(&emu->mem);
+    const MemState *const mem = &emu->mem;
+    const SceGxmProgram *const program = Ptr<const SceGxmProgram>(r0).get(mem);
+    const char *const name = Ptr<const char>(r1).get(mem);
     assert(program != nullptr);
     assert(name != nullptr);
     
-    // TODO Reverse engineer SceGxmProgram!
-    // TODO This is a SceGxmProgramParameter *.
-    return r0;
+    const SceGxmProgramParameter *const parameters = reinterpret_cast<const SceGxmProgramParameter *>(reinterpret_cast<const uint8_t *>(&program->parameters_offset) + program->parameters_offset);
+    for (int i = 0; i < program->parameter_count; ++i)
+    {
+        const SceGxmProgramParameter *const parameter = &parameters[i];
+        const uint8_t *const parameter_bytes = reinterpret_cast<const uint8_t *>(parameter);
+        const char *const parameter_name = reinterpret_cast<const char *>(parameter_bytes + parameter->name_offset);
+        if (strcmp(parameter_name, name) == 0)
+        {
+            const Address parameter_address = static_cast<Address>(parameter_bytes - &mem->memory[0]);
+            return parameter_address;
+        }
+    }
+    
+    return Ptr<SceGxmProgramParameter>().address();
 }
 
 IMP_SIG(sceGxmProgramParameterGetResourceIndex)
@@ -1383,8 +1400,7 @@ IMP_SIG(sceGxmProgramParameterGetResourceIndex)
     const SceGxmProgramParameter *const parameter = Ptr<const SceGxmProgramParameter>(r0).get(&emu->mem);
     assert(parameter != nullptr);
     
-    // TODO Reverse engineer SceGxmProgramParameter.
-    return 0;
+    return parameter->resource_index;
 }
 
 IMP_SIG(sceGxmReserveFragmentDefaultUniformBuffer)
