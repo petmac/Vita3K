@@ -697,9 +697,9 @@ struct SceGxmContext
 {
     // This is an opaque type.
     SceGxmContextParams params;
-    SDL_GLContext gl;
-    size_t fragment_ring_buffer_used;
-    size_t vertex_ring_buffer_used;
+    SDL_GLContext gl = nullptr;
+    size_t fragment_ring_buffer_used = 0;
+    size_t vertex_ring_buffer_used = 0;
     SceGxmColorSurface color_surface;
 };
 
