@@ -71,7 +71,7 @@
 		B2D4749E1D50F50000C71A33 /* 8854786452444500389.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 8854786452444500389.glsl; sourceTree = "<group>"; };
 		B2F8DAC71D50CD83003BA463 /* 13599876527580594779.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 13599876527580594779.glsl; sourceTree = "<group>"; };
 		B2F8DAC91D50CF68003BA463 /* 10622023203265062212.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = 10622023203265062212.glsl; sourceTree = "<group>"; };
-		C10B22C01D53EEC500EEA230 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		C10B22C01D53EEC500EEA230 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; usesTabs = 1; };
 		C10B22C31D53EEC500EEA230 /* icon0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon0.png; sourceTree = "<group>"; };
 		C10B22C61D53EEC500EEA230 /* bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bg.png; sourceTree = "<group>"; };
 		C10B22C71D53EEC500EEA230 /* startup.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = startup.png; sourceTree = "<group>"; };
