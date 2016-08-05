@@ -936,6 +936,15 @@ static uint64_t fnv1a(const void *data, size_t size)
     return result;
 }
 
+static void check()
+{
+    for (GLenum error = glGetError(); error != GL_NO_ERROR; error = glGetError())
+    {
+        std::cerr << "OpenGL error 0x" << std::hex << error << std::dec << std::endl;
+        assert(false);
+    }
+}
+
 static GLuint create_and_compile_shader(GLenum type, const GLchar *source)
 {
     GLuint shader = glCreateShader(type);
@@ -946,26 +955,33 @@ static GLuint create_and_compile_shader(GLenum type, const GLchar *source)
     
     const GLint length = static_cast<GLint>(strlen(source));
     glShaderSource(shader, 1, &source, &length);
+    check();
+    
     glCompileShader(shader);
+    check();
     
     GLint log_length = 0;
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_length);
+    check();
     
     if (log_length > 0)
     {
         std::vector<GLchar> log;
         log.resize(log_length);
         glGetShaderInfoLog(shader, log_length, nullptr, &log.front());
+        check();
         
         std::cerr << &log.front() << std::endl;
     }
     
     GLint is_compiled = GL_FALSE;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &is_compiled);
+    check();
     assert(is_compiled != GL_FALSE);
     if (is_compiled == GL_FALSE)
     {
         glDeleteShader(shader);
+        check();
         shader = 0;
         
         return 0;
@@ -1031,6 +1047,7 @@ IMP_SIG(sceGxmBeginScene)
     
     // TODO This is just for debugging.
     glClear(GL_COLOR_BUFFER_BIT);
+    check();
     
     return SCE_OK;
 }
@@ -1097,15 +1114,26 @@ IMP_SIG(sceGxmCreateContext)
     assert(ctx->gl != nullptr);
     
     std::cout << "GL_VERSION = " << glGetString(GL_VERSION) << std::endl;
+    check();
+    
     std::cout << "GL_SHADING_LANGUAGE_VERSION = " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+    check();
     
     if (glewInit() != GLEW_OK)
     {
         return TODO_GLEW_INIT_FAILED;
     }
     
+    // Clear any errors caused by GLEW.
+    while (glGetError() != GL_NO_ERROR)
+    {
+    }
+    
+    check();
+    
     // TODO This is just for debugging.
     glClearColor(0.0625f, 0.125f, 0.25f, 0);
+    check();
     
     return SCE_OK;
 }
@@ -1276,7 +1304,9 @@ IMP_SIG(sceGxmEndScene)
     const Address data = context->color_surface.pbeEmitWords[CSEM_DATA];
     void *const pixels = Ptr<void>(data).get(mem);
     glPixelStorei(GL_PACK_ROW_LENGTH, stride_in_pixels);
+    check();
     glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    check();
     
     return SCE_OK;
 }
@@ -1457,6 +1487,7 @@ IMP_SIG(sceGxmSetFragmentProgram)
     
     assert(fragmentProgram->program != 0);
     glUseProgram(fragmentProgram->program);
+    check();
     
     return ImportResult();
 }
@@ -1492,19 +1523,23 @@ IMP_SIG(sceGxmSetUniformDataF)
     
     GLint program = 0;
     glGetIntegerv(GL_CURRENT_PROGRAM, &program);
+    check();
     assert(program != 0);
     
     const GLint location = glGetUniformLocation(program, name);
+    check();
     assert(location >= 0);
     
     switch (componentCount)
     {
         case 4:
             glUniform4fv(location, 1, sourceData);
+            check();
             break;
             
         case 16:
             glUniformMatrix4fv(location, 1, GL_FALSE, sourceData);
+            check();
             break;
             
         default:
@@ -1602,9 +1637,11 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     }
     
     fp->program = glCreateProgram();
+    check();
     if (!fp->program)
     {
         glDeleteShader(fragment_shader);
+        check();
         fragment_shader = 0;
         
         // TODO Free fragmentProgram.
@@ -1616,28 +1653,35 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     assert(vertex_shader != shaderPatcher->vertex_shaders.end());
     
     glAttachShader(fp->program, vertex_shader->second);
+    check();
     glAttachShader(fp->program, fragment_shader);
+    check();
     
     glLinkProgram(fp->program);
+    check();
     
     GLint log_length = 0;
     glGetProgramiv(fp->program, GL_INFO_LOG_LENGTH, &log_length);
+    check();
     
     if (log_length > 0)
     {
         std::vector<GLchar> log;
         log.resize(log_length);
         glGetProgramInfoLog(fp->program, log_length, nullptr, &log.front());
+        check();
         
         std::cerr << &log.front() << std::endl;
     }
     
     GLint is_linked = GL_FALSE;
     glGetProgramiv(fp->program, GL_LINK_STATUS, &is_linked);
+    check();
     assert(is_linked != GL_FALSE);
     if (is_linked == GL_FALSE)
     {
         glDeleteProgram(fp->program);
+        check();
         fp->program = 0;
         
         // TODO Free fragmentProgram.
@@ -1646,9 +1690,12 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     }
     
     glDetachShader(fp->program, fragment_shader);
+    check();
     glDetachShader(fp->program, vertex_shader->second);
+    check();
     
     glDeleteShader(fragment_shader);
+    check();
     fragment_shader = 0;
     
     return SCE_OK;
@@ -1745,6 +1792,7 @@ IMP_SIG(sceGxmShaderPatcherReleaseFragmentProgram)
     assert(fragmentProgram != nullptr);
     
     glDeleteProgram(fragmentProgram->program);
+    check();
     fragmentProgram->program = 0;
     
     // TODO Free fragmentProgram.
@@ -1761,6 +1809,7 @@ IMP_SIG(sceGxmShaderPatcherReleaseVertexProgram)
     assert(vertexProgram != nullptr);
     
     glDeleteShader(vertexProgram->shader);
+    check();
     vertexProgram->shader = 0;
     
     // TODO Free vertexProgram.
