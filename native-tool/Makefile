@@ -44,7 +44,7 @@ $(PROJECT).velf: $(PROJECT).elf
 	vita-elf-create $< $@
 
 $(PROJECT).elf: $(OBJS)
-	$(CXX) -Wl,-q -o $@ $^
+	$(CXX) -Wl,-q -o $@ $^ -lSceGxm_stub
 
 $(OBJ_DIRS):
 	mkdir -p $@
