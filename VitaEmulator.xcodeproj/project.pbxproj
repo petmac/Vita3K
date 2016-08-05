@@ -112,6 +112,13 @@
 		C1B13F7D1D38C2AD00571DBA /* imports_uvl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imports_uvl.cpp; sourceTree = "<group>"; };
 		C1B4A0431D02FFFC00F53D2C /* mem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mem.cpp; sourceTree = "<group>"; };
 		C1B4A0441D02FFFC00F53D2C /* mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mem.h; sourceTree = "<group>"; };
+		C1B810291D546D04006EB8AD /* clear_f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = clear_f.h; sourceTree = "<group>"; };
+		C1B8102A1D546D04006EB8AD /* clear_v.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = clear_v.h; sourceTree = "<group>"; };
+		C1B8102B1D546D04006EB8AD /* color_f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = color_f.h; sourceTree = "<group>"; };
+		C1B8102C1D546D04006EB8AD /* color_v.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = color_v.h; sourceTree = "<group>"; };
+		C1B8102D1D546D04006EB8AD /* texture_f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = texture_f.h; sourceTree = "<group>"; };
+		C1B8102E1D546D04006EB8AD /* texture_tint_f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = texture_tint_f.h; sourceTree = "<group>"; };
+		C1B8102F1D546D04006EB8AD /* texture_v.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = texture_v.h; sourceTree = "<group>"; };
 		C1C845971D3FE26D005D8135 /* trampoline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = trampoline.cpp; sourceTree = "<group>"; };
 		C1C845981D3FE26D005D8135 /* trampoline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = trampoline.h; sourceTree = "<group>"; };
 		C1C8459A1D4132DC005D8135 /* import_result.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = import_result.cpp; sourceTree = "<group>"; };
@@ -197,6 +204,7 @@
 		C10B22C91D53EEC500EEA230 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				C1B810211D546B6F006EB8AD /* shaders */,
 				C10B22CA1D53EEC500EEA230 /* main.cpp */,
 			);
 			path = src;
@@ -298,6 +306,20 @@
 				C1EA5B7C1D17CBF2000CE42E /* unimplemented.cpp */,
 			);
 			path = emulator;
+			sourceTree = "<group>";
+		};
+		C1B810211D546B6F006EB8AD /* shaders */ = {
+			isa = PBXGroup;
+			children = (
+				C1B810291D546D04006EB8AD /* clear_f.h */,
+				C1B8102A1D546D04006EB8AD /* clear_v.h */,
+				C1B8102B1D546D04006EB8AD /* color_f.h */,
+				C1B8102C1D546D04006EB8AD /* color_v.h */,
+				C1B8102D1D546D04006EB8AD /* texture_f.h */,
+				C1B8102E1D546D04006EB8AD /* texture_tint_f.h */,
+				C1B8102F1D546D04006EB8AD /* texture_v.h */,
+			);
+			path = shaders;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

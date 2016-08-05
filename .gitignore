@@ -1,8 +1,8 @@
 xcuserdata/
 native-tool/out/
+native-tool/src/shaders/*.h
 native-tool/eboot.bin
 native-tool/param.sfo
 native-tool/*.elf
 native-tool/*.velf
 native-tool/*.vpk
-

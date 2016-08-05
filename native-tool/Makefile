@@ -13,10 +13,13 @@ CXXFLAGS += -std=c++11
 
 SRC_C :=$(call rwildcard, src/, *.c)
 SRC_CPP :=$(call rwildcard, src/, *.cpp)
+SRC_GXP :=$(call rwildcard, src/, *.gxp)
 
 OBJ_DIRS := $(addprefix out/, $(dir $(SRC_C:src/%.c=%.o))) $(addprefix out/, $(dir $(SRC_CPP:src/%.cpp=%.o)))
 OBJS := $(addprefix out/, $(SRC_C:src/%.c=%.o)) $(addprefix out/, $(SRC_CPP:src/%.cpp=%.o))
+GXP_HS := $(SRC_GXP:%.gxp=%.h)
 
+.SECONDARY: $(GXP_HS)
 
 all: package
 
@@ -46,12 +49,16 @@ $(PROJECT).elf: $(OBJS)
 $(OBJ_DIRS):
 	mkdir -p $@
 
-out/%.o : src/%.cpp | $(OBJ_DIRS)
+out/%.o : src/%.cpp | $(OBJ_DIRS) $(GXP_HS)
+	echo $(SRC_GXP)
 	arm-vita-eabi-g++ -c $(CXXFLAGS) -o $@ $<
 
-out/%.o : src/%.c | $(OBJ_DIRS)
+out/%.o : src/%.c | $(OBJ_DIRS) $(GXP_HS)
 	arm-vita-eabi-g++ -c -o $@ $<
 
+%.h : %.gxp
+	xxd -i <$< >$@
+
 clean:
-	rm -f $(PROJECT).velf $(PROJECT).elf $(PROJECT).vpk param.sfo eboot.bin $(OBJS)
+	rm -f $(PROJECT).velf $(PROJECT).elf $(PROJECT).vpk param.sfo eboot.bin $(OBJS) $(GXP_HS)
 	rm -r $(abspath $(OBJ_DIRS))
