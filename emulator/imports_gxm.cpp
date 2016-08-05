@@ -1618,9 +1618,6 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     glAttachShader(fp->program, vertex_shader->second);
     glAttachShader(fp->program, fragment_shader);
     
-    glDeleteShader(fragment_shader);
-    fragment_shader = 0;
-    
     glLinkProgram(fp->program);
     
     GLint log_length = 0;
@@ -1650,6 +1647,9 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     
     glDetachShader(fp->program, fragment_shader);
     glDetachShader(fp->program, vertex_shader->second);
+    
+    glDeleteShader(fragment_shader);
+    fragment_shader = 0;
     
     return SCE_OK;
 }
