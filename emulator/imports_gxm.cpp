@@ -1455,6 +1455,9 @@ IMP_SIG(sceGxmSetFragmentProgram)
     assert(context != nullptr);
     assert(fragmentProgram != nullptr);
     
+    assert(fragmentProgram->program != 0);
+    glUseProgram(fragmentProgram->program);
+    
     return ImportResult();
 }
 
