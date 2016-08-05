@@ -119,6 +119,7 @@
 		C1B8102D1D546D04006EB8AD /* texture_f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = texture_f.h; sourceTree = "<group>"; };
 		C1B8102E1D546D04006EB8AD /* texture_tint_f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = texture_tint_f.h; sourceTree = "<group>"; };
 		C1B8102F1D546D04006EB8AD /* texture_v.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = texture_v.h; sourceTree = "<group>"; };
+		C1B810301D54BDA1006EB8AD /* shaders.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shaders.h; sourceTree = "<group>"; };
 		C1C845971D3FE26D005D8135 /* trampoline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = trampoline.cpp; sourceTree = "<group>"; };
 		C1C845981D3FE26D005D8135 /* trampoline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = trampoline.h; sourceTree = "<group>"; };
 		C1C8459A1D4132DC005D8135 /* import_result.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = import_result.cpp; sourceTree = "<group>"; };
@@ -206,6 +207,7 @@
 			children = (
 				C1B810211D546B6F006EB8AD /* shaders */,
 				C10B22CA1D53EEC500EEA230 /* main.cpp */,
+				C1B810301D54BDA1006EB8AD /* shaders.h */,
 			);
 			path = src;
 			sourceTree = "<group>";

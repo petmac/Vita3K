@@ -3,9 +3,39 @@
 
 #include <stdio.h>
 
+static const uint8_t clear_f_gxp[] =
+{
+#include "shaders/clear_f.h"
+};
+
 static const uint8_t clear_v_gxp[] =
 {
 #include "shaders/clear_v.h"
+};
+
+static const uint8_t color_f_gxp[] =
+{
+#include "shaders/color_f.h"
+};
+
+static const uint8_t color_v_gxp[] =
+{
+#include "shaders/color_v.h"
+};
+
+static const uint8_t texture_f_gxp[] =
+{
+#include "shaders/texture_f.h"
+};
+
+static const uint8_t texture_tint_f_gxp[] =
+{
+#include "shaders/texture_tint_f.h"
+};
+
+static const uint8_t texture_v_gxp[] =
+{
+#include "shaders/texture_v.h"
 };
 
 static void check(int result, const char *function, FILE *fp)
@@ -80,7 +110,9 @@ int main(int argc, char *argv[])
     params.parameterBufferSize = SCE_GXM_DEFAULT_PARAMETER_BUFFER_SIZE;
     
     check(sceGxmInitialize(&params), "sceGxmInitialize", fp);
-    dump(fp, reinterpret_cast<const SceGxmProgram *>(clear_v_gxp), "clear_v");
+#define SHADER(name) dump(fp, reinterpret_cast<const SceGxmProgram *>(name##_gxp), #name);
+#include "shaders.h"
+#undef SHADER
     
     fprintf(fp, "Exiting normally.\n");
     fclose(fp);
