@@ -1478,15 +1478,39 @@ IMP_SIG(sceGxmSetUniformDataF)
 {
     // https://psp2sdk.github.io/gxm_8h.html
     const Ptr<void> uniformBuffer(r0);
-    const Ptr<const SceGxmProgramParameter> parameter(r1);
+    const SceGxmProgramParameter *const parameter = Ptr<const SceGxmProgramParameter>(r1).get(&emu->mem);
     const uint32_t componentOffset = r2;
     const uint32_t componentCount = r3;
-    const Ptr<const float> sourceData = *sp.cast<Ptr<const float>>().get(&emu->mem);
+    const float *const sourceData = sp.cast<Ptr<const float>>().get(&emu->mem)->get(&emu->mem);
     assert(uniformBuffer);
-    assert(parameter);
-    (void)componentOffset;
+    assert(parameter != nullptr);
+    assert(componentOffset == 0);
     assert(componentCount > 0);
-    assert(sourceData);
+    assert(sourceData != nullptr);
+    
+    const char *const name = reinterpret_cast<const char *>(parameter) + parameter->name_offset;
+    
+    GLint program = 0;
+    glGetIntegerv(GL_CURRENT_PROGRAM, &program);
+    assert(program != 0);
+    
+    const GLint location = glGetUniformLocation(program, name);
+    assert(location >= 0);
+    
+    switch (componentCount)
+    {
+        case 4:
+            glUniform4fv(location, 1, sourceData);
+            break;
+            
+        case 16:
+            glUniformMatrix4fv(location, 1, GL_FALSE, sourceData);
+            break;
+            
+        default:
+            assert(!"Unhandled component count.");
+            break;
+    }
     
     return SCE_OK;
 }
