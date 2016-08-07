@@ -4,6 +4,7 @@
 #include <SDL2/SDL_video.h>
 #include <unicorn/unicorn.h>
 
+#include <array>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -701,6 +702,7 @@ struct SceGxmContext
     size_t fragment_ring_buffer_used = 0;
     size_t vertex_ring_buffer_used = 0;
     SceGxmColorSurface color_surface;
+    std::array<const void *, 4> stream_data; // TODO Should this be in the vertex program?
 };
 
 enum SceGxmDepthStencilFormat
@@ -915,9 +917,9 @@ struct SceGxmVertexStream
 struct SceGxmVertexProgram
 {
     // TODO I think this is an opaque type.
-    std::vector<SceGxmVertexAttribute> attributes;
-    std::vector<SceGxmVertexStream> streams;
     GLuint shader = 0;
+    std::array<GLuint, 4> stream_vbos;
+    GLuint vao = 0;
 };
 
 // https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1a_hash
@@ -1011,6 +1013,69 @@ static GLuint create_and_compile_shader(GLenum type, const SceGxmProgram *progra
     is.read(&source[0], size);
     
     return create_and_compile_shader(type, source.c_str());
+}
+
+static GLenum attribute_format_to_gl_type(SceGxmAttributeFormat format)
+{
+    switch (format) {
+        case SCE_GXM_ATTRIBUTE_FORMAT_U8:
+        case SCE_GXM_ATTRIBUTE_FORMAT_U8N:
+            return GL_UNSIGNED_BYTE;
+        case SCE_GXM_ATTRIBUTE_FORMAT_S8:
+        case SCE_GXM_ATTRIBUTE_FORMAT_S8N:
+            return GL_BYTE;
+        case SCE_GXM_ATTRIBUTE_FORMAT_U16:
+        case SCE_GXM_ATTRIBUTE_FORMAT_U16N:
+            return GL_UNSIGNED_SHORT;
+        case SCE_GXM_ATTRIBUTE_FORMAT_S16:
+        case SCE_GXM_ATTRIBUTE_FORMAT_S16N:
+            return GL_SHORT;
+        case SCE_GXM_ATTRIBUTE_FORMAT_F16:
+            return GL_HALF_FLOAT;
+        case SCE_GXM_ATTRIBUTE_FORMAT_F32:
+            return GL_FLOAT;
+            
+        default:
+            assert(!"Unhandled format.");
+            return GL_UNSIGNED_BYTE;
+    }
+}
+
+static bool attribute_format_normalised(SceGxmAttributeFormat format)
+{
+    switch (format) {
+        case SCE_GXM_ATTRIBUTE_FORMAT_U8N:
+        case SCE_GXM_ATTRIBUTE_FORMAT_S8N:
+        case SCE_GXM_ATTRIBUTE_FORMAT_U16N:
+        case SCE_GXM_ATTRIBUTE_FORMAT_S16N:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static GLsizei compute_vertex_count(SceGxmIndexFormat type, const void *data, GLsizei index_count)
+{
+    if (index_count == 0)
+    {
+        return 0;
+    }
+    else if (data == nullptr)
+    {
+        return index_count;
+    }
+    else if (type == SCE_GXM_INDEX_FORMAT_U16)
+    {
+        const uint16_t *const begin = static_cast<const uint16_t *>(data);
+        const uint16_t *const end = begin + index_count;
+        return *std::max_element(begin, end);
+    }
+    else
+    {
+        const uint32_t *const begin = static_cast<const uint32_t *>(data);
+        const uint32_t *const end = begin + index_count;
+        return *std::max_element(begin, end);
+    }
 }
 
 IMP_SIG(sceGxmBeginScene)
@@ -1119,6 +1184,7 @@ IMP_SIG(sceGxmCreateContext)
     std::cout << "GL_SHADING_LANGUAGE_VERSION = " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
     check();
     
+    glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK)
     {
         return TODO_GLEW_INIT_FAILED;
@@ -1128,7 +1194,6 @@ IMP_SIG(sceGxmCreateContext)
     while (glGetError() != GL_NO_ERROR)
     {
     }
-    
     check();
     
     // TODO This is just for debugging.
@@ -1283,6 +1348,20 @@ IMP_SIG(sceGxmDraw)
     assert(indexType == SCE_GXM_INDEX_FORMAT_U16);
     assert(indexData != nullptr);
     assert(indexCount > 0);
+    
+    GLint stride = 0;
+    glGetIntegerv(GL_VERTEX_ATTRIB_ARRAY_STRIDE, &stride);
+    check();
+    
+    const GLsizei vertex_count = compute_vertex_count(indexType, indexData, indexCount);
+    const GLsizei size = stride * vertex_count;
+    glBufferData(GL_ARRAY_BUFFER, size, context->stream_data[0], GL_STREAM_DRAW);
+    check();
+    
+    const GLenum mode = primType == SCE_GXM_PRIMITIVE_TRIANGLES ? GL_TRIANGLES : GL_TRIANGLE_STRIP;
+    const GLenum type = indexType == SCE_GXM_INDEX_FORMAT_U16 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+    glDrawElements(mode, indexCount, type, indexData);
+    check();
     
     return SCE_OK;
 }
@@ -1558,6 +1637,9 @@ IMP_SIG(sceGxmSetVertexProgram)
     assert(context != nullptr);
     assert(vertexProgram != nullptr);
     
+    glBindVertexArray(vertexProgram->vao);
+    check();
+    
     return SCE_OK;
 }
 
@@ -1571,6 +1653,8 @@ IMP_SIG(sceGxmSetVertexStream)
     assert(context != nullptr);
     assert(streamIndex == 0);
     assert(streamData != nullptr);
+    
+    context->stream_data[streamIndex] = streamData;
     
     return SCE_OK;
 }
@@ -1735,8 +1819,6 @@ IMP_SIG(sceGxmShaderPatcherCreateVertexProgram)
     }
     
     SceGxmVertexProgram *const vp = vertexProgram->get(mem);
-    vp->attributes.assign(&attributes[0], &attributes[attributeCount]);
-    vp->streams.assign(&streams[0], &streams[stack->streamCount]);
     vp->shader = create_and_compile_shader(GL_VERTEX_SHADER, programId->program.get(mem));
     assert(vp->shader != 0);
     if (!vp->shader)
@@ -1745,6 +1827,62 @@ IMP_SIG(sceGxmShaderPatcherCreateVertexProgram)
         
         return TODO_COMPILE_FAILED;
     }
+    
+    vp->stream_vbos.fill(0);
+    glGenBuffers(static_cast<GLsizei>(vp->stream_vbos.size()), &vp->stream_vbos[0]);
+    check();
+    if (vp->stream_vbos[0] == 0)
+    {
+        glDeleteShader(vp->shader);
+        vp->shader = 0;
+        
+        // TODO Free vertexProgram.
+        
+        return OUT_OF_MEMORY;
+    }
+    
+    glGenVertexArrays(1, &vp->vao);
+    check();
+    if (vp->vao == 0)
+    {
+        glDeleteBuffers(static_cast<GLsizei>(vp->stream_vbos.size()), &vp->stream_vbos[0]);
+        vp->stream_vbos.fill(0);
+        
+        glDeleteShader(vp->shader);
+        vp->shader = 0;
+        
+        // TODO Free vertexProgram.
+        
+        return OUT_OF_MEMORY;
+    }
+    
+    glBindVertexArray(vp->vao);
+    check();
+    
+    for (int attribute_index = 0; attribute_index < attributeCount; ++attribute_index)
+    {
+        const SceGxmVertexAttribute *const attribute = &attributes[attribute_index];
+        assert(attribute->streamIndex >= 0);
+        assert(attribute->streamIndex < stack->streamCount);
+        assert(attribute->streamIndex < vp->stream_vbos.size());
+        
+        const SceGxmVertexStream *const stream = &streams[attribute->streamIndex];
+        
+        glBindBuffer(GL_ARRAY_BUFFER, vp->stream_vbos[attribute->streamIndex]);
+        check();
+        
+        const GLenum type = attribute_format_to_gl_type(attribute->format);
+        const GLboolean normalised = attribute_format_normalised(attribute->format) ? GL_TRUE : GL_FALSE;
+        const GLvoid *const pointer = reinterpret_cast<const GLvoid *>(attribute->offset);
+        glVertexAttribPointer(attribute->regIndex, attribute->componentCount, type, normalised, stream->stride, pointer);
+        check();
+    }
+    
+    glBindVertexArray(0);
+    check();
+    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    check();
     
     shaderPatcher->vertex_shaders[programId->program] = vp->shader;
     
@@ -1811,6 +1949,14 @@ IMP_SIG(sceGxmShaderPatcherReleaseVertexProgram)
     glDeleteShader(vertexProgram->shader);
     check();
     vertexProgram->shader = 0;
+    
+    glDeleteVertexArrays(1, &vertexProgram->vao);
+    check();
+    vertexProgram->vao = 0;
+    
+    glDeleteBuffers(static_cast<GLsizei>(vertexProgram->stream_vbos.size()), &vertexProgram->stream_vbos[0]);
+    check();
+    vertexProgram->stream_vbos.fill(0);
     
     // TODO Free vertexProgram.
     
