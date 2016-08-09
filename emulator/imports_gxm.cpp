@@ -694,6 +694,8 @@ struct SceGxmContextParams
     uint32_t fragmentUsseRingBufferOffset;
 };
 
+struct SceGxmVertexProgram;
+
 struct SceGxmContext
 {
     // This is an opaque type.
@@ -702,7 +704,9 @@ struct SceGxmContext
     size_t fragment_ring_buffer_used = 0;
     size_t vertex_ring_buffer_used = 0;
     SceGxmColorSurface color_surface;
+    const SceGxmVertexProgram *vertex_program = nullptr;
     std::array<const void *, 4> stream_data; // TODO Should this be in the vertex program?
+    GLuint index_buffer = 0;
 };
 
 enum SceGxmDepthStencilFormat
@@ -780,6 +784,16 @@ enum SceGxmOutputRegisterSize
     SCE_GXM_OUTPUT_REGISTER_SIZE_64BIT
 };
 
+enum SceGxmParameterCategory : uint8_t
+{
+    // https://psp2sdk.github.io/gxm_8h.html
+    SCE_GXM_PARAMETER_CATEGORY_ATTRIBUTE,
+    SCE_GXM_PARAMETER_CATEGORY_UNIFORM,
+    SCE_GXM_PARAMETER_CATEGORY_SAMPLER,
+    SCE_GXM_PARAMETER_CATEGORY_AUXILIARY_SURFACE,
+    SCE_GXM_PARAMETER_CATEGORY_UNIFORM_BUFFER
+};
+
 enum SceGxmPrimitiveType
 {
     // https://psp2sdk.github.io/gxm_8h.html
@@ -807,7 +821,7 @@ struct SceGxmProgram
 struct SceGxmProgramParameter
 {
     int32_t name_offset; // Number of bytes from the start of this structure to the name string.
-    uint8_t category;
+    SceGxmParameterCategory category;
     uint8_t container_index : 4;
     uint8_t component_count : 4;
     uint8_t unknown1[2];
@@ -1068,13 +1082,30 @@ static GLsizei compute_vertex_count(SceGxmIndexFormat type, const void *data, GL
     {
         const uint16_t *const begin = static_cast<const uint16_t *>(data);
         const uint16_t *const end = begin + index_count;
-        return *std::max_element(begin, end);
+        return *std::max_element(begin, end) + 1;
     }
     else
     {
         const uint32_t *const begin = static_cast<const uint32_t *>(data);
         const uint32_t *const end = begin + index_count;
-        return *std::max_element(begin, end);
+        return *std::max_element(begin, end) + 1;
+    }
+}
+
+static void bind_attribute_locations(GLuint gl_program, const SceGxmProgram *program)
+{
+    const SceGxmProgramParameter *const parameters = reinterpret_cast<const SceGxmProgramParameter *>(reinterpret_cast<const uint8_t *>(&program->parameters_offset) + program->parameters_offset);
+    for (int i = 0; i < program->parameter_count; ++i)
+    {
+        const SceGxmProgramParameter *const parameter = &parameters[i];
+        if (parameter->category == SCE_GXM_PARAMETER_CATEGORY_ATTRIBUTE)
+        {
+            const uint8_t *const parameter_bytes = reinterpret_cast<const uint8_t *>(parameter);
+            const char *const parameter_name = reinterpret_cast<const char *>(parameter_bytes + parameter->name_offset);
+            
+            glBindAttribLocation(gl_program, parameter->resource_index, parameter_name);
+            check();
+        }
     }
 }
 
@@ -1200,6 +1231,15 @@ IMP_SIG(sceGxmCreateContext)
     glClearColor(0.0625f, 0.125f, 0.25f, 0);
     check();
     
+    glGenBuffers(1, &ctx->index_buffer);
+    check();
+    if (ctx->index_buffer == 0)
+    {
+        // TODO Free vertexProgram.
+        
+        return OUT_OF_MEMORY;
+    }
+    
     return SCE_OK;
 }
 
@@ -1257,6 +1297,10 @@ IMP_SIG(sceGxmDestroyContext)
     const MemState *const mem = &emu->mem;
     SceGxmContext *const context = Ptr<SceGxmContext>(r0).get(mem);
     assert(context != nullptr);
+    
+    glDeleteBuffers(1, &context->index_buffer);
+    check();
+    context->index_buffer = 0;
     
     assert(context->gl != nullptr);
     SDL_GL_DeleteContext(context->gl);
@@ -1349,18 +1393,37 @@ IMP_SIG(sceGxmDraw)
     assert(indexData != nullptr);
     assert(indexCount > 0);
     
+    const GLuint attribute_index = 0; // TODO Get attribute index from stream.
     GLint stride = 0;
-    glGetIntegerv(GL_VERTEX_ATTRIB_ARRAY_STRIDE, &stride);
+    glGetVertexAttribiv(attribute_index, GL_VERTEX_ATTRIB_ARRAY_STRIDE, &stride);
+    check();
+    
+    const GLuint stream_index = 0; // TODO Do for all streams.
+    glBindBuffer(GL_ARRAY_BUFFER, context->vertex_program->stream_vbos[stream_index]);
     check();
     
     const GLsizei vertex_count = compute_vertex_count(indexType, indexData, indexCount);
     const GLsizei size = stride * vertex_count;
-    glBufferData(GL_ARRAY_BUFFER, size, context->stream_data[0], GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size, context->stream_data[stream_index], GL_STREAM_DRAW);
+    check();
+    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    check();
+    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, context->index_buffer);
+    check();
+    
+    const GLsizei index_size = indexType == SCE_GXM_INDEX_FORMAT_U16 ? 2 : 4;
+    const GLsizei indices_size = indexCount * index_size;
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size, indexData, GL_STREAM_DRAW);
     check();
     
     const GLenum mode = primType == SCE_GXM_PRIMITIVE_TRIANGLES ? GL_TRIANGLES : GL_TRIANGLE_STRIP;
     const GLenum type = indexType == SCE_GXM_INDEX_FORMAT_U16 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
-    glDrawElements(mode, indexCount, type, indexData);
+    glDrawElements(mode, indexCount, type, nullptr);
+    check();
+    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     check();
     
     return SCE_OK;
@@ -1640,6 +1703,8 @@ IMP_SIG(sceGxmSetVertexProgram)
     glBindVertexArray(vertexProgram->vao);
     check();
     
+    context->vertex_program = vertexProgram;
+    
     return SCE_OK;
 }
 
@@ -1741,6 +1806,8 @@ IMP_SIG(sceGxmShaderPatcherCreateFragmentProgram)
     glAttachShader(fp->program, fragment_shader);
     check();
     
+    bind_attribute_locations(fp->program, stack->vertexProgram.get(mem));
+    
     glLinkProgram(fp->program);
     check();
     
@@ -1834,6 +1901,7 @@ IMP_SIG(sceGxmShaderPatcherCreateVertexProgram)
     if (vp->stream_vbos[0] == 0)
     {
         glDeleteShader(vp->shader);
+        check();
         vp->shader = 0;
         
         // TODO Free vertexProgram.
@@ -1846,9 +1914,11 @@ IMP_SIG(sceGxmShaderPatcherCreateVertexProgram)
     if (vp->vao == 0)
     {
         glDeleteBuffers(static_cast<GLsizei>(vp->stream_vbos.size()), &vp->stream_vbos[0]);
+        check();
         vp->stream_vbos.fill(0);
         
         glDeleteShader(vp->shader);
+        check();
         vp->shader = 0;
         
         // TODO Free vertexProgram.
@@ -1875,6 +1945,9 @@ IMP_SIG(sceGxmShaderPatcherCreateVertexProgram)
         const GLboolean normalised = attribute_format_normalised(attribute->format) ? GL_TRUE : GL_FALSE;
         const GLvoid *const pointer = reinterpret_cast<const GLvoid *>(attribute->offset);
         glVertexAttribPointer(attribute->regIndex, attribute->componentCount, type, normalised, stream->stride, pointer);
+        check();
+        
+        glEnableVertexAttribArray(attribute->regIndex);
         check();
     }
     
