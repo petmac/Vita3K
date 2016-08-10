@@ -1680,7 +1680,7 @@ IMP_SIG(sceGxmSetUniformDataF)
             break;
             
         case 16:
-            glUniformMatrix4fv(location, 1, GL_FALSE, sourceData);
+            glUniformMatrix4fv(location, 1, GL_TRUE, sourceData);
             check();
             break;
             
