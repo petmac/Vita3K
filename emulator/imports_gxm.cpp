@@ -641,7 +641,7 @@ struct SceGxmTexture
     SceGxmTextureFormat format;
     uint32_t width;
     uint32_t height;
-    Ptr<void> data;
+    Ptr<const void> data;
 };
 
 static_assert(sizeof(SceGxmTexture) == 16, "Incorrect size.");
@@ -2134,28 +2134,20 @@ IMP_SIG(sceGxmTextureInitLinear)
     MemState *const mem = &emu->mem;
     const Stack *const stack = sp.cast<const Stack>().get(mem);
     SceGxmTexture *const texture = Ptr<SceGxmTexture>(r0).get(mem);
-    const void *const data = Ptr<const void>(r1).get(mem);
+    const Ptr<const void> data(r1);
     const SceGxmTextureFormat texFormat = static_cast<SceGxmTextureFormat>(r2);
     const uint32_t width = r3;
     assert(texture != nullptr);
-    assert(data != nullptr);
+    assert(data);
     assert(texFormat == SCE_GXM_TEXTURE_FORMAT_U8U8U8U8_ABGR);
     assert(width > 0);
     assert(stack->height > 0);
     assert(stack->mipCount == 0);
     
-    const size_t data_size = width * stack->height * 4; // TODO Handle alignment.
-    texture->data = Ptr<void>(alloc(mem, data_size, __FUNCTION__));
-    assert(texture->data);
-    if (!texture->data)
-    {
-        return OUT_OF_MEMORY;
-    }
-    
     texture->format = texFormat;
     texture->width = width;
     texture->height = stack->height;
-    memcpy(texture->data.get(mem), data, data_size);
+    texture->data = data;
     
     return SCE_OK;
 }
