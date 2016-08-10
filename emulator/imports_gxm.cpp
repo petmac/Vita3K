@@ -707,6 +707,7 @@ struct SceGxmContext
     const SceGxmVertexProgram *vertex_program = nullptr;
     std::array<const void *, 4> stream_data; // TODO Should this be in the vertex program?
     GLuint index_buffer = 0;
+    GLuint texture = 0;
 };
 
 enum SceGxmDepthStencilFormat
@@ -1240,6 +1241,18 @@ IMP_SIG(sceGxmCreateContext)
         return OUT_OF_MEMORY;
     }
     
+    glGenTextures(1, &ctx->texture);
+    check();
+    if (ctx->texture == 0)
+    {
+        glDeleteBuffers(1, &ctx->index_buffer);
+        check();
+        
+        // TODO Free vertexProgram.
+        
+        return OUT_OF_MEMORY;
+    }
+    
     return SCE_OK;
 }
 
@@ -1297,6 +1310,10 @@ IMP_SIG(sceGxmDestroyContext)
     const MemState *const mem = &emu->mem;
     SceGxmContext *const context = Ptr<SceGxmContext>(r0).get(mem);
     assert(context != nullptr);
+    
+    glDeleteTextures(1, &context->texture);
+    check();
+    context->texture = 0;
     
     glDeleteBuffers(1, &context->index_buffer);
     check();
@@ -1643,6 +1660,16 @@ IMP_SIG(sceGxmSetFragmentTexture)
     assert(context != nullptr);
     assert(textureIndex == 0);
     assert(texture != nullptr);
+    
+    glBindTexture(GL_TEXTURE_2D, context->texture);
+    check();
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+    check();
+    
+    const void *const pixels = texture->data.get(&emu->mem);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texture->width, texture->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    check();
     
     return SCE_OK;
 }
