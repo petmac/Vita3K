@@ -40,11 +40,16 @@ IMP_SIG(sceDisplaySetFrameBuf)
     assert(fb->height == 544);
     assert(set == SCE_DISPLAY_SETBUF_NEXTFRAME);
     
+    SDL_Window *const prev_gl_window = SDL_GL_GetCurrentWindow();
+    const SDL_GLContext prev_gl_context = SDL_GL_GetCurrentContext();
+    
     void *const pixels = fb->base.cast<void>().get(mem);
     const SurfacePtr framebuffer_surface(SDL_CreateRGBSurfaceFrom(pixels, fb->width, fb->height, 32, fb->pitch * 4, 0xff << 0, 0xff << 8, 0xff << 16, 0), SDL_FreeSurface);
     SDL_Surface *const window_surface = SDL_GetWindowSurface(emu->window.get());
     SDL_UpperBlit(framebuffer_surface.get(), nullptr, window_surface, nullptr);
     SDL_UpdateWindowSurface(emu->window.get());
+    
+    SDL_GL_MakeCurrent(prev_gl_window, prev_gl_context);
     
     return SCE_OK;
 }
