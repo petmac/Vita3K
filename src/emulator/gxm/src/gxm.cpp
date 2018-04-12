@@ -137,7 +137,7 @@ static void output_glsl_parameters(std::ostream &glsl, const SceGxmProgram &prog
             parameter_name(parameter), parameter.category, parameter.type, parameter.component_count, parameter.container_index);
         switch (parameter.category) {
             case SCE_GXM_PARAMETER_CATEGORY_ATTRIBUTE:
-                glsl << "in ";
+                glsl << "attribute ";
                 output_glsl_decl(glsl, parameter);
                 break;
             case SCE_GXM_PARAMETER_CATEGORY_UNIFORM:
