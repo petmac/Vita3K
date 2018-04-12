@@ -14,25 +14,6 @@
 
 #define GXM_PROFILE(name) MICROPROFILE_SCOPEI("GXM", name, MP_BLUE)
 
-static std::string load_shader(const char *hash, const char *extension, const char *base_path) {
-    std::ostringstream path;
-    path << base_path << "shaders/" << hash << "." << extension;
-
-    std::ifstream is(path.str());
-    if (is.fail()) {
-        return std::string();
-    }
-
-    is.seekg(0, std::ios::end);
-    const size_t size = is.tellg();
-    is.seekg(0);
-
-    std::string source(size, ' ');
-    is.read(&source.front(), size);
-
-    return source;
-}
-
 static const SceGxmProgramParameter *program_parameters(const SceGxmProgram &program) {
     return reinterpret_cast<const SceGxmProgramParameter *>(reinterpret_cast<const uint8_t *>(&program.parameters_offset) + program.parameters_offset);
 }
@@ -358,7 +339,7 @@ void after_callback(const glbinding::FunctionCall &fn) {
     }
 }
 
-std::string get_fragment_glsl(SceGxmShaderPatcher &shader_patcher, const SceGxmProgram &fragment_program, const char *base_path) {
+std::string get_fragment_glsl(SceGxmShaderPatcher &shader_patcher, const SceGxmProgram &fragment_program) {
     const Sha256Hash hash_bytes = sha256(&fragment_program, fragment_program.size);
     const GLSLCache::const_iterator cached = shader_patcher.fragment_glsl_cache.find(hash_bytes);
     if (cached != shader_patcher.fragment_glsl_cache.end()) {
@@ -366,19 +347,15 @@ std::string get_fragment_glsl(SceGxmShaderPatcher &shader_patcher, const SceGxmP
     }
 
     const std::array<char, 65> hash_text = hex(hash_bytes);
-    std::string source = load_shader(hash_text.data(), "frag", base_path);
-    if (source.empty()) {
-        LOG_ERROR("Missing fragment shader {}", hash_text.data());
-        source = generate_fragment_glsl(fragment_program);
-        dump_missing_shader(hash_text.data(), "frag", fragment_program, source.c_str());
-    }
+    const std::string source = generate_fragment_glsl(fragment_program);
+    dump_missing_shader(hash_text.data(), "frag", fragment_program, source.c_str());
 
     shader_patcher.fragment_glsl_cache.emplace(hash_bytes, source);
 
     return source;
 }
 
-std::string get_vertex_glsl(SceGxmShaderPatcher &shader_patcher, const SceGxmProgram &vertex_program, const char *base_path) {
+std::string get_vertex_glsl(SceGxmShaderPatcher &shader_patcher, const SceGxmProgram &vertex_program) {
     const Sha256Hash hash_bytes = sha256(&vertex_program, vertex_program.size);
     const GLSLCache::const_iterator cached = shader_patcher.vertex_glsl_cache.find(hash_bytes);
     if (cached != shader_patcher.vertex_glsl_cache.end()) {
@@ -386,12 +363,8 @@ std::string get_vertex_glsl(SceGxmShaderPatcher &shader_patcher, const SceGxmPro
     }
 
     const std::array<char, 65> hash_text = hex(hash_bytes);
-    std::string source = load_shader(hash_text.data(), "vert", base_path);
-    if (source.empty()) {
-        LOG_ERROR("Missing vertex shader {}", hash_text.data());
-        source = generate_vertex_glsl(vertex_program);
-        dump_missing_shader(hash_text.data(), "vert", vertex_program, source.c_str());
-    }
+    const std::string source = generate_vertex_glsl(vertex_program);
+    dump_missing_shader(hash_text.data(), "vert", vertex_program, source.c_str());
 
     shader_patcher.vertex_glsl_cache.emplace(hash_bytes, source);
 
