@@ -2,6 +2,7 @@
 
 #include <crypto/hash.h>
 #include <gxm/types.h>
+#include <gxp/types.h>
 #include <util/log.h>
 
 #include <glbinding/AbstractFunction.h>
