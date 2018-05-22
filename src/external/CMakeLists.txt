@@ -112,3 +112,6 @@ target_link_libraries(yaml INTERFACE yaml-cpp)
 
 add_library(rpcs3 INTERFACE)
 target_include_directories(rpcs3 INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/rpcs3/include")
+
+add_library(xxhash STATIC xxhash/xxhash.c xxhash/xxhash.h)
+target_include_directories(xxhash PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/xxhash")
