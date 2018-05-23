@@ -7,6 +7,8 @@
 
 #include <mem/ptr.h>
 
+#include <xxhash.h>
+
 #include <algorithm> // find
 #include <cstring> // memcmp
 #include <numeric> // accumulate
@@ -80,9 +82,13 @@ static size_t bits_per_pixel(SceGxmTextureBaseFormat base_format) {
 }
 
 static TextureCacheHash hash_data(const void *data, size_t size) {
+#if 0
     const uint8_t *const begin = static_cast<const uint8_t *>(data);
     const uint8_t *const end = begin + size;
     return std::accumulate(begin, end, TextureCacheHash(0));
+#else
+    return XXH32(data, size, 0);
+#endif
 }
 
 static TextureCacheHash hash_texture_data(const SceGxmTexture &texture, const MemState &mem) {
