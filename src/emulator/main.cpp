@@ -25,6 +25,7 @@
 #include <util/log.h>
 #include <util/string_convert.h>
 
+#include <microprofile.h>
 #include <SDL.h>
 #include <glutil/gl.h>
 
@@ -85,6 +86,7 @@ int main(int argc, char *argv[]) {
         DrawGameSelector(host, &is_vpk);
 
         imgui::draw_end(host.window);
+        MicroProfileFlip(nullptr);
     }
 
     if (!is_vpk) {
@@ -121,6 +123,7 @@ int main(int argc, char *argv[]) {
         host.display.condvar.notify_all();
 
         set_window_title(host);
+        MicroProfileFlip(nullptr);
     }
     return Success;
 }
