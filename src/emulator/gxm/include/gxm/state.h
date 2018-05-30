@@ -20,6 +20,7 @@ struct DisplayCallback {
     Address data;
     Address old_buffer;
     Address new_buffer;
+    uint32_t profiler_token = 0;
 };
 
 struct GxmState {

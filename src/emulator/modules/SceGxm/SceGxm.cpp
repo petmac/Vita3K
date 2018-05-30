@@ -397,6 +397,7 @@ EXPORT(void, sceGxmDisplayQueueAddEntry, Ptr<SceGxmSyncObject> oldBuffer, Ptr<Sc
     display_callback->pc = host.gxm.params.displayQueueCallback.address();
     display_callback->old_buffer = oldBuffer.address();
     display_callback->new_buffer = newBuffer.address();
+    MICROPROFILE_TIMELINE_ENTER(display_callback->profiler_token, MP_CYAN, "Queued");
     host.gxm.display_queue.push(*display_callback);
 
     // TODO Return success if/when we call callback not as a tail call.
@@ -610,6 +611,7 @@ static int SDLCALL thread_function(void *data) {
                 break;
         }
         const ThreadStatePtr display_thread = find(params.thid, params.kernel->threads);
+        MICROPROFILE_TIMELINE_LEAVE(display_callback->profiler_token);
         run_callback(*display_thread, display_callback->pc, display_callback->data);
         const Ptr<SceGxmSyncObject> newBuffer(display_callback->new_buffer);
         std::lock_guard<std::mutex> lock(newBuffer.get(*params.mem)->mutex);
