@@ -19,23 +19,30 @@
 #include <host/state.h>
 #include <imgui.h>
 
+static void kernel_menu(GuiState &gui) {
+    if (ImGui::BeginMenu("Kernel")) {
+        ImGui::MenuItem("Threads", nullptr, &gui.threads_dialog);
+        ImGui::MenuItem("Semaphores", nullptr, &gui.semaphores_dialog);
+        ImGui::MenuItem("Mutexes", nullptr, &gui.mutexes_dialog);
+        ImGui::MenuItem("Lightweight Mutexes", nullptr, &gui.lwmutexes_dialog);
+        ImGui::MenuItem("Condition Variables", nullptr, &gui.condvars_dialog);
+        ImGui::MenuItem("Lightweight Condition Variables", nullptr, &gui.lwcondvars_dialog);
+        ImGui::MenuItem("Event Flags", nullptr, &gui.eventflags_dialog);
+        ImGui::EndMenu();
+    }
+}
+
+static void optimisation_menu(GuiState &gui) {
+    if (ImGui::BeginMenu("Optimisation")) {
+        ImGui::MenuItem("Texture Cache", nullptr, &gui.texture_cache);
+        ImGui::EndMenu();
+    }
+}
+
 void DrawMainMenuBar(HostState &host) {
     if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu("Debug")) {
-            ImGui::MenuItem("Threads", nullptr, &host.gui.threads_dialog);
-            ImGui::MenuItem("Semaphores", nullptr, &host.gui.semaphores_dialog);
-            ImGui::MenuItem("Mutexes", nullptr, &host.gui.mutexes_dialog);
-            ImGui::MenuItem("Lightweight Mutexes", nullptr, &host.gui.lwmutexes_dialog);
-            ImGui::MenuItem("Condition Variables", nullptr, &host.gui.condvars_dialog);
-            ImGui::MenuItem("Lightweight Condition Variables", nullptr, &host.gui.lwcondvars_dialog);
-            ImGui::MenuItem("Event Flags", nullptr, &host.gui.eventflags_dialog);
-            ImGui::EndMenu();
-        }
-        
-        if (ImGui::BeginMenu("Optimisation")) {
-            ImGui::MenuItem("Texture Cache", nullptr, &host.gui.texture_cache);
-            ImGui::EndMenu();
-        }
+        kernel_menu(host.gui);
+        optimisation_menu(host.gui);
         ImGui::EndMainMenuBar();
     }
 }
