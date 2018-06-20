@@ -84,4 +84,5 @@ void DrawUI(HostState &host) {
     if (host.gui.kernel.eventflags_dialog) {
         DrawEventFlagsDialog(host);
     }
+    gxm_context_dialogs(host.gui.gxm, host.mem);
 }

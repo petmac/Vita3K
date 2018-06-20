@@ -10,6 +10,7 @@ src/imgui_impl.cpp
 src/ui_common_dialog.cpp
 src/ui_condvars_dialog.cpp
 src/ui_eventflags_dialog.cpp
+src/ui_gxm.cpp
 src/ui_main.cpp
 src/ui_main_menubar.cpp
 src/ui_mutexes_dialog.cpp

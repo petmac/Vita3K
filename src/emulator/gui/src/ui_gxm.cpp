@@ -15,20 +15,27 @@
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#pragma once
+#include "ui_private.h"
 
-static constexpr auto MENUBAR_HEIGHT = 19;
+#include <gui/state.h>
 
-struct GxmGuiState;
-struct HostState;
-struct MemState;
+#include <mem/mem.h> // MemState
 
-void DrawMainMenuBar(HostState &host);
-void DrawThreadsDialog(HostState &host);
-void DrawSemaphoresDialog(HostState &host);
-void DrawMutexesDialog(HostState &host);
-void DrawLwMutexesDialog(HostState &host);
-void DrawLwCondvarsDialog(HostState &host);
-void DrawCondvarsDialog(HostState &host);
-void DrawEventFlagsDialog(HostState &host);
-void gxm_context_dialogs(GxmGuiState &gui, const MemState &mem);
+#include <imgui.h>
+
+#include <mutex>
+
+static void gxm_context_dialog(ShowGxmContexts::value_type &show_context, const MemState &mem) {
+    if (!ImGui::Begin("GXM Context", &show_context.second)) {
+        return;
+    }
+}
+
+void gxm_context_dialogs(GxmGuiState &gui, const MemState &mem) {
+    const std::unique_lock<std::mutex> lock(gui.mutex);
+    for (ShowGxmContexts::value_type &show_context : gui.show_contexts) {
+        if (show_context.second) {
+            gxm_context_dialog(show_context, mem);
+        }
+    }
+}
