@@ -18,6 +18,12 @@
 #pragma once
 
 #include <dialog/state.h>
+#include <mem/ptr.h>
+
+#include <map>
+#include <mutex>
+
+struct SceGxmContext;
 
 struct KernelGuiState {
     bool threads_dialog = false;
@@ -27,6 +33,13 @@ struct KernelGuiState {
     bool mutexes_dialog = false;
     bool lwmutexes_dialog = false;
     bool eventflags_dialog = false;
+};
+
+typedef std::map<Ptr<SceGxmContext>, bool> ShowGxmContexts;
+
+struct GxmGuiState {
+    std::mutex mutex;
+    ShowGxmContexts show_contexts;
 };
 
 struct OptimisationGuiState {
@@ -47,6 +60,7 @@ struct GamesSelector {
 struct GuiState {
     bool renderer_focused = true;
     KernelGuiState kernel;
+    GxmGuiState gxm;
     OptimisationGuiState optimisation;
     DialogState common_dialog;
     GamesSelector game_selector;

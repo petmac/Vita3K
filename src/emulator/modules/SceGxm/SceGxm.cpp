@@ -257,6 +257,11 @@ EXPORT(int, sceGxmCreateContext, const emu::SceGxmContextParams *params, Ptr<Sce
     glBindVertexArray(ctx->vertex_array[0]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->element_buffer[0]);
 
+    {
+        const std::unique_lock<std::mutex> lock(host.gui.gxm.mutex);
+        host.gui.gxm.show_contexts.emplace(*context, false);
+    }
+    
     return 0;
 }
 
@@ -366,6 +371,11 @@ EXPORT(int, sceGxmDepthStencilSurfaceSetForceStoreMode) {
 EXPORT(int, sceGxmDestroyContext, Ptr<SceGxmContext> context) {
     assert(context);
 
+    {
+        const std::unique_lock<std::mutex> lock(host.gui.gxm.mutex);
+        host.gui.gxm.show_contexts.erase(context);
+    }
+    
     free(host.mem, context);
 
     return 0;

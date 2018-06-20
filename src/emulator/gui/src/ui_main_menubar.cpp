@@ -17,7 +17,11 @@
 
 #include <gui/functions.h>
 #include <host/state.h>
+#include <util/log.h> // log_hex
+
 #include <imgui.h>
+
+#include <sstream>
 
 static void kernel_menu(KernelGuiState &gui) {
     if (ImGui::BeginMenu("Kernel")) {
@@ -32,6 +36,18 @@ static void kernel_menu(KernelGuiState &gui) {
     }
 }
 
+static void gxm_menu(GxmGuiState &gui) {
+    if (ImGui::BeginMenu("GXM")) {
+        const std::unique_lock<std::mutex> lock(gui.mutex);
+        for (ShowGxmContexts::value_type &context : gui.show_contexts) {
+            std::ostringstream label;
+            label << "Context " << log_hex(context.first.address());
+            ImGui::MenuItem(label.str().c_str(), nullptr, &context.second);
+        }
+        ImGui::EndMenu();
+    }
+}
+
 static void optimisation_menu(OptimisationGuiState &gui) {
     if (ImGui::BeginMenu("Optimisation")) {
         ImGui::MenuItem("Texture Cache", nullptr, &gui.texture_cache);
@@ -42,6 +58,7 @@ static void optimisation_menu(OptimisationGuiState &gui) {
 void DrawMainMenuBar(HostState &host) {
     if (ImGui::BeginMainMenuBar()) {
         kernel_menu(host.gui.kernel);
+        gxm_menu(host.gui.gxm);
         optimisation_menu(host.gui.optimisation);
         ImGui::EndMainMenuBar();
     }
