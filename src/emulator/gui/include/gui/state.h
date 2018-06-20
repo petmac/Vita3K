@@ -19,6 +19,20 @@
 
 #include <dialog/state.h>
 
+struct KernelGuiState {
+    bool threads_dialog = false;
+    bool semaphores_dialog = false;
+    bool condvars_dialog = false;
+    bool lwcondvars_dialog = false;
+    bool mutexes_dialog = false;
+    bool lwmutexes_dialog = false;
+    bool eventflags_dialog = false;
+};
+
+struct OptimisationGuiState {
+    bool texture_cache = true;
+};
+
 enum SelectorState {
     SELECT_APP
 };
@@ -31,19 +45,9 @@ struct GamesSelector {
 };
 
 struct GuiState {
-    // Debug menu
     bool renderer_focused = true;
-    bool threads_dialog = false;
-    bool semaphores_dialog = false;
-    bool condvars_dialog = false;
-    bool lwcondvars_dialog = false;
-    bool mutexes_dialog = false;
-    bool lwmutexes_dialog = false;
-    bool eventflags_dialog = false;
-    
-    // Optimisation menu
-    bool texture_cache = true;
-
+    KernelGuiState kernel;
+    OptimisationGuiState optimisation;
     DialogState common_dialog;
     GamesSelector game_selector;
 };

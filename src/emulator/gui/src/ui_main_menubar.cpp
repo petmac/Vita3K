@@ -19,7 +19,7 @@
 #include <host/state.h>
 #include <imgui.h>
 
-static void kernel_menu(GuiState &gui) {
+static void kernel_menu(KernelGuiState &gui) {
     if (ImGui::BeginMenu("Kernel")) {
         ImGui::MenuItem("Threads", nullptr, &gui.threads_dialog);
         ImGui::MenuItem("Semaphores", nullptr, &gui.semaphores_dialog);
@@ -32,7 +32,7 @@ static void kernel_menu(GuiState &gui) {
     }
 }
 
-static void optimisation_menu(GuiState &gui) {
+static void optimisation_menu(OptimisationGuiState &gui) {
     if (ImGui::BeginMenu("Optimisation")) {
         ImGui::MenuItem("Texture Cache", nullptr, &gui.texture_cache);
         ImGui::EndMenu();
@@ -41,8 +41,8 @@ static void optimisation_menu(GuiState &gui) {
 
 void DrawMainMenuBar(HostState &host) {
     if (ImGui::BeginMainMenuBar()) {
-        kernel_menu(host.gui);
-        optimisation_menu(host.gui);
+        kernel_menu(host.gui.kernel);
+        optimisation_menu(host.gui.optimisation);
         ImGui::EndMainMenuBar();
     }
 }

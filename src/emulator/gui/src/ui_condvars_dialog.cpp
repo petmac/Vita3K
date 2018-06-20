@@ -24,7 +24,7 @@
 #include <util/resource.h>
 
 void DrawCondvarsDialog(HostState &host) {
-    ImGui::Begin("Condition Variables", &host.gui.condvars_dialog);
+    ImGui::Begin("Condition Variables", &host.gui.kernel.condvars_dialog);
     ImGui::TextColored(ImVec4(255, 255, 0, 255), "%-16s %-32s   %-16s %-16s", "ID", "Name", "Attributes", "Waiting Threads");
 
     const std::lock_guard<std::mutex> lock(host.kernel.mutex);
@@ -41,7 +41,7 @@ void DrawCondvarsDialog(HostState &host) {
 }
 
 void DrawLwCondvarsDialog(HostState &host) {
-    ImGui::Begin("Lightweight Condition Variables", &host.gui.lwcondvars_dialog);
+    ImGui::Begin("Lightweight Condition Variables", &host.gui.kernel.lwcondvars_dialog);
     ImGui::TextColored(ImVec4(255, 255, 0, 255), "%-16s %-32s   %-16s %-16s", "ID", "Name", "Attributes", "Waiting Threads");
 
     const std::lock_guard<std::mutex> lock(host.kernel.mutex);

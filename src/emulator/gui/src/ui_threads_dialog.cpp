@@ -24,7 +24,7 @@
 #include <util/resource.h>
 
 void DrawThreadsDialog(HostState &host) {
-    ImGui::Begin("Threads", &host.gui.threads_dialog);
+    ImGui::Begin("Threads", &host.gui.kernel.threads_dialog);
     ImGui::TextColored(ImVec4(255, 255, 0, 255), "%-16s %-32s   %-16s   %-16s", "ID", "Thread Name", "Status", "Stack Pointer");
 
     const std::lock_guard<std::mutex> lock(host.kernel.mutex);

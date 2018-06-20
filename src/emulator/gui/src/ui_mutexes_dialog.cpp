@@ -24,7 +24,7 @@
 #include <util/resource.h>
 
 void DrawMutexesDialog(HostState &host) {
-    ImGui::Begin("Mutexes", &host.gui.mutexes_dialog);
+    ImGui::Begin("Mutexes", &host.gui.kernel.mutexes_dialog);
     ImGui::TextColored(ImVec4(255, 255, 0, 255), "%-16s %-32s   %-7s   %-8s   %-16s   %-16s", "ID", "Mutex Name", "Status", "Attributes", "Waiting Threads", "Owner");
 
     const std::lock_guard<std::mutex> lock(host.kernel.mutex);
@@ -43,7 +43,7 @@ void DrawMutexesDialog(HostState &host) {
 }
 
 void DrawLwMutexesDialog(HostState &host) {
-    ImGui::Begin("Lightweight Mutexes", &host.gui.lwmutexes_dialog);
+    ImGui::Begin("Lightweight Mutexes", &host.gui.kernel.lwmutexes_dialog);
     ImGui::TextColored(ImVec4(255, 255, 0, 255), "%-16s %-32s   %-7s   %-8s  %-16s   %-16s", "ID", "LwMutex Name", "Status", "Attributes", "Waiting Threads", "Owner");
 
     const std::lock_guard<std::mutex> lock(host.kernel.mutex);

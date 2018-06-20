@@ -24,7 +24,7 @@
 #include <util/resource.h>
 
 void DrawSemaphoresDialog(HostState &host) {
-    ImGui::Begin("Semaphores", &host.gui.semaphores_dialog);
+    ImGui::Begin("Semaphores", &host.gui.kernel.semaphores_dialog);
     ImGui::TextColored(ImVec4(255, 255, 0, 255), "%-16s %-32s   %-16s   %-16s", "ID", "Semaphore Name", "Status", "Locked Threads");
 
     const std::lock_guard<std::mutex> lock(host.kernel.mutex);

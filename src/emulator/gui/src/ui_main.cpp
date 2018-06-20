@@ -60,25 +60,25 @@ void DrawReinstallDialog(HostState &host, GenericDialogState *status) {
 void DrawUI(HostState &host) {
     DrawMainMenuBar(host);
 
-    if (host.gui.threads_dialog) {
+    if (host.gui.kernel.threads_dialog) {
         DrawThreadsDialog(host);
     }
-    if (host.gui.semaphores_dialog) {
+    if (host.gui.kernel.semaphores_dialog) {
         DrawSemaphoresDialog(host);
     }
-    if (host.gui.mutexes_dialog) {
+    if (host.gui.kernel.mutexes_dialog) {
         DrawMutexesDialog(host);
     }
-    if (host.gui.lwmutexes_dialog) {
+    if (host.gui.kernel.lwmutexes_dialog) {
         DrawLwMutexesDialog(host);
     }
-    if (host.gui.condvars_dialog) {
+    if (host.gui.kernel.condvars_dialog) {
         DrawCondvarsDialog(host);
     }
-    if (host.gui.lwcondvars_dialog) {
+    if (host.gui.kernel.lwcondvars_dialog) {
         DrawLwCondvarsDialog(host);
     }
-    if (host.gui.eventflags_dialog) {
+    if (host.gui.kernel.eventflags_dialog) {
         DrawEventFlagsDialog(host);
     }
 }

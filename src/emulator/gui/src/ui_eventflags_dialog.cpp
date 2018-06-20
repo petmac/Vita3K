@@ -24,7 +24,7 @@
 #include <util/resource.h>
 
 void DrawEventFlagsDialog(HostState &host) {
-    ImGui::Begin("Event Flags", &host.gui.eventflags_dialog);
+    ImGui::Begin("Event Flags", &host.gui.kernel.eventflags_dialog);
     ImGui::TextColored(ImVec4(255, 255, 0, 255), "%-16s %-32s  %-7s   %-8s   %-16s", "ID", "EventFlag Name", "Flags", "Attributes", "Waiting Threads");
 
     const std::lock_guard<std::mutex> lock(host.kernel.mutex);
