@@ -17,15 +17,15 @@
 
 #pragma once
 
-enum GenericDialogState {
-    UNK_STATE,
-    CONFIRM_STATE,
-    CANCEL_STATE
-};
+static constexpr auto MENUBAR_HEIGHT = 19;
 
 struct HostState;
 
-void DrawUI(HostState &host);
-void DrawCommonDialog(HostState &host);
-void DrawGameSelector(HostState &host, bool *is_vpk);
-void DrawReinstallDialog(HostState &host, GenericDialogState *status);
+void DrawMainMenuBar(HostState &host);
+void DrawThreadsDialog(HostState &host);
+void DrawSemaphoresDialog(HostState &host);
+void DrawMutexesDialog(HostState &host);
+void DrawLwMutexesDialog(HostState &host);
+void DrawLwCondvarsDialog(HostState &host);
+void DrawCondvarsDialog(HostState &host);
+void DrawEventFlagsDialog(HostState &host);

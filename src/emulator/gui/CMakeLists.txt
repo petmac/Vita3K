@@ -13,6 +13,7 @@ src/ui_eventflags_dialog.cpp
 src/ui_main.cpp
 src/ui_main_menubar.cpp
 src/ui_mutexes_dialog.cpp
+src/ui_private.h
 src/ui_semaphores_dialog.cpp
 src/ui_threads_dialog.cpp
 )

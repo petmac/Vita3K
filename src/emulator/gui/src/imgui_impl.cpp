@@ -17,7 +17,7 @@
 
 #include <gui/imgui_impl.h>
 
-#include <gui/functions.h>
+#include "ui_private.h"
 
 #include <SDL.h>
 
