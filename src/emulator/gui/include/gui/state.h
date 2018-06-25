@@ -37,6 +37,9 @@ struct KernelGuiState {
 
 typedef std::map<Ptr<SceGxmContext>, bool> ShowGxmContexts;
 
+struct GxmContextGuiState {
+};
+
 struct GxmGuiState {
     std::mutex mutex;
     ShowGxmContexts show_contexts;

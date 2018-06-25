@@ -19,6 +19,7 @@
 
 #include <gui/state.h>
 
+#include <gxm/types.h>
 #include <mem/mem.h> // MemState
 
 #include <imgui.h>
@@ -27,8 +28,13 @@
 
 static void gxm_context_dialog(ShowGxmContexts::value_type &show_context, const MemState &mem) {
     if (!ImGui::Begin("GXM Context", &show_context.second)) {
+        ImGui::End();
         return;
     }
+    
+    const SceGxmContext &context = *show_context.first.get(mem);
+    
+    ImGui::End();
 }
 
 void gxm_context_dialogs(GxmGuiState &gui, const MemState &mem) {
