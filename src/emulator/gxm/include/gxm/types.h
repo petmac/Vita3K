@@ -58,7 +58,7 @@ typedef std::tuple<std::string, std::string> ProgramGLSLs;
 typedef std::map<ProgramGLSLs, SharedGLObject> ProgramCache;
 typedef std::array<Ptr<void>, 16> UniformBuffers;
 
-struct SceGxmViewport {
+struct GxmViewport {
     bool enabled = false;
     GLint x;
     GLint y;
@@ -87,7 +87,7 @@ struct SceGxmContext {
     GLObjectArray<SCE_GXM_MAX_VERTEX_STREAMS> stream_vertex_buffers;
     SceGxmCullMode cull_mode = SCE_GXM_CULL_NONE;
     bool two_sided = false;
-    SceGxmViewport viewport;
+    GxmViewport viewport;
 };
 
 namespace emu {
