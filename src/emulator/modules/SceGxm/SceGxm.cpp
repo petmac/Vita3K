@@ -118,8 +118,8 @@ EXPORT(int, sceGxmBeginScene, SceGxmContext *context, unsigned int flags, const 
     context->viewport.y = 0;
     context->viewport.w = host.display.image_size.width;
     context->viewport.h = host.display.image_size.height;
-    context->viewport.nearVal = 0.0f;
-    context->viewport.farVal = 1.0f;
+    context->viewport.nearVal = 1;
+    context->viewport.farVal = 0;
     glViewport(context->viewport.x, context->viewport.y, context->viewport.w, context->viewport.h);
     glDepthRange(context->viewport.nearVal, context->viewport.farVal);
 
@@ -243,6 +243,7 @@ EXPORT(int, sceGxmCreateContext, const emu::SceGxmContextParams *params, Ptr<Sce
     LOG_INFO("GL_SHADING_LANGUAGE_VERSION = {}", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     glViewport(0, 0, host.display.image_size.width, host.display.image_size.height);
+    glDepthRange(1, 0);
 
     // TODO This is just for debugging.
     glClearColor(0.0625f, 0.125f, 0.25f, 0);
@@ -1329,8 +1330,8 @@ EXPORT(void, sceGxmSetViewport, SceGxmContext *context, float xOffset, float xSc
     context->viewport.y = yOffset + yScale;
     context->viewport.w = xOffset + xScale;
     context->viewport.h = yOffset - yScale;
-    context->viewport.nearVal = zOffset - zScale;
-    context->viewport.farVal = zOffset + zScale;
+    context->viewport.nearVal = zOffset + zScale;
+    context->viewport.farVal = zOffset - zScale;
     if (context->viewport.enabled) {
         glViewport(context->viewport.x, context->viewport.y, abs(context->viewport.w), abs(context->viewport.h));
         glDepthRange(context->viewport.nearVal, context->viewport.farVal);
@@ -1344,7 +1345,7 @@ EXPORT(void, sceGxmSetViewportEnable, SceGxmContext *context, SceGxmViewportMode
         glDepthRange(context->viewport.nearVal, context->viewport.farVal);
     } else {
         glViewport(0, 0, host.display.image_size.width, host.display.image_size.height);
-        glDepthRange(0.0f, 1.0f);
+        glDepthRange(1, 0);
     }
 }
 

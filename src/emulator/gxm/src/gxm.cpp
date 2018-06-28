@@ -912,17 +912,17 @@ GLenum translate_depth_func(SceGxmDepthFunc depth_func) {
     case SCE_GXM_DEPTH_FUNC_NEVER:
         return GL_NEVER;
     case SCE_GXM_DEPTH_FUNC_LESS:
-        return GL_LESS;
+        return GL_GREATER;
     case SCE_GXM_DEPTH_FUNC_EQUAL:
         return GL_EQUAL;
     case SCE_GXM_DEPTH_FUNC_LESS_EQUAL:
-        return GL_LEQUAL;
+        return GL_GEQUAL;
     case SCE_GXM_DEPTH_FUNC_GREATER:
-        return GL_GREATER;
+        return GL_LESS;
     case SCE_GXM_DEPTH_FUNC_NOT_EQUAL:
         return GL_NOTEQUAL;
     case SCE_GXM_DEPTH_FUNC_GREATER_EQUAL:
-        return GL_GEQUAL;
+        return GL_LEQUAL;
     case SCE_GXM_DEPTH_FUNC_ALWAYS:
         return GL_ALWAYS;
     }
