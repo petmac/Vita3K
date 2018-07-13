@@ -125,6 +125,11 @@ EXPORT(int, sceGxmBeginScene, SceGxmContext *context, unsigned int flags, const 
 
     // TODO This is just for debugging.
     glClear(GL_COLOR_BUFFER_BIT);
+    
+    if (depthStencil != nullptr) {
+        glClearDepth(depthStencil->backgroundDepth); // TODO Is this right?
+//        glClear(GL_DEPTH_BUFFER_BIT);
+    }
 
     return 0;
 }
