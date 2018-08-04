@@ -43,3 +43,6 @@
 [submodule "src/external/SPIRV-Cross"]
 	path = src/external/SPIRV-Cross
 	url = https://github.com/KhronosGroup/SPIRV-Cross.git
+[submodule "src/external/remotery"]
+	path = src/external/remotery
+	url = https://github.com/Celtoys/Remotery.git
