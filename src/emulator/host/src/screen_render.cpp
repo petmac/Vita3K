@@ -19,8 +19,8 @@
 #include <host/state.h>
 #include <util/log.h>
 
+#include <Remotery.h>
 #include <SDL_video.h>
-#include <microprofile.h>
 
 bool gl_screen_renderer::init(const std::string &base_path) {
     glGenTextures(1, &m_screen_texture);
@@ -79,7 +79,7 @@ bool gl_screen_renderer::init(const std::string &base_path) {
 }
 
 void gl_screen_renderer::render(const HostState &host) {
-    MICROPROFILE_SCOPEI("gl_screen_renderer", __func__, MP_HOTPINK);
+    rmt_ScopedCPUSample(gl_screen_renderer, 0);
 
     const DisplayState &display = host.display;
     const MemState &mem = host.mem;

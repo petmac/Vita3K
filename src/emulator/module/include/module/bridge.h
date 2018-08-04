@@ -24,7 +24,7 @@
 #include <host/import_fn.h>
 #include <host/state.h>
 
-#include <microprofile.h>
+#include <Remotery.h>
 
 // Function returns a value that is written to CPU registers.
 template <typename Ret, typename... Args, size_t... indices>
@@ -44,9 +44,14 @@ ImportFn bridge(Ret (*export_fn)(HostState &, SceUID, const char *, Args...), co
     constexpr ArgsLayout<Args...> args_layout = lay_out<typename BridgeTypes<Args>::ArmType...>();
 
     return [export_fn, export_name, args_layout](HostState &host, CPUState &cpu, SceUID thread_id) {
-        MICROPROFILE_SCOPEI("HLE", export_name, MP_YELLOW);
+        RMT_OPTIONAL(RMT_ENABLED, {
+            static rmtU32 rmt_sample_hash = 0;
+            _rmt_BeginCPUSample(export_name, 0, &rmt_sample_hash);
+        });
 
         using Indices = std::index_sequence_for<Args...>;
         call(export_fn, export_name, args_layout, Indices(), thread_id, cpu, host);
+
+        rmt_EndCPUSample();
     };
 }

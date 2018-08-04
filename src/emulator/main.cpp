@@ -24,6 +24,7 @@
 #include <util/log.h>
 #include <util/string_convert.h>
 
+#include <Remotery.h>
 #include <SDL.h>
 
 #include <gui/functions.h>
@@ -31,7 +32,18 @@
 
 #include <cstdlib>
 
+typedef std::unique_ptr<Remotery, std::function<void(Remotery *)>> RemoteryPtr;
+
+static RemoteryPtr remotery;
+
 int main(int argc, char *argv[]) {
+    Remotery *rmt = nullptr;
+    rmt_CreateGlobalInstance(&rmt);
+    if (rmt != nullptr) {
+        remotery = RemoteryPtr(rmt, _rmt_DestroyGlobalInstance);
+        rmt = nullptr;
+    }
+
     init_logging();
 
     LOG_INFO("{}", window_title);

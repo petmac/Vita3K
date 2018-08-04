@@ -79,8 +79,6 @@ EXPORT(int, sceDisplaySetFrameBuf, const emu::SceDisplayFrameBuf *pParam, SceDis
     host.display.image_size.y = pParam->height;
     ++host.frame_count;
 
-    MicroProfileFlip(nullptr);
-
     return SCE_DISPLAY_ERROR_OK;
 }
 

@@ -33,13 +33,12 @@
 #include <util/lock_and_find.h>
 #include <util/log.h>
 
+#include <Remotery.h>
 #include <SDL_events.h>
 #include <SDL_filesystem.h>
 #include <SDL_video.h>
-
 #include <glbinding-aux/types_to_string.h>
 #include <glbinding/Binding.h>
-#include <microprofile.h>
 
 #include <cassert>
 #include <iomanip>
@@ -92,15 +91,12 @@ static ImportFn resolve_import(uint32_t nid) {
     return ImportFn();
 }
 
-#if MICROPROFILE_ENABLED
 static void before_callback(const glbinding::FunctionCall &fn) {
-    const MicroProfileToken token = MicroProfileGetToken("OpenGL", fn.function->name(), MP_CYAN, MicroProfileTokenTypeCpu);
-    MICROPROFILE_ENTER_TOKEN(token);
+    rmt_BeginCPUSampleDynamic(fn.function->name(), 0);
 }
-#endif // MICROPROFILE_ENABLED
 
 static void after_callback(const glbinding::FunctionCall &fn) {
-    MICROPROFILE_LEAVE();
+    rmt_EndCPUSample();
     for (GLenum error = glGetError(); error != GL_NO_ERROR; error = glGetError()) {
         std::stringstream gl_error;
         gl_error << error;
@@ -194,9 +190,7 @@ bool init(HostState &state) {
     };
     Binding::initialize(get_proc_address, false);
     Binding::setCallbackMaskExcept(CallbackMask::Before | CallbackMask::After, { "glGetError" });
-#if MICROPROFILE_ENABLED != 0
-    Binding::setBeforeCallback(before_callback);
-#endif // MICROPROFILE_ENABLED
+    RMT_OPTIONAL(RMT_ENABLED, Binding::setBeforeCallback(before_callback));
     Binding::setAfterCallback(after_callback);
 
     state.kernel.base_tick = { rtc_base_ticks() };

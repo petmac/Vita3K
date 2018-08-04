@@ -50,10 +50,8 @@ target_include_directories(googletest PUBLIC googletest/googletest/include)
 target_include_directories(googletest PRIVATE googletest/googletest)
 target_compile_definitions(googletest PUBLIC GTEST_HAS_PTHREAD=0)
 
-add_library(microprofile STATIC microprofile/microprofile.cpp microprofile/microprofile.h)
-target_include_directories(microprofile PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/microprofile")
-set_property(TARGET microprofile PROPERTY CXX_STANDARD 11)
-target_compile_definitions(microprofile PUBLIC MICROPROFILE_ENABLED=0 MICROPROFILE_GPU_TIMERS=0)
+add_library(remotery STATIC remotery/lib/Remotery.c remotery/lib/Remotery.h)
+target_include_directories(remotery PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/remotery/lib")
 
 add_library(imgui STATIC imgui/imgui.cpp imgui/imgui_draw.cpp)
 target_include_directories(imgui PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/imgui")

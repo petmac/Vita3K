@@ -532,6 +532,8 @@ struct GxmThreadParams {
 static int SDLCALL thread_function(void *data) {
     const GxmThreadParams params = *static_cast<const GxmThreadParams *>(data);
     SDL_SemPost(params.host_may_destroy_params.get());
+    rmt_SetCurrentThreadName("Vita3K GXM");
+
     while (true) {
         auto display_callback = params.gxm->display_queue.pop();
         if (!display_callback)

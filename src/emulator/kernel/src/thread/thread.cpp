@@ -27,12 +27,14 @@
 #include <util/lock_and_find.h>
 #include <util/resource.h>
 
+#include <Remotery.h>
 #include <SDL_thread.h>
 
 #include <cassert>
 #include <cstring>
 
 struct ThreadParams {
+    std::string name;
     KernelState *kernel = nullptr;
     SceUID thid = SCE_KERNEL_ERROR_ILLEGAL_THREAD_ID;
     SceSize arglen = 0;
@@ -44,6 +46,8 @@ static int SDLCALL thread_function(void *data) {
     assert(data != nullptr);
     const ThreadParams params = *static_cast<const ThreadParams *>(data);
     SDL_SemPost(params.host_may_destroy_params.get());
+    rmt_SetCurrentThreadName(params.name.c_str());
+
     const ThreadStatePtr thread = lock_and_find(params.thid, params.kernel->threads, params.kernel->mutex);
     write_reg(*thread->cpu, 0, params.arglen);
     write_reg(*thread->cpu, 1, params.argp.address());
@@ -105,6 +109,7 @@ int start_thread(KernelState &kernel, const SceUID &thid, SceSize arglen, const 
     assert(thread);
 
     ThreadParams params;
+    params.name = waiting->second.name;
     params.kernel = &kernel;
     params.thid = thid;
     params.arglen = arglen;
@@ -119,7 +124,7 @@ int start_thread(KernelState &kernel, const SceUID &thid, SceSize arglen, const 
         SDL_WaitThread(running_thread, nullptr);
     };
 
-    const ThreadPtr running_thread(SDL_CreateThread(&thread_function, waiting->second.name.c_str(), &params), delete_thread);
+    const ThreadPtr running_thread(SDL_CreateThread(&thread_function, params.name.c_str(), &params), delete_thread);
     if (!running_thread) {
         return SCE_KERNEL_ERROR_THREAD_ERROR;
     }

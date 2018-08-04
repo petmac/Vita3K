@@ -8,4 +8,4 @@ add_library(
 
 target_include_directories(shadergen PUBLIC include)
 target_link_libraries(shadergen PUBLIC util vita-headers)
-target_link_libraries(shadergen PRIVATE gxm spirv-cross-glsl SPIRV microprofile)
+target_link_libraries(shadergen PRIVATE gxm spirv-cross-glsl SPIRV remotery)
