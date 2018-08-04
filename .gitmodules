@@ -16,9 +16,6 @@
 [submodule "src/external/vita-toolchain"]
 	path = src/external/vita-toolchain
 	url = https://github.com/vitasdk/vita-toolchain
-[submodule "src/external/microprofile"]
-	path = src/external/microprofile
-	url = https://github.com/jonasmr/microprofile.git
 [submodule "src/external/sdl2-cmake-scripts"]
 	path = src/external/sdl2-cmake-scripts
 	url = https://github.com/tcbrindle/sdl2-cmake-scripts.git
