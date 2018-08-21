@@ -291,10 +291,10 @@ public:
         return static_cast<SceGxmProgramType>(type & 1);
     }
     bool is_vertex() const {
-        return get_type() == emu::SceGxmProgramType::Vertex;
+        return get_type() == SCE_GXM_VERTEX_PROGRAM;
     }
     bool is_fragment() const {
-        return get_type() == emu::SceGxmProgramType::Fragment;
+        return get_type() == SCE_GXM_FRAGMENT_PROGRAM;
     }
 };
 
