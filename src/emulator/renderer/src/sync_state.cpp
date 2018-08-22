@@ -90,6 +90,8 @@ static GLenum translate_stencil_func(SceGxmStencilFunc stencil_func) {
 }
 
 static void set_stencil_state(GLenum face, const GxmStencilState &state) {
+    R_PROFILE(__func__);
+
     glStencilOpSeparate(face,
         translate_stencil_op(state.stencil_fail),
         translate_stencil_op(state.depth_fail),
@@ -98,30 +100,24 @@ static void set_stencil_state(GLenum face, const GxmStencilState &state) {
     glStencilMaskSeparate(face, state.write_mask);
 }
 
-bool sync_state(Context &context, const GxmContextState &state, const MemState &mem, bool enable_texture_cache) {
+static void log_active_shaders(const GxmContextState &state, const MemState &mem) {
     R_PROFILE(__func__);
 
-    // TODO Use some kind of caching to avoid setting every draw call?
-    const SharedGLObject program = compile_program(context.program_cache, state, mem);
-    if (!program) {
-        return false;
-    }
-    glUseProgram(program->get());
+    const SceGxmProgram &fragment_gxp_program = *state.fragment_program.get(mem)->program.get(mem);
+    const SceGxmProgram &vertex_gxp_program = *state.vertex_program.get(mem)->program.get(mem);
 
-    if (LOG_ACTIVE_SHADERS) {
-        const SceGxmProgram &fragment_gxp_program = *state.fragment_program.get(mem)->program.get(mem);
-        const SceGxmProgram &vertex_gxp_program = *state.vertex_program.get(mem)->program.get(mem);
+    const Sha256Hash hash_bytes_f = sha256(&fragment_gxp_program, fragment_gxp_program.size);
+    const Sha256HashText hash_text_f = hex(hash_bytes_f);
 
-        const Sha256Hash hash_bytes_f = sha256(&fragment_gxp_program, fragment_gxp_program.size);
-        const Sha256HashText hash_text_f = hex(hash_bytes_f);
+    const Sha256Hash hash_bytes_v = sha256(&vertex_gxp_program, vertex_gxp_program.size);
+    const Sha256HashText hash_text_v = hex(hash_bytes_v);
 
-        const Sha256Hash hash_bytes_v = sha256(&vertex_gxp_program, vertex_gxp_program.size);
-        const Sha256HashText hash_text_v = hex(hash_bytes_v);
+    LOG_DEBUG("\nVertex  : {}\nFragment: {}", (const char *)&hash_text_v, (const char *)&hash_text_f);
+}
 
-        LOG_DEBUG("\nVertex  : {}\nFragment: {}", (const char *)&hash_text_v, (const char *)&hash_text_f);
-    }
+static void sync_viewport(const GxmContextState &state) {
+    R_PROFILE(__func__);
 
-    // Viewport.
     const GLsizei display_w = state.color_surface.pbeEmitWords[0];
     const GLsizei display_h = state.color_surface.pbeEmitWords[1];
     const GxmViewport &viewport = state.viewport;
@@ -136,9 +132,12 @@ bool sync_state(Context &context, const GxmContextState &state, const MemState &
         glViewport(0, 0, display_w, display_h);
         glDepthRange(0, 1);
     }
+}
 
-    // Clipping.
-    // TODO: There was some math here to round the scissor rect, but it looked potentially incorrect.
+static void sync_scissor(const GxmContextState &state) {
+    R_PROFILE(__func__);
+
+    const GLsizei display_h = state.color_surface.pbeEmitWords[1];
     const GLsizei scissor_x = state.region_clip_min.x;
     const GLsizei scissor_y = display_h - state.region_clip_max.y - 1;
     const GLsizei scissor_w = state.region_clip_max.x - state.region_clip_min.x + 1;
@@ -161,8 +160,11 @@ bool sync_state(Context &context, const GxmContextState &state, const MemState &
         LOG_WARN("Unimplemented region clip mode used: SCE_GXM_REGION_CLIP_INSIDE");
         break;
     }
+}
 
-    // Culling.
+static void sync_culling(const GxmContextState &state) {
+    R_PROFILE(__func__);
+
     switch (state.cull_mode) {
     case SCE_GXM_CULL_CCW:
         glEnable(GL_CULL_FACE);
@@ -176,8 +178,11 @@ bool sync_state(Context &context, const GxmContextState &state, const MemState &
         glDisable(GL_CULL_FACE);
         break;
     }
+}
 
-    // Depth test.
+static void sync_depth_test(const GxmContextState &state) {
+    R_PROFILE(__func__);
+
     if (state.depth_stencil_surface.depthData) {
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(translate_depth_func(state.front_depth_func));
@@ -185,8 +190,11 @@ bool sync_state(Context &context, const GxmContextState &state, const MemState &
     } else {
         glDisable(GL_DEPTH_TEST);
     }
+}
 
-    // Stencil.
+static void sync_stencil(const GxmContextState &state) {
+    R_PROFILE(__func__);
+
     if (state.depth_stencil_surface.stencilData) {
         glEnable(GL_STENCIL_TEST);
         set_stencil_state(GL_FRONT, state.front_stencil);
@@ -194,8 +202,11 @@ bool sync_state(Context &context, const GxmContextState &state, const MemState &
     } else {
         glDisable(GL_STENCIL_TEST);
     }
+}
 
-    // Blending.
+static void sync_blending(const GxmContextState &state, const MemState &mem) {
+    R_PROFILE(__func__);
+
     const SceGxmFragmentProgram &gxm_fragment_program = *state.fragment_program.get(mem);
     const FragmentProgram &fragment_program = *gxm_fragment_program.renderer_data.get();
     glColorMask(fragment_program.color_mask_red, fragment_program.color_mask_green, fragment_program.color_mask_blue, fragment_program.color_mask_alpha);
@@ -206,8 +217,12 @@ bool sync_state(Context &context, const GxmContextState &state, const MemState &
     } else {
         glDisable(GL_BLEND);
     }
+}
 
-    // Textures.
+static void sync_textures(Context &context, const GxmContextState &state, const MemState &mem, bool enable_texture_cache) {
+    R_PROFILE(__func__);
+
+    const SceGxmFragmentProgram &gxm_fragment_program = *state.fragment_program.get(mem);
     const SceGxmProgram &fragment_gxp = *gxm_fragment_program.program.get(mem);
     const SceGxmProgramParameter *const fragment_params = gxp::program_parameters(fragment_gxp);
     for (size_t i = 0; i < fragment_gxp.parameter_count; ++i) {
@@ -235,11 +250,11 @@ bool sync_state(Context &context, const GxmContextState &state, const MemState &
         }
     }
     glActiveTexture(GL_TEXTURE0);
+}
 
-    // Uniforms.
-    set_uniforms(program->get(), state, mem);
+static void sync_vertex_attributes(Context &context, const GxmContextState &state, const MemState &mem) {
+    R_PROFILE(__func__);
 
-    // Vertex attributes.
     const SceGxmVertexProgram &vertex_program = *state.vertex_program.get(mem);
     for (const emu::SceGxmVertexAttribute &attribute : vertex_program.attributes) {
         const SceGxmVertexStream &stream = vertex_program.streams[attribute.streamIndex];
@@ -253,6 +268,31 @@ bool sync_state(Context &context, const GxmContextState &state, const MemState &
         glEnableVertexAttribArray(attrib_location);
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+bool sync_state(Context &context, const GxmContextState &state, const MemState &mem, bool enable_texture_cache) {
+    R_PROFILE(__func__);
+
+    // TODO Use some kind of caching to avoid setting every draw call?
+    const SharedGLObject program = compile_program(context.program_cache, state, mem);
+    if (!program) {
+        return false;
+    }
+    glUseProgram(program->get());
+
+    if (LOG_ACTIVE_SHADERS) {
+        log_active_shaders(state, mem);
+    }
+
+    sync_viewport(state);
+    sync_scissor(state);
+    sync_culling(state);
+    sync_depth_test(state);
+    sync_stencil(state);
+    sync_blending(state, mem);
+    sync_textures(context, state, mem, enable_texture_cache);
+    set_uniforms(program->get(), state, mem);
+    sync_vertex_attributes(context, state, mem);
 
     return true;
 }
