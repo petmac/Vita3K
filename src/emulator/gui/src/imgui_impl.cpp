@@ -24,6 +24,7 @@
 
 #include <SDL_video.h>
 #include <imgui.h>
+#include <microprofile.h>
 
 void imgui::init(SDL_Window *window) {
     ImGui::CreateContext();
@@ -33,13 +34,20 @@ void imgui::init(SDL_Window *window) {
 }
 
 void imgui::draw_begin(HostState &host) {
+    MICROPROFILE_SCOPEI("GUI", __func__, MP_GRAY);
+
     ImGui_ImplSdlGL3_NewFrame(host.window.get());
     host.gui.renderer_focused = !ImGui::GetIO().WantCaptureMouse;
 }
 
 void imgui::draw_end(SDL_Window *window) {
+    MICROPROFILE_SCOPEI("GUI", __func__, MP_GRAY);
+
     glViewport(0, 0, static_cast<int>(ImGui::GetIO().DisplaySize.x), static_cast<int>(ImGui::GetIO().DisplaySize.y));
     ImGui::Render();
     ImGui_ImplSdlGL3_RenderDrawData(ImGui::GetDrawData());
-    SDL_GL_SwapWindow(window);
+    {
+        MICROPROFILE_SCOPEI("SDL", "SDL_GL_SwapWindow", MP_GREEN);
+        SDL_GL_SwapWindow(window);
+    }
 }
