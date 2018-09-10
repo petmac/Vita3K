@@ -190,7 +190,7 @@ bool run_thread(ThreadState &thread, bool callback) {
     }
 }
 
-bool run_callback(ThreadState &thread, Address &pc, Address &data) {
+bool run_callback(ThreadState &thread, Address pc, Address data) {
     std::unique_lock<std::mutex> lock(thread.mutex);
     write_reg(*thread.cpu, 0, data);
     write_pc(*thread.cpu, pc);
