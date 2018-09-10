@@ -4,3 +4,4 @@ add_library(
 )
 
 target_include_directories(threads INTERFACE include)
+target_link_libraries(threads INTERFACE ${Boost_LIBRARIES})

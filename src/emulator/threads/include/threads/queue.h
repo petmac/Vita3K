@@ -1,9 +1,10 @@
 #ifndef queue_h
 #define queue_h
 
+#include <boost/optional.hpp>
+
 #include <atomic>
 #include <condition_variable>
-#include <memory>
 #include <mutex>
 #include <queue>
 
@@ -12,7 +13,7 @@ class Queue {
 public:
     unsigned int displayQueueMaxPendingCount_;
 
-    std::unique_ptr<T> pop() {
+    boost::optional<T> pop() {
         T item{ T() };
         {
             std::unique_lock<std::mutex> mlock(mutex_);
@@ -25,14 +26,14 @@ public:
 #ifndef WIN32
                 mlock.release();
 #endif
-                return {};
+                return boost::none;
             }
 
             item = queue_.front();
             queue_.pop();
         }
         cond_.notify_one();
-        return std::make_unique<T>(item);
+        return item;
     }
 
     void push(const T &item) {
