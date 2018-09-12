@@ -417,6 +417,7 @@ EXPORT(int, sceGxmDraw, SceGxmContext *context, SceGxmPrimitiveType primType, Sc
         return RET_ERROR(SCE_GXM_ERROR_DRIVER);
     }
 
+    memset(&context->state.dirty, 0, sizeof(context->state.dirty));
     renderer::draw(context->renderer, context->state, primType, indexType, indexData, indexCount, host.mem);
 
     return 0;
@@ -1033,6 +1034,7 @@ EXPORT(void, sceGxmSetFragmentProgram, SceGxmContext *context, Ptr<const SceGxmF
     assert(fragmentProgram);
 
     context->state.fragment_program = fragmentProgram;
+    context->state.dirty.fragment_program = true;
 }
 
 EXPORT(int, sceGxmSetFragmentTexture, SceGxmContext *context, unsigned int textureIndex, const SceGxmTexture *texture) {
@@ -1040,7 +1042,8 @@ EXPORT(int, sceGxmSetFragmentTexture, SceGxmContext *context, unsigned int textu
     assert(texture != nullptr);
 
     context->state.fragment_textures[textureIndex] = *texture;
-
+    context->state.dirty.fragment_textures = true;
+    
     return 0;
 }
 

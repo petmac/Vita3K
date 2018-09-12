@@ -255,6 +255,10 @@ static void sync_blending(const GxmContextState &state, const MemState &mem) {
 static void sync_textures(Context &context, const GxmContextState &state, const MemState &mem, bool enable_texture_cache) {
     R_PROFILE(__func__);
 
+    if (!state.dirty.fragment_program && !state.dirty.fragment_textures) {
+//        return;
+    }
+    
     const SceGxmFragmentProgram &gxm_fragment_program = *state.fragment_program.get(mem);
     const SceGxmProgram &fragment_gxp = *gxm_fragment_program.program.get(mem);
     const SceGxmProgramParameter *const fragment_params = gxp::program_parameters(fragment_gxp);

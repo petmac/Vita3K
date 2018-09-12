@@ -88,7 +88,14 @@ struct SceGxmSyncObject {
     void *value;
 };
 
+struct GxmDirtyFlags {
+    bool fragment_program = true;
+    bool fragment_textures = true;
+};
+
 struct GxmContextState {
+    GxmDirtyFlags dirty;
+    
     // Constant after initialisation.
     emu::SceGxmContextParams params;
 
