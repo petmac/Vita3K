@@ -55,7 +55,8 @@ static void bind_attribute_locations(GLuint gl_program, const VertexProgram &pro
 
 SharedGLObject compile_program(ProgramCache &cache, const GxmContextState &state, const MemState &mem) {
     R_PROFILE(__func__);
-
+    return SharedGLObject();
+    
     assert(state.fragment_program);
     assert(state.vertex_program);
 

@@ -53,7 +53,7 @@ struct DisplayState {
 
     // Synchronize host rendering to guest (GXM) rendering
     // Used for debugging (so that graphics debuggers pick up GXM OpenGL calls)
-    static constexpr bool sync_rendering{ false };
+    static constexpr bool sync_rendering{ true };
 };
 
 struct HostState {

@@ -80,11 +80,13 @@ static size_t find_lru(const TextureCacheTimestamps &timestamps, TextureCacheTim
 }
 
 bool init(TextureCacheState &cache) {
+    return true;
     return cache.textures.init(&glGenTextures, &glDeleteTextures);
 }
 
 void cache_and_bind_texture(TextureCacheState &cache, const SceGxmTexture &gxm_texture, const MemState &mem) {
     R_PROFILE(__func__);
+    return;
 
     size_t index = 0;
     bool configure = false;

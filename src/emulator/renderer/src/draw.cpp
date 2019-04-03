@@ -32,6 +32,7 @@ static GLenum translate_primitive(SceGxmPrimitiveType primType) {
 
 void draw(Context &context, const GxmContextState &state, SceGxmPrimitiveType type, SceGxmIndexFormat format, const void *indices, size_t count, const MemState &mem) {
     R_PROFILE(__func__);
+    return;
 
     // Upload index data.
     const GLsizeiptr index_size = (format == SCE_GXM_INDEX_FORMAT_U16) ? 2 : 4;

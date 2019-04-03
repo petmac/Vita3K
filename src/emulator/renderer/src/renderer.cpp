@@ -107,7 +107,8 @@ static void flip_vertically(uint32_t *pixels, size_t width, size_t height, size_
 
 bool create(Context &context, SDL_Window *window) {
     R_PROFILE(__func__);
-
+    return true;
+    
     assert(SDL_GL_GetCurrentContext() == nullptr);
     context.gl = GLContextPtr(SDL_GL_CreateContext(window), SDL_GL_DeleteContext);
     assert(context.gl != nullptr);
@@ -135,6 +136,7 @@ bool create(Context &context, SDL_Window *window) {
 
 bool create(RenderTarget &rt, const SceGxmRenderTargetParams &params) {
     R_PROFILE(__func__);
+    return true;
 
     if (!rt.renderbuffers.init(glGenRenderbuffers, glDeleteRenderbuffers) || !rt.framebuffer.init(glGenFramebuffers, glDeleteFramebuffers)) {
         return false;
@@ -156,6 +158,7 @@ bool create(RenderTarget &rt, const SceGxmRenderTargetParams &params) {
 
 bool create(FragmentProgram &fp, State &state, const SceGxmProgram &program, const emu::SceGxmBlendInfo *blend, const char *base_path, const char *title_id) {
     R_PROFILE(__func__);
+    return true;
 
     fp.glsl = load_shader(state.fragment_glsl_cache, program, base_path, title_id);
 
@@ -179,6 +182,7 @@ bool create(FragmentProgram &fp, State &state, const SceGxmProgram &program, con
 
 bool create(VertexProgram &vp, State &state, const SceGxmProgram &program, const char *base_path, const char *title_id) {
     R_PROFILE(__func__);
+    return true;
 
     vp.glsl = load_shader(state.vertex_glsl_cache, program, base_path, title_id);
     vp.attribute_locations = attribute_locations(program);
@@ -188,6 +192,7 @@ bool create(VertexProgram &vp, State &state, const SceGxmProgram &program, const
 
 void begin_scene(const RenderTarget &rt) {
     R_PROFILE(__func__);
+    return;
 
     glBindFramebuffer(GL_FRAMEBUFFER, rt.framebuffer[0]);
 
@@ -197,6 +202,7 @@ void begin_scene(const RenderTarget &rt) {
 
 void end_scene(Context &context, SceGxmSyncObject *sync_object, size_t width, size_t height, size_t stride_in_pixels, uint32_t *pixels) {
     R_PROFILE(__func__);
+    /*return;
 
     if (sync_object != nullptr) {
         sync_object->value = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, GL_NONE_BIT);
@@ -206,18 +212,21 @@ void end_scene(Context &context, SceGxmSyncObject *sync_object, size_t width, si
     glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
     glPixelStorei(GL_PACK_ROW_LENGTH, 0);
 
-    flip_vertically(pixels, width, height, stride_in_pixels);
+    flip_vertically(pixels, width, height, stride_in_pixels);*/
+    memset(pixels, 0xff, stride_in_pixels * height * 4);
 
     ++context.texture_cache.timestamp;
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    /*glBindFramebuffer(GL_FRAMEBUFFER, 0);*/
 }
 
 void finish(Context &context) {
+    return;
     glFinish();
 }
 
 void wait_sync_object(SceGxmSyncObject *sync_object) {
+    return;
     if (sync_object->value)
         glClientWaitSync(reinterpret_cast<GLsync>(sync_object->value), GL_SYNC_FLUSH_COMMANDS_BIT, 1000000000);
 }

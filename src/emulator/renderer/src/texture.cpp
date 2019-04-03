@@ -14,6 +14,7 @@ namespace texture {
 
 void bind_texture(TextureCacheState &cache, const SceGxmTexture &gxm_texture, const MemState &mem) {
     R_PROFILE(__func__);
+    return;
 
     glBindTexture(GL_TEXTURE_2D, cache.textures[0]);
     configure_bound_texture(gxm_texture);
@@ -22,6 +23,7 @@ void bind_texture(TextureCacheState &cache, const SceGxmTexture &gxm_texture, co
 
 void configure_bound_texture(const SceGxmTexture &gxm_texture) {
     R_PROFILE(__func__);
+    return;
 
     const SceGxmTextureFormat fmt = gxm::get_format(&gxm_texture);
     const SceGxmTextureAddrMode uaddr = (SceGxmTextureAddrMode)(gxm_texture.uaddr_mode);
@@ -48,6 +50,7 @@ void configure_bound_texture(const SceGxmTexture &gxm_texture) {
 
 void upload_bound_texture(const SceGxmTexture &gxm_texture, const MemState &mem) {
     R_PROFILE(__func__);
+    return;
 
     const SceGxmTextureFormat fmt = gxm::get_format(&gxm_texture);
     const unsigned int width = gxm::get_width(&gxm_texture);

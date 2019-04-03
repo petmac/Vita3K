@@ -189,6 +189,7 @@ static void set_uniforms(GLuint gl_program, ShaderProgram &shader_program, const
 
 void set_uniforms(GLuint program, const GxmContextState &state, const MemState &mem, bool log_uniforms) {
     R_PROFILE(__func__);
+    return;
 
     assert(state.fragment_program);
     assert(state.vertex_program);

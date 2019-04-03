@@ -99,7 +99,8 @@ static void set_stencil_state(GLenum face, const GxmStencilState &state) {
 
 bool sync_state(Context &context, const GxmContextState &state, const MemState &mem, bool enable_texture_cache, bool log_active_shaders, bool log_uniforms) {
     R_PROFILE(__func__);
-
+    return true;
+    
     // TODO Use some kind of caching to avoid setting every draw call?
     const SharedGLObject program = compile_program(context.program_cache, state, mem);
     if (!program) {
